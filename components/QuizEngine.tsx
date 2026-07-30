@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
+import { clearCheckpoint, loadCheckpoint, saveCheckpoint } from '@/lib/quizStorage';
 import { QuizBank, Question } from '@/lib/types';
 import ResultsScreen from './ResultsScreen';
 
@@ -17,6 +18,8 @@ export default function QuizEngine({ bank, questions }: Props) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [timeLeft, setTimeLeft] = useState(bank.duration_seconds);
   const [finished, setFinished] = useState(false);
+  const [resuming, setResuming] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const currentQuestion = questions[currentIndex];
   const answeredCurrent = answers[currentQuestion.id] !== undefined;
@@ -32,9 +35,53 @@ export default function QuizEngine({ bank, questions }: Props) {
       .catch(() => {});
   }, []);
 
-  const finishQuiz = useCallback(() => {
-    setFinished(true);
+  // Restore a mid-quiz checkpoint (if any) after mount, so the server-rendered
+  // fresh state always matches the first client render and avoids a hydration
+  // mismatch.
+  useEffect(() => {
+    const checkpoint = loadCheckpoint(bank.slug);
+    if (checkpoint) {
+      const restoredAnswers: Record<string, number> = {};
+      checkpoint.selected.forEach((value, i) => {
+        const question = questions[i];
+        if (question && checkpoint.revealed[i] && value !== null) {
+          restoredAnswers[question.id] = value;
+        }
+      });
+
+      setCurrentIndex(Math.min(Math.max(checkpoint.current, 0), questions.length - 1));
+      setAnswers(restoredAnswers);
+      setTimeLeft(Math.min(Math.max(checkpoint.timeLeft, 0), bank.duration_seconds));
+      setResuming(true);
+    }
+    setReady(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Persist a checkpoint on every meaningful change, once the initial
+  // restore attempt has completed. A quiz with no progress yet (still on Q1,
+  // nothing answered) has nothing worth resuming, so keep the key absent —
+  // otherwise "Start fresh"/"Try again" would immediately recreate an empty
+  // checkpoint on the very next render.
+  useEffect(() => {
+    if (!ready || finished) return;
+    const hasProgress = currentIndex > 0 || Object.keys(answers).length > 0;
+    if (!hasProgress) {
+      clearCheckpoint(bank.slug);
+      return;
+    }
+    saveCheckpoint(bank.slug, {
+      current: currentIndex,
+      selected: questions.map((q) => (answers[q.id] !== undefined ? answers[q.id] : null)),
+      revealed: questions.map((q) => answers[q.id] !== undefined),
+      timeLeft,
+    });
+  }, [ready, finished, currentIndex, answers, timeLeft, bank.slug, questions]);
+
+  const finishQuiz = useCallback(() => {
+    clearCheckpoint(bank.slug);
+    setFinished(true);
+  }, [bank.slug]);
 
   useEffect(() => {
     if (finished) return;
@@ -59,6 +106,23 @@ export default function QuizEngine({ bank, questions }: Props) {
     }
   }
 
+  function handleStartFresh() {
+    clearCheckpoint(bank.slug);
+    setCurrentIndex(0);
+    setAnswers({});
+    setTimeLeft(bank.duration_seconds);
+    setResuming(false);
+  }
+
+  function handleRetry() {
+    clearCheckpoint(bank.slug);
+    setCurrentIndex(0);
+    setAnswers({});
+    setTimeLeft(bank.duration_seconds);
+    setResuming(false);
+    setFinished(false);
+  }
+
   if (finished) {
     return (
       <ResultsScreen
@@ -67,6 +131,7 @@ export default function QuizEngine({ bank, questions }: Props) {
         answers={answers}
         timeTakenS={bank.duration_seconds - Math.max(timeLeft, 0)}
         user={user}
+        onRetry={handleRetry}
       />
     );
   }
@@ -78,6 +143,18 @@ export default function QuizEngine({ bank, questions }: Props) {
 
   return (
     <div className="mt-8">
+      {resuming && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-accent/40 bg-accent/10 px-4 py-3 text-sm">
+          <span>Resuming your previous session</span>
+          <button
+            onClick={handleStartFresh}
+            className="text-accent underline hover:opacity-80 transition-opacity"
+          >
+            Start fresh
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-2 text-sm text-gray-400">
         <span>
           Question {currentIndex + 1} of {questions.length}

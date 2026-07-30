@@ -11,6 +11,7 @@ type Props = {
   answers: Record<string, number>;
   timeTakenS: number;
   user: User | null;
+  onRetry: () => void;
 };
 
 export default function ResultsScreen({
@@ -19,6 +20,7 @@ export default function ResultsScreen({
   answers,
   timeTakenS,
   user,
+  onRetry,
 }: Props) {
   const [copied, setCopied] = useState(false);
 
@@ -83,12 +85,27 @@ export default function ResultsScreen({
   }, [user]);
 
   async function handleShare() {
-    const text = `I scored ${percentage}% on "${bank.name}" — ${
-      passed ? 'passed ✅' : 'keep practicing 💪'
-    } on QuizOps.`;
+    const emoji = passed ? '✅' : '📚';
+    const verb = passed ? 'Passed' : 'Attempted';
+    const text = [
+      `${emoji} ${verb} the ${bank.name} quiz on QuizOps!`,
+      `Score: ${score}/${questions.length} (${percentage}%)`,
+      ``,
+      `Test your knowledge → https://quiz.autoshiftops.com/quiz/${bank.slug}`,
+    ].join('\n');
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch {
+        // User cancelled the native share sheet — nothing to do.
+      }
+      return;
+    }
+
     await navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   return (
@@ -157,7 +174,13 @@ export default function ResultsScreen({
           onClick={handleShare}
           className="px-5 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
         >
-          {copied ? 'Copied!' : 'Share score'}
+          {copied ? 'Copied!' : 'Share result'}
+        </button>
+        <button
+          onClick={onRetry}
+          className="px-5 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+        >
+          Try again
         </button>
         {bank.source_url && (
           <a
