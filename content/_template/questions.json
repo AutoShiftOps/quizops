@@ -1,0 +1,11 @@
+[
+  {
+    "id": "q1",
+    "text": "Question text here?",
+    "code": null,
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": 0,
+    "explanation": "Explanation of why A is correct.",
+    "tags": ["topic-tag"]
+  }
+]

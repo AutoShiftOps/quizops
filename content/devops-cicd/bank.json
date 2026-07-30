@@ -1,0 +1,11 @@
+{
+  "slug": "devops-cicd",
+  "name": "DevOps & CI/CD Fundamentals",
+  "description": "Test your knowledge of DevOps principles, CI/CD pipelines, and delivery practices.",
+  "topic": "DevOps",
+  "emoji": "⚙️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 20
+}

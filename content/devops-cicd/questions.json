@@ -1,0 +1,282 @@
+[
+  {
+    "id": "q1",
+    "text": "What is the primary goal of Continuous Integration (CI)?",
+    "code": null,
+    "options": [
+      "To automatically deploy every change straight to production",
+      "To frequently merge code changes into a shared branch and verify them with automated builds and tests",
+      "To replace manual code review entirely",
+      "To manage infrastructure provisioning across cloud providers"
+    ],
+    "answer": 1,
+    "explanation": "CI is the practice of merging developers' changes into a shared branch frequently, with each merge automatically built and tested to catch integration issues early.",
+    "tags": ["ci-cd"]
+  },
+  {
+    "id": "q2",
+    "text": "What distinguishes Continuous Delivery from Continuous Deployment?",
+    "code": null,
+    "options": [
+      "Continuous Delivery requires no automated testing, while Continuous Deployment does",
+      "There is no meaningful difference; the terms are interchangeable",
+      "Continuous Delivery ensures every change is release-ready but requires a manual approval to release, while Continuous Deployment releases automatically to production without manual intervention",
+      "Continuous Deployment only applies to mobile applications"
+    ],
+    "answer": 2,
+    "explanation": "Continuous Delivery keeps every build in a deployable state, with a human deciding when to release. Continuous Deployment goes one step further and automatically releases every passing build to production.",
+    "tags": ["ci-cd"]
+  },
+  {
+    "id": "q3",
+    "text": "In trunk-based development, how do developers typically manage feature work that isn't ready for release?",
+    "code": null,
+    "options": [
+      "They maintain long-lived feature branches for months until the feature is complete",
+      "They commit small, frequent changes directly to the trunk/main branch, often hidden behind feature flags",
+      "They fork the entire repository for each feature",
+      "They pause all other development until the feature ships"
+    ],
+    "answer": 1,
+    "explanation": "Trunk-based development favors short-lived branches or direct commits to main, using feature flags to hide incomplete work rather than isolating it in long-lived branches.",
+    "tags": ["branching"]
+  },
+  {
+    "id": "q4",
+    "text": "In Gitflow, which branch is typically used to prepare a new production release, allowing final bug fixes and version bumps?",
+    "code": null,
+    "options": [
+      "hotfix",
+      "develop",
+      "release",
+      "feature"
+    ],
+    "answer": 2,
+    "explanation": "Gitflow's release branches are cut from develop to stabilize a version — final fixes and metadata updates happen here before merging into main and back into develop.",
+    "tags": ["branching"]
+  },
+  {
+    "id": "q5",
+    "text": "What is a key benefit of using feature flags in a delivery pipeline?",
+    "code": null,
+    "options": [
+      "They eliminate the need for automated testing",
+      "They allow teams to merge and deploy incomplete or experimental code paths while keeping them disabled for users until ready",
+      "They automatically roll back failed deployments without configuration",
+      "They replace the need for a version control system"
+    ],
+    "answer": 1,
+    "explanation": "Feature flags decouple deployment from release, letting code ship to production dark (disabled) and be toggled on later, independent of the deploy process.",
+    "tags": ["branching"]
+  },
+  {
+    "id": "q6",
+    "text": "Which sequence best represents the typical stages of a CI/CD pipeline?",
+    "code": null,
+    "options": [
+      "Deploy → Build → Test → Monitor",
+      "Build → Test → Deploy → Monitor",
+      "Test → Deploy → Build → Monitor",
+      "Monitor → Build → Deploy → Test"
+    ],
+    "answer": 1,
+    "explanation": "A standard pipeline compiles/packages the code (build), validates it (test), releases it to an environment (deploy), and then observes it in production (monitor).",
+    "tags": ["pipeline"]
+  },
+  {
+    "id": "q7",
+    "text": "Why is it best practice to fail a pipeline fast when the build stage fails?",
+    "code": null,
+    "options": [
+      "To give faster feedback to developers so they can fix issues before wasting time on later stages like testing and deployment",
+      "Because later pipeline stages are always more expensive to run financially",
+      "To avoid triggering notifications to the team",
+      "Failing fast has no real benefit, it's just a convention"
+    ],
+    "answer": 0,
+    "explanation": "Fail-fast pipelines surface problems as early as possible, minimizing wasted compute and giving developers rapid feedback instead of discovering build issues only after tests or deployment run.",
+    "tags": ["pipeline"]
+  },
+  {
+    "id": "q8",
+    "text": "What is the main difference between a Docker image and a Docker container?",
+    "code": null,
+    "options": [
+      "An image is a running instance of a container",
+      "A container is a running instance of an image; the image is the immutable template",
+      "Images and containers are the same thing with different names",
+      "A container can only run one image at a time forever, while images can run many containers"
+    ],
+    "answer": 1,
+    "explanation": "A Docker image is a read-only template containing the application and its dependencies. A container is a running (or stopped) instance created from that image.",
+    "tags": ["docker"]
+  },
+  {
+    "id": "q9",
+    "text": "What is the purpose of a Dockerfile?",
+    "code": null,
+    "options": [
+      "It stores runtime logs generated by a container",
+      "It is a declarative set of instructions used to build a Docker image",
+      "It is a network configuration file for container orchestration",
+      "It replaces the need for a container registry"
+    ],
+    "answer": 1,
+    "explanation": "A Dockerfile contains step-by-step instructions (base image, copy files, install dependencies, set entrypoint, etc.) that Docker uses to build an image.",
+    "tags": ["docker"]
+  },
+  {
+    "id": "q10",
+    "text": "Why does Docker's layered filesystem matter for build performance?",
+    "code": null,
+    "options": [
+      "It doesn't affect performance at all, layers are purely cosmetic",
+      "Each instruction in a Dockerfile creates a cacheable layer, so unchanged layers can be reused, speeding up rebuilds",
+      "Layers must always be rebuilt from scratch on every build, regardless of caching",
+      "Layers only apply to Windows containers, not Linux containers"
+    ],
+    "answer": 1,
+    "explanation": "Docker caches each layer produced by a Dockerfile instruction. If an earlier layer hasn't changed, Docker reuses the cache instead of rebuilding it, significantly speeding up iterative builds.",
+    "tags": ["docker"]
+  },
+  {
+    "id": "q11",
+    "text": "Which of these is a defining characteristic of GitHub Actions compared to a traditional standalone CI server like Jenkins?",
+    "code": null,
+    "options": [
+      "GitHub Actions workflows are defined in YAML files stored in the repository itself and are triggered natively by GitHub events",
+      "GitHub Actions requires a separately hosted master server that must be manually maintained by the team",
+      "GitHub Actions cannot run tests, only deployments",
+      "Jenkins is a cloud-only SaaS product with no self-hosting option"
+    ],
+    "answer": 0,
+    "explanation": "GitHub Actions workflows live as YAML in `.github/workflows/` and react directly to repository events (push, PR, release), whereas Jenkins traditionally runs as a separately maintained server with pipelines often defined via a Jenkinsfile or UI configuration.",
+    "tags": ["ci-tools"]
+  },
+  {
+    "id": "q12",
+    "text": "In GitLab CI, what is the role of the `.gitlab-ci.yml` file?",
+    "code": null,
+    "options": [
+      "It stores the project's README documentation",
+      "It defines the stages, jobs, and rules that make up the CI/CD pipeline for the repository",
+      "It is used exclusively for managing user permissions",
+      "It configures the Git commit message template"
+    ],
+    "answer": 1,
+    "explanation": "`.gitlab-ci.yml` is GitLab's pipeline configuration file, defining stages (e.g., build, test, deploy) and the jobs that run within them.",
+    "tags": ["ci-tools"]
+  },
+  {
+    "id": "q13",
+    "text": "What is a blue-green deployment strategy?",
+    "code": null,
+    "options": [
+      "Running two identical production environments where traffic is switched from the old (blue) to the new (green) version, enabling instant rollback",
+      "Gradually shifting a small percentage of traffic to a new version over time",
+      "Deploying updates to servers one at a time in a rolling sequence",
+      "A strategy that only applies to database schema migrations"
+    ],
+    "answer": 0,
+    "explanation": "Blue-green deployment maintains two full environments. Traffic is cut over to the new (green) environment once verified, and rollback is as simple as routing back to blue.",
+    "tags": ["deployment"]
+  },
+  {
+    "id": "q14",
+    "text": "How does a canary deployment differ from a rolling deployment?",
+    "code": null,
+    "options": [
+      "They are identical strategies with different names",
+      "A canary release exposes a new version to a small subset of users/traffic first to validate it before a full rollout, while a rolling deployment incrementally replaces all instances of the old version with the new one",
+      "A canary deployment requires downtime, while a rolling deployment never does",
+      "Rolling deployments are only used for database changes"
+    ],
+    "answer": 1,
+    "explanation": "Canary deployments limit exposure to a small slice of traffic to validate the new version's behavior in production before a broader rollout, while rolling deployments progressively update instances across the full fleet.",
+    "tags": ["deployment"]
+  },
+  {
+    "id": "q15",
+    "text": "What core principle does Infrastructure as Code (IaC) rely on?",
+    "code": null,
+    "options": [
+      "Manually configuring servers through a GUI to avoid documentation drift",
+      "Defining and provisioning infrastructure through machine-readable configuration files that can be versioned, reviewed, and reused",
+      "Storing infrastructure credentials directly inside application source code",
+      "Avoiding automation to keep infrastructure changes auditable"
+    ],
+    "answer": 1,
+    "explanation": "IaC treats infrastructure configuration as code — version-controlled, reviewable, and repeatable — instead of manual, undocumented changes made through consoles or ad hoc scripts.",
+    "tags": ["iac"]
+  },
+  {
+    "id": "q16",
+    "text": "Why is idempotency an important property for Infrastructure as Code tools like Terraform?",
+    "code": null,
+    "options": [
+      "It ensures running the same configuration multiple times produces the same end state without unintended side effects",
+      "It guarantees the infrastructure will never need to change again",
+      "It means the tool automatically writes application code for you",
+      "It has no practical importance in IaC tooling"
+    ],
+    "answer": 0,
+    "explanation": "Idempotent IaC tooling means applying the same configuration repeatedly converges to the same infrastructure state, making it safe to re-run without introducing drift or duplicate resources.",
+    "tags": ["iac"]
+  },
+  {
+    "id": "q17",
+    "text": "What is the primary difference between monitoring and observability?",
+    "code": null,
+    "options": [
+      "Monitoring tracks predefined metrics and alerts against known failure modes, while observability provides the tools to explore and understand unknown or unanticipated system states",
+      "They are the exact same concept with different marketing names",
+      "Observability only refers to log storage, nothing else",
+      "Monitoring requires no dashboards or alerting"
+    ],
+    "answer": 0,
+    "explanation": "Monitoring answers 'is something wrong?' using known metrics and thresholds, while observability (via logs, metrics, and traces) lets engineers investigate novel or unexpected problems they didn't anticipate in advance.",
+    "tags": ["observability"]
+  },
+  {
+    "id": "q18",
+    "text": "Which three data types are commonly described as the 'three pillars of observability'?",
+    "code": null,
+    "options": [
+      "Metrics, logs, and traces",
+      "Backups, snapshots, and archives",
+      "Commits, branches, and tags",
+      "Containers, images, and volumes"
+    ],
+    "answer": 0,
+    "explanation": "Metrics (numeric time-series data), logs (discrete event records), and traces (request flow across services) together give teams visibility into system behavior.",
+    "tags": ["observability"]
+  },
+  {
+    "id": "q19",
+    "text": "What does 'shift-left testing' mean in a DevOps context?",
+    "code": null,
+    "options": [
+      "Moving testing activities earlier in the development lifecycle so defects are found and fixed sooner, rather than only at the end",
+      "Testing only after the application has been deployed to production",
+      "Reassigning all testing responsibilities exclusively to a dedicated QA team late in the cycle",
+      "Removing automated tests in favor of manual exploratory testing"
+    ],
+    "answer": 0,
+    "explanation": "Shift-left testing moves quality checks (unit tests, static analysis, security scans) earlier in the pipeline, closer to when code is written, reducing the cost and delay of fixing defects found later.",
+    "tags": ["testing"]
+  },
+  {
+    "id": "q20",
+    "text": "What is the purpose of an artifact repository (such as Nexus, Artifactory, or a container registry) in a CI/CD pipeline?",
+    "code": null,
+    "options": [
+      "It stores and versions build outputs (binaries, packages, container images) so they can be reliably retrieved and deployed across environments",
+      "It is only used for storing source code, replacing the need for Git",
+      "It exists solely to host documentation for the project",
+      "It manages user authentication for the CI server"
+    ],
+    "answer": 0,
+    "explanation": "Artifact repositories store the versioned, immutable outputs of a build (JARs, npm packages, Docker images, etc.), ensuring the exact same artifact tested in CI is the one promoted through each environment to production.",
+    "tags": ["artifacts"]
+  }
+]

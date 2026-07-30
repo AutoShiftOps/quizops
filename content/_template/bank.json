@@ -1,0 +1,11 @@
+{
+  "slug": "your-topic-slug",
+  "name": "Your Quiz Name",
+  "description": "One sentence describing what this tests.",
+  "topic": "Category e.g. DevOps, Cloud, Frontend",
+  "emoji": "🚀",
+  "source_url": "https://autoshiftops.com/your-post",
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 20
+}
