@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import LoginButton from './LoginButton';
+import Logo from './Logo';
 
 export default function NavBar() {
   const [user, setUser] = useState<User | null>(null);
@@ -41,8 +42,8 @@ export default function NavBar() {
   return (
     <header className="border-b border-border">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-heading text-xl font-bold">
-          Quiz<span className="text-accent">Ops</span>
+        <Link href="/" className="flex items-center">
+          <Logo size="sm" showTagline={false} />
         </Link>
 
         <div>
