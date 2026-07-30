@@ -28,8 +28,14 @@ export const metadata: Metadata = {
       'Open-source quiz engine for DevOps, Cloud, and engineering certifications.',
     url: 'https://quiz.autoshiftops.com',
     siteName: 'QuizOps',
-    // TODO: replace og-image.png with branded version
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'QuizOps — Test your technical knowledge',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
