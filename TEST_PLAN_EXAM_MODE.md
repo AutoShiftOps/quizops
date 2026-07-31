@@ -321,25 +321,28 @@ ALTER TABLE quiz_attempts
 
 ## DEFECT LOG
 
+Tested at commit b9b8c27. Migration 002_exam_mode.sql not yet run — TC-E18
+Supabase verification pending.
+
 | TC | Status | Notes |
 |----|--------|-------|
-| TC-E01 | — | |
-| TC-E02 | — | |
-| TC-E03 | — | |
-| TC-E04 | — | |
-| TC-E05 | — | |
-| TC-E06 | — | |
-| TC-E07 | — | |
-| TC-E08 | — | |
-| TC-E09 | — | |
-| TC-E10 | — | |
-| TC-E11 | — | |
-| TC-E12 | — | |
-| TC-E13 | — | |
-| TC-E14 | — | |
-| TC-E15 | — | |
-| TC-E16 | — | |
-| TC-E17 | — | |
-| TC-E18 | — | |
-| TC-E19 | — | |
-| TC-E20 | — | |
+| TC-E01 | PASS | |
+| TC-E02 | PASS | |
+| TC-E03 | SKIP | P2 — shares code path with E09-E11 |
+| TC-E04 | PASS | |
+| TC-E05 | PASS | |
+| TC-E06 | PASS | |
+| TC-E07 | PASS | |
+| TC-E08 | PASS | |
+| TC-E09 | PASS | |
+| TC-E10 | PASS | |
+| TC-E11 | PASS | |
+| TC-E12 | SKIP | P2 — shares violation code path |
+| TC-E13 | SKIP | P2 — shares violation code path |
+| TC-E14 | PASS | |
+| TC-E15 | PASS | |
+| TC-E16 | PASS | |
+| TC-E17 | PASS | |
+| TC-E18 | PARTIAL | Guest mode only, Supabase row needs manual verify after migration run |
+| TC-E19 | PASS | |
+| TC-E20 | SKIP | P2 — needs real device |
