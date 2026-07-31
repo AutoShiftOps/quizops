@@ -36,10 +36,7 @@ export default function QuizCard({ bank }: { bank: QuizBank }) {
   const minutes = Math.round(bank.duration_seconds / 60);
 
   return (
-    <Link
-      href={`/quiz/${bank.slug}`}
-      className="block bg-surface border border-border rounded-xl p-6 hover:border-accent transition-colors"
-    >
+    <div className="bg-surface border border-border rounded-xl p-6 hover:border-accent transition-colors">
       <div className="flex items-start justify-between mb-3">
         <span className="text-3xl">{bank.emoji}</span>
         {percentage !== null && (
@@ -56,13 +53,27 @@ export default function QuizCard({ bank }: { bank: QuizBank }) {
       </div>
       <h3 className="font-heading text-lg font-semibold mb-1">{bank.name}</h3>
       <p className="text-gray-400 text-sm mb-4">{bank.description}</p>
-      <div className="flex items-center gap-3 text-xs text-gray-500">
+      <div className="flex items-center gap-3 text-xs text-gray-500 mb-5">
         <span className="px-2 py-1 rounded-full bg-accent/10 text-accent">
           {bank.topic}
         </span>
         <span>{bank.question_count} questions</span>
         <span>{minutes} min</span>
       </div>
-    </Link>
+      <div className="flex items-center gap-3">
+        <Link
+          href={`/quiz/${bank.slug}`}
+          className="flex-1 text-center text-sm px-4 py-2 rounded-md border border-border hover:border-accent transition-colors"
+        >
+          Practice
+        </Link>
+        <Link
+          href={`/exam/${bank.slug}`}
+          className="flex-1 text-center text-sm px-4 py-2 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity"
+        >
+          Take Exam
+        </Link>
+      </div>
+    </div>
   );
 }

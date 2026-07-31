@@ -13,6 +13,10 @@ create table if not exists quiz_attempts (
   answers jsonb,
   time_taken_s integer,
   completed_at timestamptz default now(),
+  mode text default 'practice',
+  violation_count integer default 0,
+  auto_submitted boolean default false,
+  flagged_questions jsonb default '[]',
   unique (user_id, bank_slug)
 );
 

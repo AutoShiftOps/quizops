@@ -31,3 +31,19 @@ export type Attempt = {
   time_taken_s: number;
   completed_at: string;
 };
+
+export type ExamState = {
+  current: number;
+  selected: (number | null)[];
+  flagged: boolean[];
+  timeLeft: number;
+  violationCount: number;
+  savedAt: number;
+};
+
+export type ExamAttempt = Attempt & {
+  mode: 'exam';
+  violation_count: number;
+  auto_submitted: boolean;
+  flagged_questions: number[];
+};

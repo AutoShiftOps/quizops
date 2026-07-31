@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { ExamAttempt } from './types';
 
 let client: SupabaseClient | null = null;
 let clientPromise: Promise<SupabaseClient> | null = null;
@@ -22,4 +23,26 @@ export async function getSupabaseClient(): Promise<SupabaseClient> {
     });
   }
   return clientPromise;
+}
+
+export async function saveExamAttempt(attempt: ExamAttempt): Promise<void> {
+  const supabase = await getSupabaseClient();
+  await supabase.from('quiz_attempts').upsert(
+    {
+      user_id: attempt.user_id,
+      bank_slug: attempt.bank_slug,
+      score: attempt.score,
+      total: attempt.total,
+      percentage: attempt.percentage,
+      passed: attempt.passed,
+      answers: attempt.answers,
+      time_taken_s: attempt.time_taken_s,
+      completed_at: attempt.completed_at,
+      mode: attempt.mode,
+      violation_count: attempt.violation_count,
+      auto_submitted: attempt.auto_submitted,
+      flagged_questions: attempt.flagged_questions,
+    },
+    { onConflict: 'user_id,bank_slug' }
+  );
 }
