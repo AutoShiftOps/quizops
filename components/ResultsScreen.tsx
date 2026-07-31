@@ -46,6 +46,7 @@ export default function ResultsScreen({
           user_id: user.id,
           email: user.email,
           bank_slug: bank.slug,
+          mode: 'practice',
           score,
           total: questions.length,
           percentage,
@@ -54,7 +55,7 @@ export default function ResultsScreen({
           time_taken_s: timeTakenS,
           completed_at: new Date().toISOString(),
         },
-        { onConflict: 'user_id,bank_slug' }
+        { onConflict: 'user_id,bank_slug,mode' }
       );
 
       const { data: progress } = await supabase

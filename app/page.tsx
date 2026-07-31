@@ -1,5 +1,5 @@
 import { getAllBanks } from '@/lib/loadBanks';
-import QuizCard from '@/components/QuizCard';
+import BankGrid from '@/components/BankGrid';
 
 export default function HomePage() {
   const banks = getAllBanks();
@@ -17,11 +17,7 @@ export default function HomePage() {
       </section>
 
       {banks.length > 0 ? (
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {banks.map((bank) => (
-            <QuizCard key={bank.slug} bank={bank} />
-          ))}
-        </section>
+        <BankGrid banks={banks} />
       ) : (
         <p className="text-center text-gray-500">No quiz banks found yet.</p>
       )}

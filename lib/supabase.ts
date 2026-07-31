@@ -43,6 +43,6 @@ export async function saveExamAttempt(attempt: ExamAttempt): Promise<void> {
       auto_submitted: attempt.auto_submitted,
       flagged_questions: attempt.flagged_questions,
     },
-    { onConflict: 'user_id,bank_slug' }
+    { onConflict: 'user_id,bank_slug,mode' }
   );
 }

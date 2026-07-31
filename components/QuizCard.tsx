@@ -1,65 +1,61 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getSupabaseClient } from '@/lib/supabase';
 import { QuizBank } from '@/lib/types';
 
-export default function QuizCard({ bank }: { bank: QuizBank }) {
-  const [percentage, setPercentage] = useState<number | null>(null);
+type Score = { percentage: number; passed: boolean };
 
-  useEffect(() => {
-    let active = true;
+type Props = {
+  bank: QuizBank;
+  practiceScore?: Score | null;
+  examScore?: Score | null;
+};
 
-    (async () => {
-      const supabase = await getSupabaseClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.user) return;
-
-      const { data } = await supabase
-        .from('quiz_attempts')
-        .select('percentage')
-        .eq('user_id', session.user.id)
-        .eq('bank_slug', bank.slug)
-        .maybeSingle();
-
-      if (active && data) setPercentage(data.percentage);
-    })().catch(() => {});
-
-    return () => {
-      active = false;
-    };
-  }, [bank.slug]);
-
+export default function QuizCard({ bank, practiceScore, examScore }: Props) {
   const minutes = Math.round(bank.duration_seconds / 60);
+  const hasAnyScore = Boolean(practiceScore) || Boolean(examScore);
 
   return (
     <div className="bg-surface border border-border rounded-xl p-6 hover:border-accent transition-colors">
       <div className="flex items-start justify-between mb-3">
         <span className="text-3xl">{bank.emoji}</span>
-        {percentage !== null && (
-          <span
-            className={`text-xs font-semibold px-2 py-1 rounded-full ${
-              percentage >= bank.pass_mark
-                ? 'bg-green/20 text-green'
-                : 'bg-red-500/20 text-red-400'
-            }`}
-          >
-            {percentage}%
-          </span>
-        )}
       </div>
       <h3 className="font-heading text-lg font-semibold mb-1">{bank.name}</h3>
       <p className="text-gray-400 text-sm mb-4">{bank.description}</p>
-      <div className="flex items-center gap-3 text-xs text-gray-500 mb-5">
+      <div className="flex items-center gap-3 text-xs text-gray-500 mb-4">
         <span className="px-2 py-1 rounded-full bg-accent/10 text-accent">
           {bank.topic}
         </span>
         <span>{bank.question_count} questions</span>
         <span>{minutes} min</span>
       </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-5">
+        {!hasAnyScore && (
+          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-border text-gray-400 self-start">
+            Not attempted
+          </span>
+        )}
+        {practiceScore && (
+          <span
+            className={`text-xs font-semibold px-2 py-1 rounded-full border bg-transparent self-start ${
+              practiceScore.passed
+                ? 'border-green text-green'
+                : 'border-red-500 text-red-400'
+            }`}
+          >
+            Practice {practiceScore.percentage}%
+          </span>
+        )}
+        {examScore && (
+          <span
+            className={`text-xs font-semibold px-2 py-1 rounded-full self-start ${
+              examScore.passed ? 'bg-green/20 text-green' : 'bg-red-500/20 text-red-400'
+            }`}
+          >
+            Exam {examScore.percentage}%
+          </span>
+        )}
+      </div>
+
       <div className="flex items-center gap-3">
         <Link
           href={`/quiz/${bank.slug}`}
