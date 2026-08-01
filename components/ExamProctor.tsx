@@ -29,6 +29,19 @@ export default function ExamProctor({
   }, []);
 
   useEffect(() => {
+    return () => {
+      // Exit fullscreen when component unmounts
+      // (user navigates away, submits, or goes back)
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {
+          // Ignore errors — browser may already
+          // have exited fullscreen
+        });
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     function registerViolation() {
       if (paused) return;
       const nextCount = violationCount + 1;

@@ -327,7 +327,7 @@ Supabase verification pending.
 | TC | Status | Notes |
 |----|--------|-------|
 | TC-E01 | PASS | |
-| TC-E02 | PASS | |
+| TC-E02 | BUG FIXED | Fullscreen not released on back navigation — fixed in this commit. exitFullscreen() now called on unmount, back navigation, and exam submission. |
 | TC-E03 | SKIP | P2 — shares code path with E09-E11 |
 | TC-E04 | PASS | |
 | TC-E05 | PASS | |

@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { clearExamProgress, loadExamProgress, saveExamProgress } from '@/lib/examStorage';
@@ -35,6 +37,7 @@ function dotClasses(isAnswered: boolean, isFlagged: boolean): string {
 
 export default function ExamEngine({ bank, questions }: Props) {
   const total = questions.length;
+  const router = useRouter();
 
   const [phase, setPhase] = useState<Phase>('start');
   const [user, setUser] = useState<User | null>(null);
@@ -128,6 +131,14 @@ export default function ExamEngine({ bank, questions }: Props) {
     setPhase('exam');
   }
 
+  async function handleBackToHome(e: React.MouseEvent) {
+    e.preventDefault();
+    if (typeof document !== 'undefined' && document.fullscreenElement) {
+      await document.exitFullscreen().catch(() => {});
+    }
+    router.push('/');
+  }
+
   function handleRetake() {
     clearExamProgress(bank.slug);
     setCurrentIndex(0);
@@ -177,7 +188,18 @@ export default function ExamEngine({ bank, questions }: Props) {
   }
 
   if (phase === 'start') {
-    return <ExamStartScreen bank={bank} resuming={resuming} onStart={handleStart} />;
+    return (
+      <>
+        <Link
+          href="/"
+          onClick={handleBackToHome}
+          className="text-sm text-gray-400 hover:text-accent transition-colors"
+        >
+          ← Back to home
+        </Link>
+        <ExamStartScreen bank={bank} resuming={resuming} onStart={handleStart} />
+      </>
+    );
   }
 
   if (phase === 'results') {
@@ -236,6 +258,14 @@ export default function ExamEngine({ bank, questions }: Props) {
 
   return (
     <div className="mt-8">
+      <Link
+        href="/"
+        onClick={handleBackToHome}
+        className="text-sm text-gray-400 hover:text-accent transition-colors mb-4 inline-block"
+      >
+        ← Back to home
+      </Link>
+
       {phase === 'exam' && (
         <ExamProctor
           violationCount={violationCount}
