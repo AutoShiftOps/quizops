@@ -2,6 +2,11 @@
 -- Run this in the Supabase SQL editor (or via the CLI) against your project
 -- BEFORE using exam mode with a signed-in account. Exam-mode Supabase saves
 -- will fail with an "unknown column" error until this has been applied.
+--
+-- IMPORTANT: After running this migration, any app code using
+-- onConflict:'user_id,bank_slug' must be updated to
+-- onConflict:'user_id,bank_slug,mode'
+-- This was fixed in ce08ba1.
 
 ALTER TABLE quiz_attempts
   ADD COLUMN IF NOT EXISTS mode TEXT DEFAULT 'practice',

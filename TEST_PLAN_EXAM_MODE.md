@@ -343,6 +343,10 @@ Supabase verification pending.
 | TC-E15 | PASS | |
 | TC-E16 | PASS | |
 | TC-E17 | PASS | |
-| TC-E18 | PARTIAL | Guest mode only, Supabase row needs manual verify after migration run |
+| TC-E18 | PASS* | Supabase upsert uses onConflict:'user_id,bank_slug,mode' — verified schema matches. Live row verification pending real Google session. |
 | TC-E19 | PASS | |
 | TC-E20 | SKIP | P2 — needs real device |
+
+ce08ba1 — fixed critical onConflict mismatch in saveExamAttempt and practice
+upsert. Both now use 3-column constraint. Would have caused silent failures
+in production.
