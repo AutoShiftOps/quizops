@@ -47,3 +47,47 @@ export type ExamAttempt = Attempt & {
   auto_submitted: boolean;
   flagged_questions: number[];
 };
+
+export type Publisher = {
+  id: string;
+  username: string;
+  display_name: string;
+  bio: string | null;
+  website_url: string | null;
+  tier: 'free' | 'pro' | 'team';
+  quiz_count: number;
+  created_at: string;
+};
+
+export type PublishedQuiz = {
+  id: string;
+  publisher_id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  source_url: string | null;
+  topic: string | null;
+  tags: string[];
+  emoji: string;
+  duration_s: number;
+  pass_mark: number;
+  questions: Question[];
+  status: 'draft' | 'published';
+  attempt_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PublisherAttempt = {
+  id: string;
+  quiz_id: string;
+  publisher_id: string;
+  user_id: string | null;
+  score: number;
+  total: number;
+  percentage: number;
+  passed: boolean;
+  answers: Record<string, number>;
+  time_taken_s: number;
+  attempted_at: string;
+};
