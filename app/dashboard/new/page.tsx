@@ -43,7 +43,8 @@ export default function NewQuizPage() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Review step metadata
-  const [title, setTitle] = useState('Untitled Quiz');
+  const [title, setTitle] = useState('');
+  const [titleTouched, setTitleTouched] = useState(false);
   const [description, setDescription] = useState('');
   const [emoji, setEmoji] = useState('📝');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -88,7 +89,8 @@ export default function NewQuizPage() {
     setQuestionCount(10);
     setInputError(null);
     setQuestions([]);
-    setTitle('Untitled Quiz');
+    setTitle('');
+    setTitleTouched(false);
     setDescription('');
     setEmoji('📝');
     setSourceUrl('');
@@ -340,14 +342,25 @@ export default function NewQuizPage() {
 
         <div className="bg-surface border border-border rounded-xl p-5 mb-8 space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1.5">Title</label>
+            <label className="block text-sm font-medium mb-1.5">
+              Title <span className="text-red-400">*</span>
+            </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              onBlur={() => setTitleTouched(true)}
+              placeholder="e.g. How CI/CD Pipelines Actually Work"
               maxLength={100}
-              className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none"
+              className={`w-full px-3 py-2 rounded-md bg-background border outline-none ${
+                titleTouched && !title.trim()
+                  ? 'border-red-500'
+                  : 'border-border focus:border-accent'
+              }`}
             />
+            {titleTouched && !title.trim() && (
+              <p className="text-xs text-red-400 mt-1.5">Title is required.</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1.5">Description</label>
