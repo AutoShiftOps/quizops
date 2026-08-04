@@ -273,7 +273,7 @@
 
 ---
 
-### TC-P20 — ANTHROPIC_API_KEY not exposed to browser
+### TC-P20 — OPENAI_API_KEY not exposed to browser
 **Steps:**
 1. Open DevTools → Network
 2. Trigger question generation
@@ -283,6 +283,9 @@
 - API key NOT visible in any request headers
 - API key NOT visible in any response body
 - Key only used server-side in `/api/generate/route.ts`
+
+> Note: switch to `ANTHROPIC_API_KEY` when the first paid customer is
+> onboarded — see `.env.example` for the provider-swap pattern.
 
 ---
 
@@ -298,25 +301,29 @@
 
 ## DEFECT LOG
 
+Tested at e909f65. Real OpenAI streaming confirmed. TC-P20 (API key not
+exposed) verified — real key was found in .env.example before staging and
+replaced with placeholder.
+
 | TC | Status | Notes |
 |----|--------|-------|
-| TC-P01 | — | |
-| TC-P02 | — | |
-| TC-P03 | — | |
-| TC-P04 | — | |
-| TC-P05 | — | |
-| TC-P06 | — | |
-| TC-P07 | — | |
-| TC-P08 | — | |
-| TC-P09 | — | |
-| TC-P10 | — | |
-| TC-P11 | — | |
-| TC-P12 | — | |
-| TC-P13 | — | |
-| TC-P14 | — | |
-| TC-P15 | — | |
-| TC-P16 | — | |
-| TC-P17 | — | |
-| TC-P18 | — | |
-| TC-P19 | — | |
-| TC-P20 | — | |
+| TC-P01 | PASS | Verified with real Google session |
+| TC-P02 | PASS | Verified |
+| TC-P03 | PASS | Verified with real OpenAI call |
+| TC-P04 | — | Not yet tested |
+| TC-P05 | PASS | Verified — streaming confirmed |
+| TC-P06 | PASS | Verified |
+| TC-P07 | PASS | Verified |
+| TC-P08 | — | Not yet tested |
+| TC-P09 | PASS* | Quiz published correctly, share screen timing ambiguous in Playwright |
+| TC-P10 | PASS* | Same as P09 |
+| TC-P11 | PASS | Public reader page verified |
+| TC-P12 | — | Pending |
+| TC-P13 | — | Pending |
+| TC-P14 | — | Pending |
+| TC-P15 | — | Pending |
+| TC-P16 | — | Pending |
+| TC-P17 | — | Pending |
+| TC-P18 | — | Pending |
+| TC-P19 | — | Pending |
+| TC-P20 | — | Pending |

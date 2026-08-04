@@ -41,7 +41,7 @@ QuizOps lets technical writers turn their articles into interactive quizzes — 
 | Framework | Next.js 14 (App Router) |
 | Styling | Tailwind CSS |
 | Auth + DB | Supabase (Google OAuth) |
-| AI | Anthropic Claude (claude-sonnet-4-6) |
+| AI | OpenAI (gpt-4o-mini) |
 | Hosting | Vercel |
 | Domain | quiz.autoshiftops.com |
 
@@ -128,8 +128,13 @@ quizops/
 |----------|----------|-------------|
 | `SUPABASE_URL` | Yes | Your Supabase project URL |
 | `SUPABASE_ANON_KEY` | Yes | Supabase anon/public key |
-| `ANTHROPIC_API_KEY` | Yes (publisher feature) | Claude API key for question generation |
+| `AI_PROVIDER` | Yes (publisher feature) | `openai` (current) or `anthropic` |
+| `AI_MODEL` | Yes (publisher feature) | Model name for the selected provider |
+| `OPENAI_API_KEY` | Yes (publisher feature) | OpenAI API key for question generation |
 | `APP_URL` | Yes | Full URL of this deployment |
+
+> Switch to `ANTHROPIC_API_KEY` when the first paid customer is onboarded —
+> see `.env.example` for the provider-swap pattern (no code change needed).
 
 ---
 

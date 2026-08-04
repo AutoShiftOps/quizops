@@ -41,16 +41,19 @@ Create the three new tables required for the publisher feature:
 
 **Description:**
 Build `POST /api/generate` — fetches article from URL,
-extracts text, calls Claude API with streaming,
+extracts text, calls OpenAI API with streaming,
 returns NDJSON stream of questions one by one.
+
+> Note: switch to `ANTHROPIC_API_KEY` when the first paid customer is
+> onboarded — see `.env.example` for the provider-swap pattern.
 
 **Acceptance criteria:**
 - [ ] URL provided → fetches HTML, strips to plain text
 - [ ] If URL fetch fails → returns `{ error: 'fetch_failed' }` so frontend shows paste fallback
-- [ ] Calls `claude-sonnet-4-6` with streaming enabled
+- [ ] Calls `gpt-4o-mini` (OpenAI) with streaming enabled
 - [ ] Returns `ReadableStream` of NDJSON (one question object per line)
 - [ ] Each question matches `Question` type in `lib/types.ts`
-- [ ] `ANTHROPIC_API_KEY` read from env vars — never exposed to browser
+- [ ] `OPENAI_API_KEY` read from env vars — never exposed to browser
 - [ ] Rate limited to prevent abuse (max 3 requests per user per hour on free tier)
 - [ ] Handles API errors gracefully with meaningful error messages
 - [ ] Tested with a real autoshiftops.com article URL
@@ -58,7 +61,7 @@ returns NDJSON stream of questions one by one.
 **Related files:**
 - `app/api/generate/route.ts`
 - `lib/types.ts`
-- `.env.example` (add `ANTHROPIC_API_KEY`)
+- `.env.example` (add `OPENAI_API_KEY`)
 
 ---
 
@@ -331,7 +334,9 @@ the publisher feature and new env vars.
 
 **Acceptance criteria:**
 - [ ] README covers both reader and publisher flows
-- [ ] New env var `ANTHROPIC_API_KEY` documented
+- [ ] New env vars `AI_PROVIDER`, `AI_MODEL`, `OPENAI_API_KEY` documented
+      (note the switch to `ANTHROPIC_API_KEY` for when the first paid
+      customer is onboarded)
 - [ ] Publisher onboarding steps documented
 - [ ] CONTRIBUTING.md updated — both JSON bank contribution
   AND publisher dashboard for non-technical users
