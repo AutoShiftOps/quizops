@@ -305,6 +305,9 @@ Tested at e909f65. Real OpenAI streaming confirmed. TC-P20 (API key not
 exposed) verified — real key was found in .env.example before staging and
 replaced with placeholder.
 
+Title auto-extracted from article in generate flow — fixes Untitled Quiz
+issue.
+
 | TC | Status | Notes |
 |----|--------|-------|
 | TC-P01 | PASS | Verified with real Google session |
@@ -321,7 +324,7 @@ replaced with placeholder.
 | TC-P12 | — | Pending |
 | TC-P13 | — | Pending |
 | TC-P14 | — | Pending |
-| TC-P15 | — | Pending |
+| TC-P15 | PASS | Edit flow verified |
 | TC-P16 | — | Pending |
 | TC-P17 | — | Pending |
 | TC-P18 | — | Pending |

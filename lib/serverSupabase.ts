@@ -11,7 +11,16 @@ export function createServerSupabase(accessToken?: string): SupabaseClient {
     throw new Error('Supabase env vars not configured');
   }
   return createClient(url, anonKey, {
-    global: accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined,
+    global: {
+      ...(accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : {}),
+      // Next.js patches the global fetch in Server Components and caches
+      // GET requests by default — including ones issued internally by the
+      // Supabase client. Without this, `dynamic = 'force-dynamic'` on a
+      // page alone isn't reliably enough to stop reads from serving stale
+      // data right after a write (e.g. right after unpublishing/deleting).
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: 'no-store' }),
+    },
   });
 }
 

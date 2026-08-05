@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/serverSupabase';
 import { getPublisher, checkTierLimit, incrementQuizCount } from '@/lib/publisher';
-import { Question } from '@/lib/types';
+import { validateTitle, validateQuestions } from '@/lib/quizValidation';
 
 function slugify(title: string): string {
   return title
@@ -12,26 +12,6 @@ function slugify(title: string): string {
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 80);
-}
-
-function validateQuestions(questions: unknown): questions is Question[] {
-  if (!Array.isArray(questions)) return false;
-  if (questions.length < 3 || questions.length > 50) return false;
-  return questions.every((q) => {
-    if (!q || typeof q !== 'object') return false;
-    const question = q as Record<string, unknown>;
-    return (
-      typeof question.text === 'string' &&
-      question.text.trim().length > 0 &&
-      Array.isArray(question.options) &&
-      question.options.length === 4 &&
-      typeof question.answer === 'number' &&
-      question.answer >= 0 &&
-      question.answer <= 3 &&
-      typeof question.explanation === 'string' &&
-      question.explanation.trim().length > 0
-    );
-  });
 }
 
 export async function POST(req: NextRequest) {
@@ -75,7 +55,7 @@ export async function POST(req: NextRequest) {
     questions?: unknown;
   };
 
-  if (!title || typeof title !== 'string' || title.trim().length === 0 || title.length > 100) {
+  if (!validateTitle(title)) {
     return NextResponse.json(
       { error: 'invalid_title', message: 'Please enter a title (max 100 characters).' },
       { status: 400 }

@@ -158,8 +158,12 @@ export default function NewQuizPage() {
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
-            const q = JSON.parse(line);
-            setQuestions((prev) => [...prev, q]);
+            const parsed = JSON.parse(line);
+            if (parsed.__meta__) {
+              if (parsed.title) setTitle(parsed.title);
+              continue;
+            }
+            setQuestions((prev) => [...prev, parsed]);
           } catch {
             // skip malformed lines
           }
@@ -237,6 +241,10 @@ export default function NewQuizPage() {
   }
 
   async function handlePublish() {
+    if (!title.trim()) {
+      setTitleTouched(true);
+      return;
+    }
     setPublishing(true);
     setPublishError(null);
     const headers = await authHeader();

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
 import { decrementQuizCount } from '@/lib/publisher';
 import { PublishedQuiz } from '@/lib/types';
@@ -73,13 +74,12 @@ export default function PublisherQuizCard({ quiz, username, passRate, onDeleted 
         >
           View
         </a>
-        <button
-          disabled
-          title="Editing is coming soon"
-          className="px-3 py-1.5 rounded-md border border-border opacity-40 cursor-not-allowed"
+        <Link
+          href={`/dashboard/quiz/${quiz.id}`}
+          className="px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
         >
           ✎ Edit
-        </button>
+        </Link>
         <button
           onClick={handleShare}
           className="px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"

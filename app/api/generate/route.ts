@@ -20,19 +20,55 @@ function isRateLimited(userId: string): boolean {
   return timestamps.length > FREE_TIER_HOURLY_LIMIT;
 }
 
-function extractTextFromHtml(html: string): string {
-  return html
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
+function decodeEntities(s: string): string {
+  return s
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+    .replace(/&#39;/g, "'");
+}
+
+function extractTextFromHtml(html: string): string {
+  return decodeEntities(
+    html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+  )
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+// 1. <title> tag (strip a trailing " | Site Name" / " – Site Name" /
+//    " - Site Name" suffix), 2. first <h1>, 3. first <h2>, else null.
+function extractTitleFromHtml(html: string): string | null {
+  const clean = (raw: string) =>
+    decodeEntities(raw.replace(/<[^>]+>/g, ' '))
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (titleMatch) {
+    const full = clean(titleMatch[1]);
+    const stripped = full.split(/\s[|–-]\s/)[0].trim();
+    if (stripped) return stripped;
+  }
+
+  const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  if (h1Match) {
+    const text = clean(h1Match[1]);
+    if (text) return text;
+  }
+
+  const h2Match = html.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
+  if (h2Match) {
+    const text = clean(h2Match[1]);
+    if (text) return text;
+  }
+
+  return null;
 }
 
 function truncateWords(text: string, maxWords: number): string {
@@ -95,6 +131,7 @@ export async function POST(req: NextRequest) {
   };
 
   let articleText: string;
+  let extractedTitle: string | null = null;
 
   if (url) {
     let res: Response;
@@ -119,6 +156,7 @@ export async function POST(req: NextRequest) {
       );
     }
     const html = await res.text();
+    extractedTitle = extractTitleFromHtml(html);
     articleText = extractTextFromHtml(html);
   } else if (text) {
     articleText = text;
@@ -145,6 +183,12 @@ export async function POST(req: NextRequest) {
   return new Response(
     new ReadableStream({
       async start(controller) {
+        controller.enqueue(
+          new TextEncoder().encode(
+            JSON.stringify({ __meta__: true, title: extractedTitle }) + '\n'
+          )
+        );
+
         let buffer = '';
         for await (const chunk of stream) {
           const delta = chunk.choices[0]?.delta?.content || '';

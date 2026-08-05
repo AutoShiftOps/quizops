@@ -4,6 +4,12 @@ import { createServerSupabase } from '@/lib/serverSupabase';
 import { getPublisherByUsername, getPublishedQuiz } from '@/lib/publishedQuiz';
 import PublishedQuizEngine from '@/components/PublishedQuizEngine';
 
+// Next.js caches fetch()/RSC output by default. Without this, unpublishing
+// or deleting a quiz wouldn't actually take effect for readers until the
+// cache happened to clear — the page would keep serving the stale
+// published state.
+export const dynamic = 'force-dynamic';
+
 type Props = { params: { username: string; slug: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
