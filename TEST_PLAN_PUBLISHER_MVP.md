@@ -289,6 +289,50 @@
 
 ---
 
+### TC-P21 — Manual quiz creation
+**Precondition:** On `/dashboard/new`
+**Steps:**
+1. Select "Write questions manually" path
+2. Fill in title, source URL, topic
+3. Add 3 questions with 4 options each, mark correct answer, add
+   explanation
+4. Click Publish
+
+**Expected:**
+- No AI call made (check Network tab)
+- Quiz appears at `/q/[username]/[slug]`
+- All 3 questions show correctly
+- `quiz_count` incremented
+
+---
+
+### TC-P22 — Save draft
+**Precondition:** On quiz builder (AI or manual path)
+**Steps:**
+1. Fill title and at least 1 question
+2. Click Save draft
+
+**Expected:**
+- Dashboard shows quiz with Draft badge
+- `quiz_count` unchanged
+- `/q/[username]/[slug]` returns 404
+- Supabase: `status = 'draft'`
+
+---
+
+### TC-P23 — Publish a draft
+**Precondition:** Draft quiz exists on dashboard
+**Steps:**
+1. Click Publish on draft card
+
+**Expected:**
+- Badge changes to Published
+- `quiz_count` increments by 1
+- `/q/[username]/[slug]` now accessible
+- Supabase: `status = 'published'`
+
+---
+
 ## PASS CRITERIA
 
 | Priority | Cases | Required before deploy |
@@ -330,6 +374,9 @@ issue.
 | TC-P18 | — | Pending |
 | TC-P19 | — | Pending |
 | TC-P20 | — | Pending |
+| TC-P21 | — | |
+| TC-P22 | — | |
+| TC-P23 | — | |
 
 ---
 
