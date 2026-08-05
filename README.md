@@ -199,11 +199,15 @@ See [DEPLOY.md](./DEPLOY.md) for full Vercel + Supabase + DNS setup.
 | Core quiz engine | ✅ Done | Practice + exam modes |
 | Auth + progress | ✅ Done | Google OAuth, Supabase |
 | Exam proctoring | ✅ Done | Fullscreen, violations, flagging |
-| Publisher MVP | 🚧 Building | AI generation, dashboard, public pages |
-| Analytics | ⏳ Planned | Charts, weak areas, exports |
+| Publisher MVP | ✅ Done | AI generation, dashboard, public pages |
+| Dashboard redesign | ✅ Done | Stats, tip bar, quiz cards |
+| Edit / delete quiz | ✅ Done | Full edit page at /dashboard/quiz/[id] |
+| Manual quiz creation | ⏳ Planned | Write questions without AI |
+| Save draft | ⏳ Planned | Draft status before first publish |
+| Analytics dashboard | ⏳ Planned | Charts, weak areas, exports |
 | Pro tier + Stripe | ⏳ Planned | Monetisation |
 | Embeds + badges | ⏳ Planned | iFrame, SVG badges |
-| AI on free tier | ⏳ Planned | 3 generations/month |
+| AI provider swap | ⏳ Planned | Switch to Anthropic Haiku on first paid customer |
 
 ---
 
