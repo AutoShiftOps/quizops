@@ -315,8 +315,8 @@ issue.
 | TC-P03 | PASS | Verified with real OpenAI call |
 | TC-P04 | — | Not yet tested |
 | TC-P05 | PASS | Verified — streaming confirmed |
-| TC-P06 | PASS | Verified |
-| TC-P07 | PASS | Verified |
+| TC-P06 | PASS | Inline question edit confirmed |
+| TC-P07 | PASS | Delete and add questions confirmed |
 | TC-P08 | — | Not yet tested |
 | TC-P09 | PASS* | Quiz published correctly, share screen timing ambiguous in Playwright |
 | TC-P10 | PASS* | Same as P09 |
@@ -324,9 +324,35 @@ issue.
 | TC-P12 | — | Pending |
 | TC-P13 | — | Pending |
 | TC-P14 | — | Pending |
-| TC-P15 | PASS | Edit flow verified |
+| TC-P15 | PASS | Edit quiz flow implemented — title, description, emoji, source URL, questions all editable. Save/unpublish/delete all working. |
 | TC-P16 | — | Pending |
 | TC-P17 | — | Pending |
 | TC-P18 | — | Pending |
 | TC-P19 | — | Pending |
 | TC-P20 | — | Pending |
+
+---
+
+## FIXES SHIPPED POST e909f65
+
+### c09dc20 — Dashboard redesign
+- Dashboard wrapped in max-w-[900px] container
+- Stats row: 4 real-data cards (published count, total attempts, avg pass
+  rate, readers this week)
+- Tier pill with inline progress bar
+- Tip bar shown until first attempt recorded
+- Quiz cards redesigned — emoji, status badge, attempts, pass rate, action
+  buttons
+- Invite card slot when quota not reached
+- Title field default changed from 'Untitled Quiz' to empty — fixes silent
+  validation bypass
+
+### 144ba96 — Auto-title + Edit quiz (#8)
+- Article title auto-extracted from `<title>`/`<h1>` and pre-filled via
+  `__meta__` NDJSON line
+- Title field required before publish
+- Edit page: `/dashboard/quiz/[id]`
+- `PATCH /api/quiz/[id]` — updates all fields
+- `DELETE /api/quiz/[id]` — deletes + decrements
+- Unpublish/republish status toggle
+- Edit button on dashboard card now routes correctly

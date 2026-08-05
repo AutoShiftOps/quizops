@@ -5,17 +5,23 @@
 
 ---
 
+Deployment complete as of 2026-08-05.
+Manual live testing in progress.
+Start at LT-01 and work through all 27 tests.
+
+---
+
 ## PRE-TEST CHECKLIST (before opening browser)
 
-- [ ] Vercel deployment green (no build errors)
-- [ ] quiz.autoshiftops.com resolves (DNS propagated)
-- [ ] Vercel env vars set: SUPABASE_URL, SUPABASE_ANON_KEY,
+- [x] Vercel deployment green (no build errors)
+- [x] quiz.autoshiftops.com resolves (DNS propagated)
+- [x] Vercel env vars set: SUPABASE_URL, SUPABASE_ANON_KEY,
       OPENAI_API_KEY, AI_PROVIDER, AI_MODEL, APP_URL
-- [ ] Supabase → Authentication → Redirect URLs includes
+- [x] Supabase → Authentication → Redirect URLs includes
       https://quiz.autoshiftops.com and 
       https://quiz.autoshiftops.com/**
-- [ ] Google OAuth origins includes quiz.autoshiftops.com
-- [ ] All 3 Supabase migrations confirmed run
+- [x] Google OAuth origins includes quiz.autoshiftops.com
+- [x] All 3 Supabase migrations confirmed run
 - [ ] DevTools open throughout (Console + Network tabs)
 - [ ] Zero console errors on cold page load
 
