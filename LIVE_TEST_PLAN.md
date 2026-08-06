@@ -422,7 +422,7 @@ to external publishers.**
 | LT-17c | — | |
 | LT-18 | — | |
 | LT-19 | — | |
-| LT-20 | RETEST REQUIRED | TC-P12 — Published quiz attempts also affected |
+| LT-20 | RETEST REQUIRED | savePublishedAttempt silent error fixed in this commit — re-verify after fix |
 | LT-21 | — | |
 | LT-22 | — | |
 | LT-23 | — | |

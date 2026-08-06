@@ -71,7 +71,7 @@ export default function PublishedQuizEngine({ quiz }: Props) {
     if (!finished || saved) return;
     (async () => {
       const supabase = await getSupabaseClient();
-      await savePublishedAttempt(
+      const attemptSaved = await savePublishedAttempt(
         supabase,
         quiz.id,
         quiz.publisher_id,
@@ -82,9 +82,19 @@ export default function PublishedQuizEngine({ quiz }: Props) {
         timeTakenS,
         quiz.pass_mark
       );
-      await incrementAttemptCount(supabase, quiz.id);
+      if (!attemptSaved) {
+        console.error('[PublishedQuizEngine] attempt failed to save for quiz:', quiz.id);
+      }
+      const countIncremented = await incrementAttemptCount(supabase, quiz.id);
+      if (!countIncremented) {
+        console.error('[PublishedQuizEngine] attempt_count failed to increment for quiz:', quiz.id);
+      }
       setSaved(true);
-    })().catch(() => {});
+    })().catch((err) => {
+      // This used to swallow every failure silently — a rejected promise
+      // (network error, thrown exception) had nowhere to go.
+      console.error('[PublishedQuizEngine] save effect threw:', err);
+    });
     // Only persist once, right after the quiz finishes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);

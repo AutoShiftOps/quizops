@@ -44,33 +44,51 @@ export async function isUsernameTaken(
 export async function incrementQuizCount(
   supabase: SupabaseClient,
   publisherId: string
-): Promise<void> {
-  const { data } = await supabase
+): Promise<boolean> {
+  const { data, error: readError } = await supabase
     .from('publishers')
     .select('quiz_count')
     .eq('id', publisherId)
     .maybeSingle();
+  if (readError) {
+    console.error('incrementQuizCount read failed:', readError.message, readError.code);
+    return false;
+  }
   const current = data?.quiz_count ?? 0;
-  await supabase
+  const { error: updateError } = await supabase
     .from('publishers')
     .update({ quiz_count: current + 1 })
     .eq('id', publisherId);
+  if (updateError) {
+    console.error('incrementQuizCount update failed:', updateError.message, updateError.code);
+    return false;
+  }
+  return true;
 }
 
 export async function decrementQuizCount(
   supabase: SupabaseClient,
   publisherId: string
-): Promise<void> {
-  const { data } = await supabase
+): Promise<boolean> {
+  const { data, error: readError } = await supabase
     .from('publishers')
     .select('quiz_count')
     .eq('id', publisherId)
     .maybeSingle();
+  if (readError) {
+    console.error('decrementQuizCount read failed:', readError.message, readError.code);
+    return false;
+  }
   const current = data?.quiz_count ?? 0;
-  await supabase
+  const { error: updateError } = await supabase
     .from('publishers')
     .update({ quiz_count: Math.max(current - 1, 0) })
     .eq('id', publisherId);
+  if (updateError) {
+    console.error('decrementQuizCount update failed:', updateError.message, updateError.code);
+    return false;
+  }
+  return true;
 }
 
 export function checkTierLimit(publisher: Publisher): boolean {

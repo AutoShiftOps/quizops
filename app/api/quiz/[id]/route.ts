@@ -62,9 +62,15 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
 
     if (body.status === 'published' && quiz.status !== 'published') {
-      await incrementQuizCount(authed.supabase, quiz.publisher_id);
+      const incremented = await incrementQuizCount(authed.supabase, quiz.publisher_id);
+      if (!incremented) {
+        console.error('[quiz PATCH] quiz_count failed to increment for publisher:', quiz.publisher_id);
+      }
     } else if (body.status === 'draft' && quiz.status === 'published') {
-      await decrementQuizCount(authed.supabase, quiz.publisher_id);
+      const decremented = await decrementQuizCount(authed.supabase, quiz.publisher_id);
+      if (!decremented) {
+        console.error('[quiz PATCH] quiz_count failed to decrement for publisher:', quiz.publisher_id);
+      }
     }
 
     return NextResponse.json({ success: true });
@@ -156,7 +162,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   // Drafts never counted against quiz_count, so only decrement for a quiz
   // that was actually published.
   if (quiz.status === 'published') {
-    await decrementQuizCount(authed.supabase, quiz.publisher_id);
+    const decremented = await decrementQuizCount(authed.supabase, quiz.publisher_id);
+    if (!decremented) {
+      console.error('[quiz DELETE] quiz_count failed to decrement for publisher:', quiz.publisher_id);
+    }
   }
 
   return NextResponse.json({ success: true });

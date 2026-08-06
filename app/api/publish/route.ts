@@ -120,7 +120,10 @@ export async function POST(req: NextRequest) {
 
   // Only published quizzes count against the free-tier limit.
   if (status === 'published') {
-    await incrementQuizCount(authed.supabase, publisher.id);
+    const incremented = await incrementQuizCount(authed.supabase, publisher.id);
+    if (!incremented) {
+      console.error('[publish] quiz_count failed to increment for publisher:', publisher.id);
+    }
   }
 
   const appUrl = process.env.APP_URL || 'http://localhost:3000';
