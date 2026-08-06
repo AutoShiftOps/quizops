@@ -7,9 +7,10 @@ type Props = {
   bank: QuizBank;
   practiceScore?: Score | null;
   examScore?: Score | null;
+  hasAttempted?: boolean;
 };
 
-export default function QuizCard({ bank, practiceScore, examScore }: Props) {
+export default function QuizCard({ bank, practiceScore, examScore, hasAttempted }: Props) {
   const minutes = Math.round(bank.duration_seconds / 60);
   const hasAnyScore = Boolean(practiceScore) || Boolean(examScore);
 
@@ -61,7 +62,7 @@ export default function QuizCard({ bank, practiceScore, examScore }: Props) {
           href={`/quiz/${bank.slug}`}
           className="flex-1 text-center text-sm px-4 py-2 rounded-md border border-border hover:border-accent transition-colors"
         >
-          Practice
+          {hasAttempted ? 'Practice again' : 'Practice'}
         </Link>
         <Link
           href={`/exam/${bank.slug}`}
