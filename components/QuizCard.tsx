@@ -36,23 +36,13 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
           </span>
         )}
         {practiceScore && (
-          <span
-            className={`text-xs font-semibold px-2 py-1 rounded-full border bg-transparent self-start ${
-              practiceScore.passed
-                ? 'border-green text-green'
-                : 'border-red-500 text-red-400'
-            }`}
-          >
-            Practice {practiceScore.percentage}%
+          <span className="text-xs font-semibold px-2 py-1 rounded-full border border-green-500 text-green-500 bg-transparent self-start">
+            Practice {practiceScore.percentage}% ✓
           </span>
         )}
         {examScore && (
-          <span
-            className={`text-xs font-semibold px-2 py-1 rounded-full self-start ${
-              examScore.passed ? 'bg-green/20 text-green' : 'bg-red-500/20 text-red-400'
-            }`}
-          >
-            Exam {examScore.percentage}%
+          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-purple-500/20 text-purple-400 self-start">
+            Exam {examScore.percentage}% ✓
           </span>
         )}
       </div>

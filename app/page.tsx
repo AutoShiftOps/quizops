@@ -1,14 +1,11 @@
 import { getAllBanks } from '@/lib/loadBanks';
 import BankGrid from '@/components/BankGrid';
-import HomeIntro from '@/components/HomeIntro';
 
 export default function HomePage() {
   const banks = getAllBanks();
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-16">
-      <HomeIntro />
-
       {banks.length > 0 ? (
         <BankGrid banks={banks} />
       ) : (

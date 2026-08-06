@@ -406,7 +406,7 @@ to external publishers.**
 | LT-03 | — | |
 | LT-04 | — | |
 | LT-05 | — | |
-| LT-06 | — | |
+| LT-06 | — | Score badges verified working after BankGrid auth fix |
 | LT-07 | — | |
 | LT-08 | — | |
 | LT-09 | — | |
