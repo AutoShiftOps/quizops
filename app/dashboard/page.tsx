@@ -94,10 +94,22 @@ export default function DashboardPage() {
   }, [router]);
 
   function handleQuizDeleted(quizId: string) {
-    setQuizzes((prev) => prev.filter((q) => q.id !== quizId));
-    setPublisher((prev) =>
-      prev ? { ...prev, quiz_count: Math.max(prev.quiz_count - 1, 0) } : prev
+    setQuizzes((prev) => {
+      const deleted = prev.find((q) => q.id === quizId);
+      // Drafts never counted against quiz_count, so only decrement the
+      // locally-displayed count for a quiz that was actually published.
+      if (deleted?.status === 'published') {
+        setPublisher((p) => (p ? { ...p, quiz_count: Math.max(p.quiz_count - 1, 0) } : p));
+      }
+      return prev.filter((q) => q.id !== quizId);
+    });
+  }
+
+  function handleQuizPublished(quizId: string) {
+    setQuizzes((prev) =>
+      prev.map((q) => (q.id === quizId ? { ...q, status: 'published' } : q))
     );
+    setPublisher((prev) => (prev ? { ...prev, quiz_count: prev.quiz_count + 1 } : prev));
   }
 
   if (loading) {
@@ -129,14 +141,15 @@ export default function DashboardPage() {
           <TierBadge publisher={publisher} />
         </div>
         <Link
-          href={limitReached ? '#' : '/dashboard/new'}
-          aria-disabled={limitReached}
-          title={limitReached ? 'Free tier limit reached — upgrade to Pro' : undefined}
-          className={`px-5 py-2.5 rounded-md bg-accent text-white font-medium transition-opacity shrink-0 ${
-            limitReached ? 'opacity-40 pointer-events-none' : 'hover:opacity-90'
-          }`}
+          href="/dashboard/new"
+          title={
+            limitReached
+              ? 'Free tier publish limit reached — you can still save drafts'
+              : undefined
+          }
+          className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity shrink-0"
         >
-          + Create quiz from article
+          + Create quiz
         </Link>
       </div>
 
@@ -195,26 +208,25 @@ export default function DashboardPage() {
             username={publisher.username}
             passRate={passRates[quiz.id] ?? null}
             onDeleted={handleQuizDeleted}
+            onPublished={handleQuizPublished}
           />
         ))}
 
-        {!limitReached && (
-          <Link
-            href="/dashboard/new"
-            className="bg-surface border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-accent transition-colors"
-          >
-            <span className="w-12 h-12 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-xl mb-4">
-              ✨
-            </span>
-            <p className="font-heading font-semibold mb-2">Create your next quiz</p>
-            <p className="text-sm text-gray-400 mb-5">
-              Paste any article URL and get 10 questions in under 60 seconds.
-            </p>
-            <span className="px-4 py-2 rounded-md border border-border text-sm">
-              ✨ Generate with AI
-            </span>
-          </Link>
-        )}
+        <Link
+          href="/dashboard/new"
+          className="bg-surface border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-accent transition-colors"
+        >
+          <span className="w-12 h-12 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-xl mb-4">
+            ✨
+          </span>
+          <p className="font-heading font-semibold mb-2">Create your next quiz</p>
+          <p className="text-sm text-gray-400 mb-5">
+            Generate from an article with AI, or write your own questions from scratch.
+          </p>
+          <span className="px-4 py-2 rounded-md border border-border text-sm">
+            + Create quiz
+          </span>
+        </Link>
       </div>
     </div>
   );

@@ -9,6 +9,11 @@ type Props = {
   onChange: (updated: Question) => void;
   onDelete: () => void;
   canDelete: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  isFirst: boolean;
+  isLast: boolean;
+  startInEditMode?: boolean;
 };
 
 export default function QuestionEditor({
@@ -17,8 +22,13 @@ export default function QuestionEditor({
   onChange,
   onDelete,
   canDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
+  startInEditMode,
 }: Props) {
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(startInEditMode ?? false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [draft, setDraft] = useState<Question>(question);
 
@@ -43,39 +53,95 @@ export default function QuestionEditor({
     setDraft({ ...draft, options });
   }
 
+  const moveControls = (
+    <div className="flex items-center gap-1 shrink-0">
+      <button
+        type="button"
+        onClick={onMoveUp}
+        disabled={isFirst}
+        title="Move up"
+        className="w-8 h-8 flex items-center justify-center rounded-md border border-border text-sm hover:border-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        ▲
+      </button>
+      <button
+        type="button"
+        onClick={onMoveDown}
+        disabled={isLast}
+        title="Move down"
+        className="w-8 h-8 flex items-center justify-center rounded-md border border-border text-sm hover:border-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        ▼
+      </button>
+      <button
+        type="button"
+        onClick={onDelete}
+        disabled={!canDelete}
+        title={!canDelete ? 'At least 1 question required' : 'Delete question'}
+        className="w-8 h-8 flex items-center justify-center rounded-md border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        🗑️
+      </button>
+    </div>
+  );
+
   if (editing) {
     return (
       <div className="bg-surface border border-accent rounded-xl p-5">
-        <p className="text-sm text-gray-400 mb-2">Question {index + 1}</p>
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <p className="text-sm text-gray-400">
+            Question {index + 1} <span className="text-accent">— editing</span>
+          </p>
+          <button
+            type="button"
+            onClick={cancel}
+            title="Cancel"
+            className="w-8 h-8 flex items-center justify-center rounded-md border border-border text-sm hover:border-accent transition-colors shrink-0"
+          >
+            ✕
+          </button>
+        </div>
         <textarea
           value={draft.text}
           onChange={(e) => setDraft({ ...draft, text: e.target.value })}
           rows={2}
+          placeholder="Question text..."
           className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none mb-3"
         />
-        <div className="space-y-2 mb-3">
-          {draft.options.map((option, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                type="radio"
-                checked={draft.answer === i}
-                onChange={() => setDraft({ ...draft, answer: i })}
-              />
-              <span className="text-xs text-gray-500 w-4">{String.fromCharCode(65 + i)}</span>
-              <input
-                type="text"
-                value={option}
-                onChange={(e) => updateOption(i, e.target.value)}
-                className="flex-1 px-3 py-1.5 rounded-md bg-background border border-border focus:border-accent outline-none"
-              />
-            </div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+          {draft.options.map((option, i) => {
+            const isCorrect = draft.answer === i;
+            return (
+              <div key={i} className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDraft({ ...draft, answer: i })}
+                  title={`Mark ${String.fromCharCode(65 + i)} as correct`}
+                  className={`w-6 h-6 shrink-0 rounded-md text-xs font-semibold flex items-center justify-center transition-colors ${
+                    isCorrect ? 'bg-green text-background' : 'bg-border text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  {String.fromCharCode(65 + i)}
+                </button>
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => updateOption(i, e.target.value)}
+                  placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                  className={`flex-1 min-w-0 px-3 py-1.5 rounded-md bg-background border outline-none ${
+                    isCorrect ? 'border-green' : 'border-border focus:border-accent'
+                  }`}
+                />
+                {isCorrect && <span className="text-xs text-green shrink-0">correct</span>}
+              </div>
+            );
+          })}
         </div>
         <textarea
           value={draft.explanation}
           onChange={(e) => setDraft({ ...draft, explanation: e.target.value })}
           rows={2}
-          placeholder="Explanation"
+          placeholder="Explanation (why is this correct?)"
           className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none mb-3"
         />
         <div className="flex gap-2">
@@ -99,30 +165,33 @@ export default function QuestionEditor({
   return (
     <div className="bg-surface border border-border rounded-xl p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
-        <p className="font-medium">
-          {index + 1}. {question.text}
-        </p>
+        <p className="font-medium">Question {index + 1}</p>
+        {moveControls}
       </div>
-      <div className="space-y-1.5 mb-3">
-        {question.options.map((option, i) => (
-          <p
-            key={i}
-            className={`text-sm px-3 py-1.5 rounded-md ${
-              i === question.answer ? 'bg-green/10 text-green' : 'text-gray-400'
-            }`}
-          >
-            {String.fromCharCode(65 + i)}. {option}
-          </p>
-        ))}
+      <p className="mb-3">{question.text}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+        {question.options.map((option, i) => {
+          const isCorrect = i === question.answer;
+          return (
+            <div
+              key={i}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm ${
+                isCorrect ? 'border-green bg-green/10 text-green' : 'border-border text-gray-400'
+              }`}
+            >
+              <span
+                className={`w-5 h-5 shrink-0 rounded text-xs font-semibold flex items-center justify-center ${
+                  isCorrect ? 'bg-green text-background' : 'bg-border text-gray-400'
+                }`}
+              >
+                {String.fromCharCode(65 + i)}
+              </span>
+              <span className="truncate">{option}</span>
+            </div>
+          );
+        })}
       </div>
-      <button
-        onClick={() => setShowExplanation((v) => !v)}
-        className="text-xs text-accent hover:underline mb-3"
-      >
-        {showExplanation ? 'Hide' : 'Show'} explanation
-      </button>
-      {showExplanation && <p className="text-sm text-gray-400 mb-3">{question.explanation}</p>}
-      <div className="flex gap-2">
+      <div className="flex items-center gap-3 mb-3">
         <button
           onClick={startEdit}
           className="px-3 py-1.5 rounded-md border border-border text-sm hover:border-accent transition-colors"
@@ -130,14 +199,13 @@ export default function QuestionEditor({
           ✎ Edit
         </button>
         <button
-          onClick={onDelete}
-          disabled={!canDelete}
-          title={!canDelete ? 'At least 3 questions required' : undefined}
-          className="px-3 py-1.5 rounded-md border border-red-500/40 text-red-400 text-sm hover:bg-red-500/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          onClick={() => setShowExplanation((v) => !v)}
+          className="text-xs text-accent hover:underline"
         >
-          ✕ Delete
+          {showExplanation ? 'Hide' : 'Show'} explanation
         </button>
       </div>
+      {showExplanation && <p className="text-sm text-gray-400">{question.explanation}</p>}
     </div>
   );
 }

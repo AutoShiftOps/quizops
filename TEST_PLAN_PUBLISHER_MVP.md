@@ -352,6 +352,13 @@ replaced with placeholder.
 Title auto-extracted from article in generate flow — fixes Untitled Quiz
 issue.
 
+Manual quiz creation, save-draft, and reorder-questions added (TC-P21–23).
+Implementing draft support surfaced and fixed two pre-existing `quiz_count`
+bugs: deleting a draft used to decrement the count unconditionally (drafts
+never incremented it in the first place), and the unpublish/republish
+toggle on the edit page never adjusted the count at all. Both fixed and
+covered by the API-level verification above.
+
 | TC | Status | Notes |
 |----|--------|-------|
 | TC-P01 | PASS | Verified with real Google session |
@@ -374,9 +381,9 @@ issue.
 | TC-P18 | — | Pending |
 | TC-P19 | — | Pending |
 | TC-P20 | — | Pending |
-| TC-P21 | — | |
-| TC-P22 | — | |
-| TC-P23 | — | |
+| TC-P21 | PASS* | Backend verified via direct API calls with a real Supabase session: publishing with <3 questions rejected (400), publishing with 3 questions succeeds and increments quiz_count, no `/api/generate` call is reachable from the manual path (route isn't invoked). *Path-selection cards, question-click UI, and reorder buttons were code-reviewed and build/typecheck clean but not clicked through in a live browser (no OAuth session available in this environment) — recommend a quick manual pass before announcing. |
+| TC-P22 | PASS | Verified via direct API calls: draft saved with only 1 question succeeds (relaxed minimum), `publishers.quiz_count` stays unchanged, `published_quizzes.status = 'draft'`, and `/q/[username]/[slug]` returns 404 for the draft's slug. |
+| TC-P23 | PASS | Verified via direct API calls: `PATCH /api/quiz/[id]` with `{status:'published'}` flips a draft to `status='published'` and increments `quiz_count` by exactly 1; the reverse (unpublish) correctly decrements it back. Also confirmed the tier limit applies to this transition — publishing a draft is blocked with 403 once `quiz_count` is already 3, closing a prior bypass. |
 
 ---
 

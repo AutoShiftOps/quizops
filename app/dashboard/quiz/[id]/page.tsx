@@ -6,12 +6,7 @@ import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PublishedQuiz, Question } from '@/lib/types';
 import QuestionEditor from '@/components/QuestionEditor';
-
-const EMOJI_OPTIONS = [
-  '📝', '🚀', '💡', '🔧', '🛠️', '📦', '☁️', '🔒',
-  '🐳', '⚙️', '📊', '🧪', '🎯', '🔥', '⚡', '🌐',
-  '🧠', '📚', '✅', '💻',
-];
+import QuizMetadataForm from '@/components/QuizMetadataForm';
 
 function relativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -43,8 +38,8 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
   const [titleTouched, setTitleTouched] = useState(false);
   const [description, setDescription] = useState('');
   const [emoji, setEmoji] = useState('📝');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [sourceUrl, setSourceUrl] = useState('');
+  const [topic, setTopic] = useState('');
   const [durationMin, setDurationMin] = useState(10);
   const [passMark, setPassMark] = useState(70);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -85,6 +80,7 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
       setDescription(found.description ?? '');
       setEmoji(found.emoji);
       setSourceUrl(found.source_url ?? '');
+      setTopic(found.topic ?? '');
       setDurationMin(Math.round(found.duration_s / 60));
       setPassMark(found.pass_mark);
       setQuestions(found.questions);
@@ -102,7 +98,7 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
   }
 
   function handleQuestionDelete(index: number) {
-    if (questions.length <= 3) return;
+    if (questions.length <= 1) return;
     setQuestions((prev) => prev.filter((_, i) => i !== index));
     markDirty();
   }
@@ -123,6 +119,26 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
     markDirty();
   }
 
+  function handleMoveUp(index: number) {
+    if (index === 0) return;
+    setQuestions((prev) => {
+      const next = [...prev];
+      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+      return next;
+    });
+    markDirty();
+  }
+
+  function handleMoveDown(index: number) {
+    setQuestions((prev) => {
+      if (index >= prev.length - 1) return prev;
+      const next = [...prev];
+      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+      return next;
+    });
+    markDirty();
+  }
+
   async function handleSave() {
     if (!title.trim()) {
       setTitleTouched(true);
@@ -140,6 +156,7 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
         description: description || undefined,
         emoji,
         source_url: sourceUrl || undefined,
+        topic: topic || undefined,
         duration_s: durationMin * 60,
         pass_mark: passMark,
         questions,
@@ -165,6 +182,7 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
             description: description || null,
             emoji,
             source_url: sourceUrl || null,
+            topic: topic || null,
             duration_s: durationMin * 60,
             pass_mark: passMark,
             questions,
@@ -188,6 +206,9 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
 
     if (res.ok) {
       setQuiz((prev) => (prev ? { ...prev, status: newStatus } : prev));
+    } else {
+      const json = await res.json().catch(() => ({}));
+      setSaveError(json.message || 'Could not update status.');
     }
     setTogglingStatus(false);
   }
@@ -205,6 +226,8 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
 
   if (!quiz) return null;
 
+  const belowMinimum = questions.length < 3;
+
   return (
     <div className="max-w-2xl mx-auto px-6 mt-8">
       <Link
@@ -215,136 +238,68 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
       </Link>
 
       <div className="flex items-center justify-between mt-4 mb-8">
-        <div>
+        <div className="flex items-center gap-2">
           <h1 className="font-heading text-xl font-semibold">Edit quiz</h1>
-          <p className="text-xs text-gray-500 mt-1">
-            Last updated: {relativeTime(quiz.updated_at)}
-          </p>
+          {quiz.status === 'draft' && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-500/20 text-gray-400">
+              Draft
+            </span>
+          )}
         </div>
         {dirty && <span className="text-xs text-amber-400">● Unsaved changes</span>}
       </div>
+      <p className="text-xs text-gray-500 -mt-6 mb-8">
+        Last updated: {relativeTime(quiz.updated_at)}
+      </p>
 
-      <div className="bg-surface border border-border rounded-xl p-5 mb-8 space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1.5">
-            Title <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              markDirty();
-            }}
-            onBlur={() => setTitleTouched(true)}
-            maxLength={100}
-            className={`w-full px-3 py-2 rounded-md bg-background border outline-none ${
-              titleTouched && !title.trim()
-                ? 'border-red-500'
-                : 'border-border focus:border-accent'
-            }`}
-          />
-          {titleTouched && !title.trim() && (
-            <p className="text-xs text-red-400 mt-1.5">Title is required.</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => {
-              setDescription(e.target.value);
-              markDirty();
-            }}
-            rows={2}
-            className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none resize-none"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Emoji</label>
-          <button
-            type="button"
-            onClick={() => setShowEmojiPicker((v) => !v)}
-            className="text-2xl px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
-          >
-            {emoji}
-          </button>
-          {showEmojiPicker && (
-            <div className="grid grid-cols-10 gap-1 mt-2 p-3 rounded-md border border-border bg-background">
-              {EMOJI_OPTIONS.map((e) => (
-                <button
-                  key={e}
-                  type="button"
-                  onClick={() => {
-                    setEmoji(e);
-                    setShowEmojiPicker(false);
-                    markDirty();
-                  }}
-                  className="text-xl hover:bg-surface rounded p-1"
-                >
-                  {e}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Source URL</label>
-          <input
-            type="text"
-            value={sourceUrl}
-            onChange={(e) => {
-              setSourceUrl(e.target.value);
-              markDirty();
-            }}
-            className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Duration</label>
-          <div className="flex gap-2">
-            {[10, 20, 30].map((min) => (
-              <button
-                key={min}
-                type="button"
-                onClick={() => {
-                  setDurationMin(min);
-                  markDirty();
-                }}
-                className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
-                  durationMin === min
-                    ? 'border-accent bg-accent/10 text-accent'
-                    : 'border-border hover:border-accent'
-                }`}
-              >
-                {min} min
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Pass mark</label>
-          <div className="flex gap-2">
-            {[60, 70, 80].map((mark) => (
-              <button
-                key={mark}
-                type="button"
-                onClick={() => {
-                  setPassMark(mark);
-                  markDirty();
-                }}
-                className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
-                  passMark === mark
-                    ? 'border-accent bg-accent/10 text-accent'
-                    : 'border-border hover:border-accent'
-                }`}
-              >
-                {mark}%
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="mb-6">
+        <QuizMetadataForm
+          title={title}
+          onTitleChange={(v) => {
+            setTitle(v);
+            markDirty();
+          }}
+          titleTouched={titleTouched}
+          onTitleBlur={() => setTitleTouched(true)}
+          description={description}
+          onDescriptionChange={(v) => {
+            setDescription(v);
+            markDirty();
+          }}
+          emoji={emoji}
+          onEmojiChange={(v) => {
+            setEmoji(v);
+            markDirty();
+          }}
+          sourceUrl={sourceUrl}
+          onSourceUrlChange={(v) => {
+            setSourceUrl(v);
+            markDirty();
+          }}
+          topic={topic}
+          onTopicChange={(v) => {
+            setTopic(v);
+            markDirty();
+          }}
+          durationMin={durationMin}
+          onDurationChange={(v) => {
+            setDurationMin(v);
+            markDirty();
+          }}
+          passMark={passMark}
+          onPassMarkChange={(v) => {
+            setPassMark(v);
+            markDirty();
+          }}
+        />
       </div>
+
+      {quiz.status === 'draft' && belowMinimum && (
+        <div className="mb-6 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+          Add at least 3 questions to publish. Each question needs 4 options and one correct
+          answer marked.
+        </div>
+      )}
 
       <div className="space-y-4 mb-6">
         {questions.map((q, i) => (
@@ -354,7 +309,11 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
             index={i}
             onChange={(updated) => handleQuestionChange(i, updated)}
             onDelete={() => handleQuestionDelete(i)}
-            canDelete={questions.length > 3}
+            canDelete={questions.length > 1}
+            onMoveUp={() => handleMoveUp(i)}
+            onMoveDown={() => handleMoveDown(i)}
+            isFirst={i === 0}
+            isLast={i === questions.length - 1}
           />
         ))}
       </div>
@@ -379,14 +338,19 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
           </button>
           <button
             onClick={handleToggleStatus}
-            disabled={togglingStatus}
-            className="px-4 py-2.5 rounded-md border border-border hover:border-accent transition-colors disabled:opacity-50"
+            disabled={togglingStatus || (quiz.status === 'draft' && belowMinimum)}
+            title={
+              quiz.status === 'draft' && belowMinimum
+                ? 'Add at least 3 questions to publish'
+                : undefined
+            }
+            className="px-4 py-2.5 rounded-md border border-border hover:border-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {togglingStatus
               ? 'Working…'
               : quiz.status === 'published'
               ? 'Unpublish'
-              : 'Republish'}
+              : 'Publish'}
           </button>
         </div>
         <button

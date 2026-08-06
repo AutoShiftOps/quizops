@@ -3,18 +3,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
-import { getPublisher, checkTierLimit } from '@/lib/publisher';
+import { getPublisher } from '@/lib/publisher';
 import { Publisher, Question } from '@/lib/types';
 import QuestionEditor from '@/components/QuestionEditor';
+import QuizMetadataForm from '@/components/QuizMetadataForm';
 import SharePanel from '@/components/SharePanel';
 
-type Step = 'input' | 'generating' | 'review' | 'published';
+type Step = 'select' | 'input' | 'generating' | 'review' | 'published';
+type Mode = 'ai' | 'manual';
 
-const EMOJI_OPTIONS = [
-  '📝', '🚀', '💡', '🔧', '🛠️', '📦', '☁️', '🔒',
-  '🐳', '⚙️', '📊', '🧪', '🎯', '🔥', '⚡', '🌐',
-  '🧠', '📚', '✅', '💻',
-];
+function blankQuestion(n: number): Question {
+  return {
+    id: `q${n}-${Date.now()}`,
+    text: 'New question',
+    code: null,
+    options: ['Option A', 'Option B', 'Option C', 'Option D'],
+    answer: 0,
+    explanation: '',
+    tags: [],
+  };
+}
 
 async function authHeader(): Promise<Record<string, string>> {
   const supabase = await getSupabaseClient();
@@ -29,29 +37,31 @@ export default function NewQuizPage() {
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [loadingPublisher, setLoadingPublisher] = useState(true);
 
-  const [step, setStep] = useState<Step>('input');
+  const [step, setStep] = useState<Step>('select');
+  const [mode, setMode] = useState<Mode>('ai');
 
-  // Input step
+  // Input step (AI path only)
   const [url, setUrl] = useState('');
   const [showPasteArea, setShowPasteArea] = useState(false);
   const [pastedText, setPastedText] = useState('');
   const [questionCount, setQuestionCount] = useState(10);
   const [inputError, setInputError] = useState<string | null>(null);
 
-  // Generating step
+  // Generating step (AI path only)
   const [questions, setQuestions] = useState<Question[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Review step metadata
+  // Review step metadata (shared by both paths)
   const [title, setTitle] = useState('');
   const [titleTouched, setTitleTouched] = useState(false);
   const [description, setDescription] = useState('');
   const [emoji, setEmoji] = useState('📝');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [sourceUrl, setSourceUrl] = useState('');
+  const [topic, setTopic] = useState('');
   const [durationMin, setDurationMin] = useState(10);
   const [passMark, setPassMark] = useState(70);
   const [publishing, setPublishing] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
 
   // Published step
@@ -81,23 +91,41 @@ export default function NewQuizPage() {
     })().catch(() => setLoadingPublisher(false));
   }, [router]);
 
-  function resetToInput() {
-    setStep('input');
+  function resetMetadata() {
+    setTitle('');
+    setTitleTouched(false);
+    setDescription('');
+    setEmoji('📝');
+    setSourceUrl('');
+    setTopic('');
+    setDurationMin(10);
+    setPassMark(70);
+    setPublishError(null);
+    setShareData(null);
+  }
+
+  function resetToSelect() {
+    setStep('select');
+    setMode('ai');
     setUrl('');
     setShowPasteArea(false);
     setPastedText('');
     setQuestionCount(10);
     setInputError(null);
     setQuestions([]);
-    setTitle('');
-    setTitleTouched(false);
-    setDescription('');
-    setEmoji('📝');
-    setSourceUrl('');
-    setDurationMin(10);
-    setPassMark(70);
-    setPublishError(null);
-    setShareData(null);
+    resetMetadata();
+  }
+
+  function handleSelectAi() {
+    setMode('ai');
+    setStep('input');
+  }
+
+  function handleSelectManual() {
+    setMode('manual');
+    resetMetadata();
+    setQuestions([blankQuestion(1)]);
+    setStep('review');
   }
 
   async function startGeneration(payload: { url?: string; text?: string }) {
@@ -213,7 +241,7 @@ export default function NewQuizPage() {
 
   function handleStartOver() {
     if (!window.confirm('This will discard everything and start over. Continue?')) return;
-    resetToInput();
+    resetToSelect();
   }
 
   function handleQuestionChange(index: number, updated: Question) {
@@ -221,31 +249,39 @@ export default function NewQuizPage() {
   }
 
   function handleQuestionDelete(index: number) {
-    if (questions.length <= 3) return;
+    if (questions.length <= 1) return;
     setQuestions((prev) => prev.filter((_, i) => i !== index));
   }
 
   function handleAddQuestion() {
-    setQuestions((prev) => [
-      ...prev,
-      {
-        id: `q${prev.length + 1}-${Date.now()}`,
-        text: 'New question',
-        code: null,
-        options: ['Option A', 'Option B', 'Option C', 'Option D'],
-        answer: 0,
-        explanation: '',
-        tags: [],
-      },
-    ]);
+    setQuestions((prev) => [...prev, blankQuestion(prev.length + 1)]);
   }
 
-  async function handlePublish() {
+  function handleMoveUp(index: number) {
+    if (index === 0) return;
+    setQuestions((prev) => {
+      const next = [...prev];
+      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+      return next;
+    });
+  }
+
+  function handleMoveDown(index: number) {
+    setQuestions((prev) => {
+      if (index >= prev.length - 1) return prev;
+      const next = [...prev];
+      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+      return next;
+    });
+  }
+
+  async function submitQuiz(status: 'draft' | 'published') {
     if (!title.trim()) {
       setTitleTouched(true);
       return;
     }
-    setPublishing(true);
+    if (status === 'published') setPublishing(true);
+    else setSavingDraft(true);
     setPublishError(null);
     const headers = await authHeader();
 
@@ -257,16 +293,24 @@ export default function NewQuizPage() {
         description: description || undefined,
         emoji,
         source_url: sourceUrl || undefined,
+        topic: topic || undefined,
         duration_s: durationMin * 60,
         pass_mark: passMark,
         questions,
+        status,
       }),
     });
 
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
-      setPublishError(json.message || 'Could not publish quiz. Please try again.');
+      setPublishError(json.message || 'Could not save quiz. Please try again.');
       setPublishing(false);
+      setSavingDraft(false);
+      return;
+    }
+
+    if (status === 'draft') {
+      router.push('/dashboard');
       return;
     }
 
@@ -282,30 +326,54 @@ export default function NewQuizPage() {
 
   if (!publisher) return null;
 
-  const limitReached = checkTierLimit(publisher);
-
-  if (limitReached && step === 'input') {
-    return (
-      <div className="mt-8 max-w-lg mx-auto text-center">
-        <p className="text-4xl mb-4">🔒</p>
-        <h1 className="font-heading text-xl font-semibold mb-2">
-          Free tier limit reached (3/3 quizzes)
-        </h1>
-        <p className="text-gray-400 mb-6">
-          Upgrade to Pro for unlimited quizzes and generations.
-        </p>
-      </div>
-    );
-  }
-
   if (step === 'published' && shareData) {
     return (
       <SharePanel
         url={shareData.url}
         embedHtml={shareData.embedHtml}
         badgeMarkdown={shareData.badgeMarkdown}
-        onCreateAnother={resetToInput}
+        onCreateAnother={resetToSelect}
       />
+    );
+  }
+
+  if (step === 'select') {
+    return (
+      <div className="mt-8 max-w-2xl mx-auto">
+        <h1 className="font-heading text-2xl font-semibold mb-1">Create a quiz</h1>
+        <p className="text-gray-400 mb-6">
+          Choose how you want to build it — generate from your article or write questions
+          yourself.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button
+            onClick={handleSelectAi}
+            className="text-left p-6 rounded-xl border-2 border-accent bg-accent/10 transition-colors"
+          >
+            <span className="text-2xl text-accent">✨</span>
+            <h2 className="font-heading font-semibold mt-3 mb-1">Generate from article</h2>
+            <p className="text-sm text-gray-400 mb-4">
+              Paste your article URL or text. AI writes 10 questions in under 60 seconds.
+              Review and edit before publishing.
+            </p>
+            <span className="text-xs font-semibold text-accent">Recommended</span>
+          </button>
+          <button
+            onClick={handleSelectManual}
+            className="text-left p-6 rounded-xl border border-border hover:border-green transition-colors"
+          >
+            <span className="text-2xl text-green">✎</span>
+            <h2 className="font-heading font-semibold mt-3 mb-1">Write questions manually</h2>
+            <p className="text-sm text-gray-400 mb-4">
+              Start with a blank quiz. Add your own questions, options, and explanations at
+              your own pace.
+            </p>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">
+              Full control
+            </span>
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -344,116 +412,45 @@ export default function NewQuizPage() {
   }
 
   if (step === 'review') {
+    const belowMinimum = questions.length < 3;
+
     return (
       <div className="mt-8 max-w-2xl mx-auto">
-        <h1 className="font-heading text-xl font-semibold mb-6">Review your quiz</h1>
+        <h1 className="font-heading text-xl font-semibold mb-6">
+          {mode === 'manual' ? 'Write your quiz' : 'Review your quiz'}
+        </h1>
 
-        <div className="bg-surface border border-border rounded-xl p-5 mb-8 space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1.5">
-              Title <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onBlur={() => setTitleTouched(true)}
-              placeholder="e.g. How CI/CD Pipelines Actually Work"
-              maxLength={100}
-              className={`w-full px-3 py-2 rounded-md bg-background border outline-none ${
-                titleTouched && !title.trim()
-                  ? 'border-red-500'
-                  : 'border-border focus:border-accent'
-              }`}
-            />
-            {titleTouched && !title.trim() && (
-              <p className="text-xs text-red-400 mt-1.5">Title is required.</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={2}
-              className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none resize-none"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Emoji</label>
-            <button
-              type="button"
-              onClick={() => setShowEmojiPicker((v) => !v)}
-              className="text-2xl px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
-            >
-              {emoji}
-            </button>
-            {showEmojiPicker && (
-              <div className="grid grid-cols-10 gap-1 mt-2 p-3 rounded-md border border-border bg-background">
-                {EMOJI_OPTIONS.map((e) => (
-                  <button
-                    key={e}
-                    type="button"
-                    onClick={() => {
-                      setEmoji(e);
-                      setShowEmojiPicker(false);
-                    }}
-                    className="text-xl hover:bg-surface rounded p-1"
-                  >
-                    {e}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Source URL</label>
-            <input
-              type="text"
-              value={sourceUrl}
-              onChange={(e) => setSourceUrl(e.target.value)}
-              className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Duration</label>
-            <div className="flex gap-2">
-              {[10, 20, 30].map((min) => (
-                <button
-                  key={min}
-                  type="button"
-                  onClick={() => setDurationMin(min)}
-                  className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
-                    durationMin === min
-                      ? 'border-accent bg-accent/10 text-accent'
-                      : 'border-border hover:border-accent'
-                  }`}
-                >
-                  {min} min
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Pass mark</label>
-            <div className="flex gap-2">
-              {[60, 70, 80].map((mark) => (
-                <button
-                  key={mark}
-                  type="button"
-                  onClick={() => setPassMark(mark)}
-                  className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
-                    passMark === mark
-                      ? 'border-accent bg-accent/10 text-accent'
-                      : 'border-border hover:border-accent'
-                  }`}
-                >
-                  {mark}%
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="mb-6">
+          <QuizMetadataForm
+            title={title}
+            onTitleChange={setTitle}
+            titleTouched={titleTouched}
+            onTitleBlur={() => setTitleTouched(true)}
+            description={description}
+            onDescriptionChange={setDescription}
+            emoji={emoji}
+            onEmojiChange={setEmoji}
+            sourceUrl={sourceUrl}
+            onSourceUrlChange={setSourceUrl}
+            topic={topic}
+            onTopicChange={setTopic}
+            durationMin={durationMin}
+            onDurationChange={setDurationMin}
+            passMark={passMark}
+            onPassMarkChange={setPassMark}
+          />
         </div>
+
+        <p className="text-center text-sm text-gray-500 mb-4">
+          questions ({questions.length} of minimum 3)
+        </p>
+
+        {belowMinimum && (
+          <div className="mb-6 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+            Add at least 3 questions to publish. Each question needs 4 options and one
+            correct answer marked.
+          </div>
+        )}
 
         <div className="space-y-4 mb-6">
           {questions.map((q, i) => (
@@ -463,7 +460,12 @@ export default function NewQuizPage() {
               index={i}
               onChange={(updated) => handleQuestionChange(i, updated)}
               onDelete={() => handleQuestionDelete(i)}
-              canDelete={questions.length > 3}
+              canDelete={questions.length > 1}
+              onMoveUp={() => handleMoveUp(i)}
+              onMoveDown={() => handleMoveDown(i)}
+              isFirst={i === 0}
+              isLast={i === questions.length - 1}
+              startInEditMode={q.text === 'New question' && q.explanation === ''}
             />
           ))}
         </div>
@@ -477,37 +479,54 @@ export default function NewQuizPage() {
 
         {publishError && <p className="text-sm text-red-400 mb-4">{publishError}</p>}
 
-        <div className="flex items-center justify-between border-t border-border pt-6">
-          <div>
-            <p className="text-sm text-gray-400 mb-2">{questions.length} questions</p>
-            <div className="flex gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+          <div className="flex gap-2">
+            {mode === 'manual' ? (
               <button
-                onClick={handleStartOver}
+                onClick={resetToSelect}
                 className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
               >
-                ↺ Start over
+                ← Back
               </button>
-              <button
-                onClick={handleRegenerate}
-                className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
-              >
-                ↺ Regenerate
-              </button>
-            </div>
+            ) : (
+              <>
+                <button
+                  onClick={handleStartOver}
+                  className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+                >
+                  ↺ Start over
+                </button>
+                <button
+                  onClick={handleRegenerate}
+                  className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+                >
+                  ↺ Regenerate
+                </button>
+              </>
+            )}
           </div>
-          <button
-            onClick={handlePublish}
-            disabled={publishing || questions.length < 3 || !title.trim()}
-            className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {publishing ? 'Publishing…' : 'Publish quiz →'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => submitQuiz('draft')}
+              disabled={savingDraft || publishing || questions.length < 1 || !title.trim()}
+              className="px-4 py-2.5 rounded-md border border-border hover:border-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+            >
+              {savingDraft ? 'Saving…' : 'Save draft'}
+            </button>
+            <button
+              onClick={() => submitQuiz('published')}
+              disabled={publishing || savingDraft || questions.length < 3 || !title.trim()}
+              className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+            >
+              {publishing ? 'Publishing…' : 'Publish quiz →'}
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // step === 'input'
+  // step === 'input' (AI path)
   return (
     <div className="mt-8 max-w-lg mx-auto">
       <h1 className="font-heading text-2xl font-semibold mb-6 text-center">
@@ -571,12 +590,20 @@ export default function NewQuizPage() {
 
       {inputError && <p className="text-sm text-red-400 mb-4">{inputError}</p>}
 
-      <button
-        onClick={handleGenerateClick}
-        className="w-full px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity"
-      >
-        Generate quiz →
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={resetToSelect}
+          className="px-4 py-2.5 rounded-md border border-border hover:border-accent transition-colors text-sm"
+        >
+          ← Back
+        </button>
+        <button
+          onClick={handleGenerateClick}
+          className="flex-1 px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity"
+        >
+          Generate quiz →
+        </button>
+      </div>
     </div>
   );
 }

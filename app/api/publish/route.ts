@@ -24,15 +24,6 @@ export async function POST(req: NextRequest) {
   if (!publisher) {
     return NextResponse.json({ error: 'no_publisher_profile' }, { status: 403 });
   }
-  if (checkTierLimit(publisher)) {
-    return NextResponse.json(
-      {
-        error: 'tier_limit_reached',
-        message: 'Free tier limit reached (3/3 quizzes). Upgrade to Pro for more.',
-      },
-      { status: 403 }
-    );
-  }
 
   const body = await req.json().catch(() => ({}));
   const {
@@ -44,6 +35,7 @@ export async function POST(req: NextRequest) {
     duration_s: durationS,
     pass_mark: passMark,
     questions,
+    status: requestedStatus,
   } = body as {
     title?: string;
     description?: string;
@@ -53,7 +45,22 @@ export async function POST(req: NextRequest) {
     duration_s?: number;
     pass_mark?: number;
     questions?: unknown;
+    status?: 'draft' | 'published';
   };
+
+  const status: 'draft' | 'published' = requestedStatus === 'draft' ? 'draft' : 'published';
+
+  // Drafts don't count against the free-tier limit — only enforce it for
+  // quizzes that will actually be published.
+  if (status === 'published' && checkTierLimit(publisher)) {
+    return NextResponse.json(
+      {
+        error: 'tier_limit_reached',
+        message: 'Free tier limit reached (3/3 quizzes). Upgrade to Pro for more.',
+      },
+      { status: 403 }
+    );
+  }
 
   if (!validateTitle(title)) {
     return NextResponse.json(
@@ -61,12 +68,17 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  if (!validateQuestions(questions)) {
+  // Drafts can be saved with as little as one question — the 3-question
+  // minimum only applies once you're actually publishing.
+  const minQuestions = status === 'draft' ? 1 : 3;
+  if (!validateQuestions(questions, minQuestions)) {
     return NextResponse.json(
       {
         error: 'invalid_questions',
         message:
-          'Every question needs 4 options, a correct answer, and an explanation — check for any blank fields.',
+          status === 'draft'
+            ? 'Add at least 1 question with 4 options, a correct answer, and an explanation.'
+            : 'Every question needs 4 options, a correct answer, and an explanation — check for any blank fields.',
       },
       { status: 400 }
     );
@@ -99,14 +111,17 @@ export async function POST(req: NextRequest) {
     duration_s: durationS ?? 600,
     pass_mark: passMark ?? 70,
     questions,
-    status: 'published',
+    status,
   });
 
   if (insertError) {
     return NextResponse.json({ error: 'insert_failed' }, { status: 500 });
   }
 
-  await incrementQuizCount(authed.supabase, publisher.id);
+  // Only published quizzes count against the free-tier limit.
+  if (status === 'published') {
+    await incrementQuizCount(authed.supabase, publisher.id);
+  }
 
   const appUrl = process.env.APP_URL || 'http://localhost:3000';
   const url = `${appUrl}/q/${publisher.username}/${slug}`;
