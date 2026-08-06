@@ -11,8 +11,28 @@ const config: Config = {
         background: '#0A0E14',
         surface: '#111827',
         border: '#1F2937',
-        accent: '#3E7BFA',
         green: '#3ECF8E',
+        accent: {
+          DEFAULT: '#3E7BFA',
+          light: 'rgba(62,123,250,0.12)',
+          border: 'rgba(62,123,250,0.25)',
+          muted: '#6B8FFD',
+        },
+        success: {
+          DEFAULT: '#22C55E',
+          light: 'rgba(34,197,94,0.12)',
+          border: 'rgba(34,197,94,0.25)',
+        },
+        warning: {
+          DEFAULT: '#F59E0B',
+          light: 'rgba(245,158,11,0.12)',
+          border: 'rgba(245,158,11,0.25)',
+        },
+        danger: {
+          DEFAULT: '#EF4444',
+          light: 'rgba(239,68,68,0.1)',
+          border: 'rgba(239,68,68,0.2)',
+        },
       },
       fontFamily: {
         heading: ['var(--font-space-grotesk)', 'sans-serif'],

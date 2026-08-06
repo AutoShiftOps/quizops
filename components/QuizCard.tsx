@@ -41,7 +41,7 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
           </span>
         )}
         {examScore && (
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-purple-500/20 text-purple-400 self-start">
+          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-accent/20 text-accent self-start">
             Exam {examScore.percentage}% ✓
           </span>
         )}

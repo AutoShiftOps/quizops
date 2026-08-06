@@ -156,14 +156,14 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
   return (
     <>
       {isSignedIn && user && (
-        <div className="-mx-6 px-6 py-2 mb-10 flex flex-wrap items-center justify-between gap-2 bg-[rgba(108,99,255,0.08)] border-b border-[rgba(108,99,255,0.2)]">
-          <span className="text-[13px] text-[#8B83FF]">
+        <div className="-mx-6 px-6 py-2 mb-10 flex flex-wrap items-center justify-between gap-2 bg-[rgba(62,123,250,0.08)] border-b border-[rgba(62,123,250,0.2)]">
+          <span className="text-[13px] text-[#6B8FFD]">
             👋 Welcome back, {getFirstName(user)}
           </span>
           {hasPublisherProfile && (
             <button
               onClick={() => router.push('/dashboard')}
-              className="text-[12px] text-[#6C63FF] underline hover:opacity-80 transition-opacity"
+              className="text-[12px] text-[#3E7BFA] underline hover:opacity-80 transition-opacity"
             >
               Publisher dashboard →
             </button>
@@ -193,7 +193,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
             ) : (
               <>
                 <div className="bg-[#111118] border border-border rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-[#6C63FF]">{quizzesTaken}</p>
+                  <p className="text-2xl font-bold text-[#3E7BFA]">{quizzesTaken}</p>
                   <p className="text-[10px] uppercase text-[#6B6882] mt-1">Quizzes taken</p>
                 </div>
                 <div className="bg-[#111118] border border-border rounded-lg p-3 text-center">
@@ -234,7 +234,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       </section>
 
       {isSignedIn && hasPublisherProfile ? (
-        <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#111118] border border-[rgba(108,99,255,0.2)] rounded-lg py-3 px-4">
+        <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#111118] border border-[rgba(62,123,250,0.2)] rounded-lg py-3 px-4">
           <div>
             <p className="text-[13px] font-medium">Your quizzes</p>
             <p className="text-[11px] text-[#6B6882] mt-0.5">
@@ -243,7 +243,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
           </div>
           <button
             onClick={() => router.push('/dashboard')}
-            className="text-xs px-3 py-1.5 rounded-md bg-[#6C63FF] text-white hover:opacity-90 transition-opacity shrink-0"
+            className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity shrink-0"
           >
             Go to dashboard →
           </button>
