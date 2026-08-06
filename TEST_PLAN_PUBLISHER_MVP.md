@@ -352,6 +352,21 @@ replaced with placeholder.
 Title auto-extracted from article in generate flow — fixes Untitled Quiz
 issue.
 
+Bug found and fixed: free tier limit was enforced correctly by the API
+(`/api/publish`, `/api/quiz/[id]`) but not by the UI — the dashboard
+"+ Create quiz" button and `/dashboard/new` let a publisher at 3/3 reach
+the create flow, where they'd only discover the limit after filling out a
+whole quiz and hitting Publish. Fixed with a UI-level gate in three places:
+the dashboard header button now shows "Upgrade to create more" (amber)
+instead of navigating when `quiz_count >= 3` on the free tier; the invite
+card in the quiz grid is replaced with an upgrade card in the same state;
+and `/dashboard/new` itself hard-gates on mount — even a direct URL visit
+renders an upgrade wall instead of the create flow. All three read the
+same `checkTierLimit()` used by the API, verified against real
+`quiz_count` transitions (0→2→3, publish-blocked-at-3, delete-back-to-2)
+with an isolated test publisher. API-side enforcement is unchanged (belt
+and suspenders, per TC-P13).
+
 Manual quiz creation, save-draft, and reorder-questions added (TC-P21–23).
 Implementing draft support surfaced and fixed two pre-existing `quiz_count`
 bugs: deleting a draft used to decrement the count unconditionally (drafts
@@ -373,7 +388,7 @@ covered by the API-level verification above.
 | TC-P10 | PASS* | Same as P09 |
 | TC-P11 | PASS | Public reader page verified |
 | TC-P12 | — | Pending |
-| TC-P13 | — | Pending |
+| TC-P13 | BUG FIXED | UI gate added — button disabled at 3/3, /dashboard/new shows upgrade wall. API enforcement unchanged. |
 | TC-P14 | — | Pending |
 | TC-P15 | PASS | Edit quiz flow implemented — title, description, emoji, source URL, questions all editable. Save/unpublish/delete all working. |
 | TC-P16 | — | Pending |

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
-import { getPublisher } from '@/lib/publisher';
+import { getPublisher, checkTierLimit } from '@/lib/publisher';
 import { Publisher, Question } from '@/lib/types';
 import QuestionEditor from '@/components/QuestionEditor';
 import QuizMetadataForm from '@/components/QuizMetadataForm';
@@ -63,6 +63,7 @@ export default function NewQuizPage() {
   const [publishing, setPublishing] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [upgradeToast, setUpgradeToast] = useState(false);
 
   // Published step
   const [shareData, setShareData] = useState<{
@@ -318,6 +319,10 @@ export default function NewQuizPage() {
     setShareData(json);
     setStep('published');
     setPublishing(false);
+    // Keep the locally-held publisher in sync so the tier-limit gate below
+    // re-evaluates correctly if they stay on this page (e.g. "Create
+    // another quiz") right after publishing their 3rd free quiz.
+    setPublisher((prev) => (prev ? { ...prev, quiz_count: prev.quiz_count + 1 } : prev));
   }
 
   if (loadingPublisher) {
@@ -326,6 +331,10 @@ export default function NewQuizPage() {
 
   if (!publisher) return null;
 
+  // Show the just-published share screen before the gate check runs — a
+  // publish that pushed them to the limit should still land on their share
+  // links, not get clobbered by the wall. The wall only applies to
+  // (re-)entering the create flow itself.
   if (step === 'published' && shareData) {
     return (
       <SharePanel
@@ -334,6 +343,47 @@ export default function NewQuizPage() {
         badgeMarkdown={shareData.badgeMarkdown}
         onCreateAnother={resetToSelect}
       />
+    );
+  }
+
+  // Hard gate: even a direct URL visit to /dashboard/new must hit this wall
+  // when the free tier limit is reached — the API already rejects publishes
+  // past the limit, but the UI shouldn't let someone reach the create flow
+  // at all in that state.
+  if (checkTierLimit(publisher)) {
+    return (
+      <div className="mt-16 max-w-md mx-auto text-center">
+        <div className="w-16 h-16 mx-auto rounded-full bg-amber-500/15 text-amber-400 flex items-center justify-center text-3xl mb-6">
+          🔒
+        </div>
+        <h1 className="font-heading text-xl font-semibold mb-2">Free tier limit reached</h1>
+        <p className="text-sm text-gray-400 mb-8">
+          You&apos;ve published 3 of 3 free quizzes. Upgrade to Pro for unlimited
+          quizzes, advanced analytics, and more.
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-5 py-2.5 rounded-md border border-border hover:border-accent transition-colors text-sm"
+          >
+            ← Back to dashboard
+          </button>
+          <button
+            onClick={() => {
+              setUpgradeToast(true);
+              setTimeout(() => setUpgradeToast(false), 3000);
+            }}
+            className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
+          >
+            Upgrade to Pro →
+          </button>
+        </div>
+        {upgradeToast && (
+          <div className="fixed bottom-6 right-6 bg-surface border border-border px-4 py-2.5 rounded-md shadow-lg text-sm">
+            Pro tier coming soon! We&apos;ll notify you when it&apos;s available.
+          </div>
+        )}
+      </div>
     );
   }
 

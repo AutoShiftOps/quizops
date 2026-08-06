@@ -30,6 +30,13 @@ export default function DashboardPage() {
   });
   const [passRates, setPassRates] = useState<Record<string, number | null>>({});
   const [origin, setOrigin] = useState('');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  function showProComingSoonToast() {
+    setToast("Pro tier coming soon! We'll notify you when it's available.");
+    setTimeout(() => setToast(null), 3000);
+  }
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -140,17 +147,21 @@ export default function DashboardPage() {
           </p>
           <TierBadge publisher={publisher} />
         </div>
-        <Link
-          href="/dashboard/new"
-          title={
-            limitReached
-              ? 'Free tier publish limit reached — you can still save drafts'
-              : undefined
-          }
-          className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity shrink-0"
-        >
-          + Create quiz
-        </Link>
+        {limitReached ? (
+          <button
+            onClick={() => setShowUpgradeModal(true)}
+            className="px-5 py-2.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/40 font-medium hover:bg-amber-500/25 transition-colors shrink-0"
+          >
+            Upgrade to create more
+          </button>
+        ) : (
+          <Link
+            href="/dashboard/new"
+            className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity shrink-0"
+          >
+            + Create quiz
+          </Link>
+        )}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -212,22 +223,80 @@ export default function DashboardPage() {
           />
         ))}
 
-        <Link
-          href="/dashboard/new"
-          className="bg-surface border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-accent transition-colors"
-        >
-          <span className="w-12 h-12 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-xl mb-4">
-            ✨
-          </span>
-          <p className="font-heading font-semibold mb-2">Create your next quiz</p>
-          <p className="text-sm text-gray-400 mb-5">
-            Generate from an article with AI, or write your own questions from scratch.
-          </p>
-          <span className="px-4 py-2 rounded-md border border-border text-sm">
-            + Create quiz
-          </span>
-        </Link>
+        {limitReached ? (
+          <div className="bg-surface border border-amber-500/30 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+            <span className="w-12 h-12 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-4">
+              🔒
+            </span>
+            <p className="font-heading font-semibold mb-2">Upgrade to add more quizzes</p>
+            <p className="text-sm text-gray-400 mb-5">You&apos;ve used all 3 free slots.</p>
+            <button
+              onClick={() => setShowUpgradeModal(true)}
+              className="px-4 py-2 rounded-md border border-amber-500/40 text-amber-300 text-sm hover:bg-amber-500/10 transition-colors"
+            >
+              Learn about Pro →
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/dashboard/new"
+            className="bg-surface border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-accent transition-colors"
+          >
+            <span className="w-12 h-12 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-xl mb-4">
+              ✨
+            </span>
+            <p className="font-heading font-semibold mb-2">Create your next quiz</p>
+            <p className="text-sm text-gray-400 mb-5">
+              Generate from an article with AI, or write your own questions from scratch.
+            </p>
+            <span className="px-4 py-2 rounded-md border border-border text-sm">
+              + Create quiz
+            </span>
+          </Link>
+        )}
       </div>
+
+      {showUpgradeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-6">
+            <h3 className="font-heading text-lg font-semibold mb-2">
+              You&apos;ve reached the free limit
+            </h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Free tier includes 3 published quizzes. Upgrade to Pro for:
+            </p>
+            <ul className="text-sm text-gray-300 space-y-1.5 mb-6">
+              <li>✓ Unlimited quizzes</li>
+              <li>✓ Full analytics history</li>
+              <li>✓ Remove QuizOps branding</li>
+              <li>✓ iFrame embed support</li>
+            </ul>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowUpgradeModal(false)}
+                className="flex-1 px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowUpgradeModal(false);
+                  showProComingSoonToast();
+                }}
+                className="flex-1 px-4 py-2 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
+              >
+                Upgrade to Pro →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 bg-surface border border-border px-4 py-2.5 rounded-md shadow-lg text-sm">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
