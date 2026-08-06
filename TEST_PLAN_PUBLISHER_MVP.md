@@ -374,6 +374,14 @@ never incremented it in the first place), and the unpublish/republish
 toggle on the edit page never adjusted the count at all. Both fixed and
 covered by the API-level verification above.
 
+410c318 — CRITICAL write-side bug found: quiz_attempts table had ZERO rows
+for any user. Root cause: saveExamAttempt() and both practice-mode upserts
+in ResultsScreen and QuizEngine silently discarded Supabase errors. The
+entire score persistence system was non-functional from day one. Fixed by
+adding error checks and logging to all three write paths.
+onAuthStateChange reactivity also added to QuizEngine and ExamEngine to
+close auth race condition.
+
 | TC | Status | Notes |
 |----|--------|-------|
 | TC-P01 | PASS | Verified with real Google session |

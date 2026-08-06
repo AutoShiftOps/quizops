@@ -406,8 +406,8 @@ to external publishers.**
 | LT-03 | — | |
 | LT-04 | — | |
 | LT-05 | — | |
-| LT-06 | — | Score badges verified working after BankGrid auth fix |
-| LT-07 | — | |
+| LT-06 | RETEST REQUIRED | Write-side bug fixed in 410c318 — re-verify score saves to quiz_attempts after completing quiz |
+| LT-07 | RETEST REQUIRED | Same — exam mode write path also fixed |
 | LT-08 | — | |
 | LT-09 | — | |
 | LT-10 | — | |
@@ -422,7 +422,7 @@ to external publishers.**
 | LT-17c | — | |
 | LT-18 | — | |
 | LT-19 | — | |
-| LT-20 | — | |
+| LT-20 | RETEST REQUIRED | TC-P12 — Published quiz attempts also affected |
 | LT-21 | — | |
 | LT-22 | — | |
 | LT-23 | — | |
@@ -445,3 +445,23 @@ to external publishers.**
 7. Monitor Vercel → Functions logs for any generation errors
 8. Set up a simple uptime monitor 
    (UptimeRobot free tier covers this)
+
+---
+
+## CRITICAL BUG HISTORY
+
+### Score persistence non-functional (410c318)
+Severity: Critical
+Found: During live test phase
+Impact: quiz_attempts table empty for all 
+  users — no scores ever saved to database.
+  Score badges, stats, and progress tracking 
+  all showing incorrect data as a result.
+Root cause: Silent error discarding on all 
+  three Supabase write paths (saveExamAttempt,
+  practice ResultsScreen, exam ResultsScreen).
+Fix: Error checking + logging added to all 
+  write paths. onAuthStateChange reactivity 
+  added to quiz engines.
+Verification: Requires completing a real quiz 
+  signed in and confirming row in quiz_attempts.
