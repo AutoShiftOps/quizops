@@ -7,7 +7,7 @@
 
 Deployment complete as of 2026-08-05.
 Manual live testing in progress.
-Start at LT-01 and work through all 27 tests.
+Start at LT-01 and work through all 29 tests.
 
 ---
 
@@ -231,6 +231,32 @@ Pass criteria:
 - [ ] publishers.quiz_count incremented to 1
 - [ ] Redirected to share screen
 
+### LT-17b — Manual creation (TC-P21 browser test)
+On /dashboard/new, select "Write questions manually".
+
+Pass criteria:
+- [ ] Path selection cards render, manual card selectable
+- [ ] No URL input or streaming shown for manual path
+- [ ] No /api/generate call made (check Network tab)
+- [ ] Can fill title, source URL, topic
+- [ ] Can add 3+ questions, each with 4 options and a
+      correct answer marked by clicking it
+- [ ] Move up/down buttons reorder questions correctly
+- [ ] Publish succeeds → quiz appears at /q/[username]/[slug]
+
+### LT-17c — Save draft + publish draft (TC-P22/23)
+From the quiz builder (AI or manual path).
+
+Pass criteria:
+- [ ] Save draft with title + 1 question succeeds
+- [ ] Dashboard shows quiz with grey Draft badge
+- [ ] publishers.quiz_count unchanged after draft save
+- [ ] /q/[username]/[slug] returns 404 for the draft
+- [ ] Click [Publish] on draft card → badge changes to
+      Published
+- [ ] publishers.quiz_count increments by 1 on publish
+- [ ] /q/[username]/[slug] now accessible
+
 ### LT-18 — Share screen (TC-P10)
 Pass criteria:
 - [ ] Live URL shown and correct
@@ -357,7 +383,7 @@ Open quiz.autoshiftops.com on your phone.
 | 8 — Dashboard | LT-24 to LT-25 | All pass |
 | 9 — Regression | LT-26 to LT-27 | All pass |
 
-**Total: 27 live tests. All must pass before opening 
+**Total: 29 live tests. All must pass before opening 
 to external publishers.**
 
 ---
@@ -392,6 +418,8 @@ to external publishers.**
 | LT-15 | — | |
 | LT-16 | — | |
 | LT-17 | — | |
+| LT-17b | — | |
+| LT-17c | — | |
 | LT-18 | — | |
 | LT-19 | — | |
 | LT-20 | — | |
@@ -405,7 +433,7 @@ to external publishers.**
 
 ---
 
-## POST-LAUNCH ACTIONS (after all 27 pass)
+## POST-LAUNCH ACTIONS (after all 29 pass)
 
 1. Update DEPLOY.md deployment status table
 2. Close GitHub issues #1–#7 with test results
