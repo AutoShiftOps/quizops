@@ -25,14 +25,27 @@ export default function QuizEngine({ bank, questions }: Props) {
   const answeredCurrent = answers[currentQuestion.id] !== undefined;
 
   useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
     getSupabaseClient()
       .then(async (supabase) => {
         const {
           data: { session },
         } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
+
+        // A one-time check on mount could miss a sign-in that completes
+        // slightly later (e.g. right after an OAuth redirect lands here) —
+        // without this, finishing the quiz before that resolves would save
+        // the attempt as a guest (or not at all).
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, newSession) => {
+          setUser(newSession?.user ?? null);
+        });
+        unsubscribe = () => subscription.unsubscribe();
       })
       .catch(() => {});
+    return () => unsubscribe?.();
   }, []);
 
   // Restore a mid-quiz checkpoint (if any) after mount, so the server-rendered

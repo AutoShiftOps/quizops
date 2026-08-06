@@ -40,8 +40,9 @@ export default function ResultsScreen({
 
     (async () => {
       const supabase = await getSupabaseClient();
+      console.log('[ResultsScreen] saving attempt for user:', user.id, 'bank:', bank.slug);
 
-      await supabase.from('quiz_attempts').upsert(
+      const { error: attemptError } = await supabase.from('quiz_attempts').upsert(
         {
           user_id: user.id,
           email: user.email,
@@ -57,18 +58,30 @@ export default function ResultsScreen({
         },
         { onConflict: 'user_id,bank_slug,mode' }
       );
+      // Supabase-js resolves normally even when the query itself fails (RLS
+      // denial, bad column, etc.) — only network-level failures reject the
+      // promise below. Discarding `error` here (as this used to) meant a
+      // practice score could silently fail to save with zero trace anywhere.
+      if (attemptError) {
+        console.error('[ResultsScreen] quiz_attempts upsert failed:', attemptError);
+      } else {
+        console.log('[ResultsScreen] quiz_attempts upsert succeeded');
+      }
 
-      const { data: progress } = await supabase
+      const { data: progress, error: progressReadError } = await supabase
         .from('quiz_progress')
         .select('banks_done, weak_tags, total_taken')
         .eq('user_id', user.id)
         .maybeSingle();
+      if (progressReadError) {
+        console.error('[ResultsScreen] quiz_progress read failed:', progressReadError);
+      }
 
       const banksDone = { ...(progress?.banks_done ?? {}), [bank.slug]: percentage };
       const weakTags = new Set<string>(progress?.weak_tags ?? []);
       wrongAnswers.forEach((q) => q.tags?.forEach((tag) => weakTags.add(tag)));
 
-      await supabase.from('quiz_progress').upsert(
+      const { error: progressWriteError } = await supabase.from('quiz_progress').upsert(
         {
           user_id: user.id,
           email: user.email,
@@ -80,7 +93,12 @@ export default function ResultsScreen({
         },
         { onConflict: 'user_id' }
       );
-    })().catch(() => {});
+      if (progressWriteError) {
+        console.error('[ResultsScreen] quiz_progress upsert failed:', progressWriteError);
+      }
+    })().catch((err) => {
+      console.error('[ResultsScreen] save effect threw:', err);
+    });
     // Only persist once, right after the quiz finishes and user identity resolves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

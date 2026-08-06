@@ -59,6 +59,7 @@ export default function ExamResultsScreen({
       .map((f, i) => (f ? i : -1))
       .filter((i) => i >= 0);
 
+    console.log('[ExamResultsScreen] saving attempt for user:', user.id);
     saveExamAttempt({
       user_id: user.id,
       bank_slug: bank.slug,
@@ -73,7 +74,11 @@ export default function ExamResultsScreen({
       violation_count: violationCount,
       auto_submitted: autoSubmitted,
       flagged_questions: flaggedQuestions,
-    }).catch(() => {});
+    }).catch((err) => {
+      // This used to swallow every failure silently — a rejected promise
+      // (network error, thrown exception) had nowhere to go.
+      console.error('[ExamResultsScreen] saveExamAttempt threw:', err);
+    });
     // Only persist once, right after the exam finishes and user identity resolves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

@@ -25,9 +25,11 @@ export async function getSupabaseClient(): Promise<SupabaseClient> {
   return clientPromise;
 }
 
-export async function saveExamAttempt(attempt: ExamAttempt): Promise<void> {
+export async function saveExamAttempt(attempt: ExamAttempt): Promise<boolean> {
   const supabase = await getSupabaseClient();
-  await supabase.from('quiz_attempts').upsert(
+  console.log('[saveExamAttempt] writing for user:', attempt.user_id, 'bank:', attempt.bank_slug);
+
+  const { error } = await supabase.from('quiz_attempts').upsert(
     {
       user_id: attempt.user_id,
       bank_slug: attempt.bank_slug,
@@ -45,4 +47,15 @@ export async function saveExamAttempt(attempt: ExamAttempt): Promise<void> {
     },
     { onConflict: 'user_id,bank_slug,mode' }
   );
+
+  // Supabase-js resolves normally even when the query itself fails (RLS
+  // denial, bad column, etc.) — only network-level failures reject the
+  // promise. Discarding `error` here (as this used to) meant an exam score
+  // could silently fail to save with zero trace anywhere.
+  if (error) {
+    console.error('[saveExamAttempt] upsert failed:', error);
+    return false;
+  }
+  console.log('[saveExamAttempt] upsert succeeded');
+  return true;
 }

@@ -18,16 +18,22 @@ function getFirstName(user: User): string {
   return user.email?.split('@')[0] ?? 'there';
 }
 
+type TopQuiz = { title: string; slug: string; readers: number; passRate: number };
+type RecentQuiz = { title: string; slug: string };
+
 export default function BankGrid({ banks }: { banks: QuizBank[] }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [hasPublisherProfile, setHasPublisherProfile] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   const [publishedCount, setPublishedCount] = useState(0);
   const [scoreMap, setScoreMap] = useState<ScoreMap>({});
   const [quizzesTaken, setQuizzesTaken] = useState(0);
   const [bestScore, setBestScore] = useState<number | null>(null);
-  const [readersThisWeek, setReadersThisWeek] = useState(0);
+  const [topQuizThisWeek, setTopQuizThisWeek] = useState<TopQuiz | null>(null);
+  const [mostRecentQuiz, setMostRecentQuiz] = useState<RecentQuiz | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -39,27 +45,35 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       setLoadingUserData(true);
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-      // All three signed-in-only reads run in parallel — none depends on
+      // All four signed-in-only reads run in parallel — none depends on
       // another's result (publisher_id === auth user id in this schema, so
-      // the readers-this-week count doesn't need to wait on the publisher
-      // row resolving first).
-      const [attemptsResult, publisherResult, readersResult] = await Promise.all([
-        supabase
-          .from('quiz_attempts')
-          .select('bank_slug, mode, percentage, passed')
-          .eq('user_id', u.id),
-        supabase.from('publishers').select('*').eq('id', u.id).maybeSingle(),
-        supabase
-          .from('published_quiz_attempts')
-          .select('id', { count: 'exact', head: true })
-          .eq('publisher_id', u.id)
-          .gte('attempted_at', sevenDaysAgo),
-      ]);
+      // the publisher-strip queries don't need to wait on the publisher row
+      // resolving first).
+      const [attemptsResult, publisherResult, weeklyReadersResult, quizzesResult] =
+        await Promise.all([
+          supabase
+            .from('quiz_attempts')
+            .select('bank_slug, mode, percentage, passed')
+            .eq('user_id', u.id),
+          supabase.from('publishers').select('*').eq('id', u.id).maybeSingle(),
+          supabase
+            .from('published_quiz_attempts')
+            .select('quiz_id, passed, attempted_at')
+            .eq('publisher_id', u.id)
+            .gte('attempted_at', sevenDaysAgo),
+          supabase
+            .from('published_quizzes')
+            .select('id, slug, title, created_at')
+            .eq('publisher_id', u.id)
+            .eq('status', 'published')
+            .order('created_at', { ascending: false }),
+        ]);
 
       console.log('[BankGrid] user:', u.id);
       console.log('[BankGrid] quiz_attempts response:', attemptsResult);
       console.log('[BankGrid] publishers response:', publisherResult);
-      console.log('[BankGrid] published_quiz_attempts response:', readersResult);
+      console.log('[BankGrid] published_quiz_attempts (7d) response:', weeklyReadersResult);
+      console.log('[BankGrid] published_quizzes response:', quizzesResult);
 
       if (attemptsResult.error) {
         // This is the failure mode that used to show up as "score badges
@@ -71,8 +85,11 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       if (publisherResult.error) {
         console.error('[BankGrid] publishers query failed:', publisherResult.error);
       }
-      if (readersResult.error) {
-        console.error('[BankGrid] published_quiz_attempts query failed:', readersResult.error);
+      if (weeklyReadersResult.error) {
+        console.error('[BankGrid] published_quiz_attempts query failed:', weeklyReadersResult.error);
+      }
+      if (quizzesResult.error) {
+        console.error('[BankGrid] published_quizzes query failed:', quizzesResult.error);
       }
 
       const attempts = attemptsResult.data ?? [];
@@ -92,8 +109,34 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
 
       const publisher = publisherResult.data;
       setHasPublisherProfile(publisher !== null);
+      setUsername(publisher?.username ?? null);
       setPublishedCount(publisher?.quiz_count ?? 0);
-      setReadersThisWeek(readersResult.count ?? 0);
+
+      // Find the quiz with the most reads in the last 7 days — the "ah
+      // moment" highlight. Quizzes with zero reads this week don't appear
+      // in weeklyReadersResult at all, so anything left over after grouping
+      // only covers quizzes that actually got attempts.
+      const quizzes = quizzesResult.data ?? [];
+      const perQuiz: Record<string, { count: number; passedCount: number }> = {};
+      for (const row of weeklyReadersResult.data ?? []) {
+        if (!perQuiz[row.quiz_id]) perQuiz[row.quiz_id] = { count: 0, passedCount: 0 };
+        perQuiz[row.quiz_id].count += 1;
+        if (row.passed) perQuiz[row.quiz_id].passedCount += 1;
+      }
+      let top: TopQuiz | null = null;
+      for (const quiz of quizzes) {
+        const stats = perQuiz[quiz.id];
+        if (stats && (!top || stats.count > top.readers)) {
+          top = {
+            title: quiz.title,
+            slug: quiz.slug,
+            readers: stats.count,
+            passRate: Math.round((stats.passedCount / stats.count) * 100),
+          };
+        }
+      }
+      setTopQuizThisWeek(top);
+      setMostRecentQuiz(quizzes[0] ? { title: quizzes[0].title, slug: quizzes[0].slug } : null);
       setLoadingUserData(false);
     }
 
@@ -102,8 +145,10 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       setQuizzesTaken(0);
       setBestScore(null);
       setHasPublisherProfile(false);
+      setUsername(null);
       setPublishedCount(0);
-      setReadersThisWeek(0);
+      setTopQuizThisWeek(null);
+      setMostRecentQuiz(null);
       setLoadingUserData(false);
     }
 
@@ -156,18 +201,10 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
   return (
     <>
       {isSignedIn && user && (
-        <div className="-mx-6 px-6 py-2 mb-10 flex flex-wrap items-center justify-between gap-2 bg-[rgba(62,123,250,0.08)] border-b border-[rgba(62,123,250,0.2)]">
+        <div className="-mx-6 px-6 py-2 mb-10 bg-[rgba(62,123,250,0.08)] border-b border-[rgba(62,123,250,0.2)]">
           <span className="text-[13px] text-[#6B8FFD]">
             👋 Welcome back, {getFirstName(user)}
           </span>
-          {hasPublisherProfile && (
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="text-[12px] text-[#3E7BFA] underline hover:opacity-80 transition-opacity"
-            >
-              Publisher dashboard →
-            </button>
-          )}
         </div>
       )}
 
@@ -235,18 +272,70 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
 
       {isSignedIn && hasPublisherProfile ? (
         <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#111118] border border-[rgba(62,123,250,0.2)] rounded-lg py-3 px-4">
-          <div>
-            <p className="text-[13px] font-medium">Your quizzes</p>
-            <p className="text-[11px] text-[#6B6882] mt-0.5">
-              {publishedCount} published · {readersThisWeek} readers this week
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity shrink-0"
-          >
-            Go to dashboard →
-          </button>
+          {topQuizThisWeek ? (
+            <>
+              <p className="text-[13px]">
+                📖 <span className="font-medium">{topQuizThisWeek.title}</span> was read by{' '}
+                {topQuizThisWeek.readers} {topQuizThisWeek.readers === 1 ? 'person' : 'people'}{' '}
+                this week — {topQuizThisWeek.passRate}% passed
+              </p>
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={`/q/${username}/${topQuizThisWeek.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
+                >
+                  View quiz
+                </a>
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity"
+                >
+                  Go to dashboard →
+                </button>
+              </div>
+            </>
+          ) : mostRecentQuiz ? (
+            <>
+              <div>
+                <p className="text-[13px] font-medium">Share your quiz to get your first reader</p>
+                <p className="text-[11px] text-[#6B6882] mt-0.5">
+                  {typeof window !== 'undefined' ? window.location.origin : ''}/q/{username}/
+                  {mostRecentQuiz.slug}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/q/${username}/${mostRecentQuiz.slug}`;
+                    navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="text-xs px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
+                >
+                  {copied ? 'Copied!' : 'Copy link'}
+                </button>
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity"
+                >
+                  Go to dashboard →
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[13px] font-medium">You haven&apos;t published a quiz yet</p>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity shrink-0"
+              >
+                Go to dashboard →
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <section className="mt-20 text-center border-t border-border pt-10">
