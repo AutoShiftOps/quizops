@@ -421,7 +421,7 @@ to external publishers.**
 | LT-17b | — | |
 | LT-17c | — | |
 | LT-18 | — | |
-| LT-19 | — | |
+| LT-19 | RETEST REQUIRED | incrementAttemptCount RLS fix — verify attempt_count increments as guest |
 | LT-20 | RETEST REQUIRED | savePublishedAttempt silent error fixed in this commit — re-verify after fix |
 | LT-21 | — | |
 | LT-22 | — | |
@@ -465,3 +465,27 @@ Fix: Error checking + logging added to all
   added to quiz engines.
 Verification: Requires completing a real quiz 
   signed in and confirming row in quiz_attempts.
+
+### attempt_count never incrementing (this commit)
+Severity: High
+Found: During 38fc43b write-path audit
+Impact: Every publisher's reader count 
+  showing 0 or undercounted. Dashboard 
+  stats wrong for all publishers.
+Root cause: published_quizzes UPDATE RLS 
+  policy is owner-only. incrementAttemptCount 
+  runs in reader context — silently fails.
+Fix: Moved increment to SECURITY DEFINER 
+  postgres function called via .rpc()
+Verification: Guest completes published quiz,
+  attempt_count increments correctly.
+
+> Note: this fix is code + migration file only. The SQL in
+> supabase/migrations/004_increment_attempt_count.sql has NOT been applied
+> to the live database yet — confirmed via a live RPC call returning 404
+> ("Could not find the function public.increment_attempt_count"). Until
+> that migration is run manually in the Supabase SQL Editor,
+> incrementAttemptCount will fail for *everyone* (not just non-owner
+> readers as before) — this is a harder failure than the bug it replaces,
+> so treat "run the migration" as a blocking step before this deploys, not
+> an optional follow-up.

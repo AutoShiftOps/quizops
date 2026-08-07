@@ -66,40 +66,16 @@ export async function incrementAttemptCount(
   supabase: SupabaseClient,
   quizId: string
 ): Promise<boolean> {
-  const { data, error: readError } = await supabase
-    .from('published_quizzes')
-    .select('attempt_count')
-    .eq('id', quizId)
-    .maybeSingle();
-  if (readError) {
-    console.error('incrementAttemptCount read failed:', readError.message, readError.code);
-    return false;
-  }
-  const current = data?.attempt_count ?? 0;
-  const { data: updated, error: updateError } = await supabase
-    .from('published_quizzes')
-    .update({ attempt_count: current + 1 })
-    .eq('id', quizId)
-    .select('id');
-  if (updateError) {
-    console.error('incrementAttemptCount update failed:', updateError.message, updateError.code);
-    return false;
-  }
-  // An RLS policy that silently filters out disallowed rows (rather than
-  // erroring) makes this update a no-op with `error: null` — checking
-  // `error` alone isn't enough to catch that. This table's UPDATE policy is
-  // owner-only (`auth.uid() = publisher_id`), but this function runs as
-  // whoever is *taking* the quiz — almost never the publisher — so this
-  // path is confirmed to silently fail for real readers today. Flagging it
-  // as a failure here at least surfaces it instead of hiding it; the actual
-  // fix needs a policy change (or a server-side increment), which is a
-  // separate, larger change than this error-checking pass.
-  if (!updated || updated.length === 0) {
-    console.error(
-      'incrementAttemptCount: update matched 0 rows for quiz',
-      quizId,
-      '— likely blocked by the owner-only RLS policy on published_quizzes (see comment above)'
-    );
+  // published_quizzes' UPDATE policy is owner-only (auth.uid() =
+  // publisher_id), but this runs in the READER's context — almost always a
+  // guest or a signed-in user who isn't the publisher. A direct update()
+  // was silently filtered out by RLS (0 rows affected, no error at all —
+  // see the audit in 38fc43b). Routing through a SECURITY DEFINER function
+  // bypasses that: it runs as its owner (postgres) and can only ever do the
+  // one narrow thing it's written to do.
+  const { error } = await supabase.rpc('increment_attempt_count', { quiz_id: quizId });
+  if (error) {
+    console.error('incrementAttemptCount failed:', error.message, error.code);
     return false;
   }
   return true;
