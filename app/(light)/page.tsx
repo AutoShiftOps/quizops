@@ -5,7 +5,7 @@ export default function HomePage() {
   const banks = getAllBanks();
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-16">
+    <div className="max-w-6xl mx-auto px-6 pt-12 pb-16">
       {banks.length > 0 ? (
         <BankGrid banks={banks} />
       ) : (

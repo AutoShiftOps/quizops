@@ -286,20 +286,53 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
         </h2>
       </div>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {banks.map((bank) => {
-          const scores = scoreMap[bank.slug];
-          return (
-            <QuizCard
-              key={bank.slug}
-              bank={bank}
-              practiceScore={scores?.practice ?? null}
-              examScore={scores?.exam ?? null}
-              hasAttempted={Boolean(scores?.practice || scores?.exam)}
-            />
-          );
-        })}
-      </section>
+      {(() => {
+        // A lone card left-aligned in a wide grid looks abandoned, so the
+        // "contribute" invite fills the row out to 2 whenever there's only
+        // one real bank. Once there are 2+ banks the grid is already
+        // visually populated and the invite isn't needed.
+        const showInvite = banks.length === 1;
+        const totalItems = banks.length + (showInvite ? 1 : 0);
+        const gridClass =
+          totalItems === 1
+            ? 'grid grid-cols-1 max-w-[420px] mx-auto gap-6'
+            : totalItems === 2
+            ? 'grid grid-cols-1 sm:grid-cols-2 max-w-[700px] mx-auto gap-6'
+            : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-[960px] mx-auto gap-6';
+
+        return (
+          <section className={gridClass}>
+            {banks.map((bank) => {
+              const scores = scoreMap[bank.slug];
+              return (
+                <QuizCard
+                  key={bank.slug}
+                  bank={bank}
+                  practiceScore={scores?.practice ?? null}
+                  examScore={scores?.exam ?? null}
+                  hasAttempted={Boolean(scores?.practice || scores?.exam)}
+                />
+              );
+            })}
+            {showInvite && (
+              <a
+                href="https://github.com/AutoShiftOps/quizops/blob/main/CONTRIBUTING.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center text-center rounded-xl p-6 hover:border-[#A1A1AA] transition-colors"
+                style={{ border: '1px dashed #D4D4D8', background: '#FAFAFA' }}
+              >
+                <span className="text-3xl mb-3">➕</span>
+                <p className="font-heading font-semibold text-[#18181B] mb-1">Add a quiz bank</p>
+                <p className="text-sm text-[#71717A] mb-3">
+                  Contribute questions on any technical topic — no coding required.
+                </p>
+                <span className="text-sm text-accent font-medium">See CONTRIBUTING.md →</span>
+              </a>
+            )}
+          </section>
+        );
+      })()}
 
       {isSignedIn && hasPublisherProfile ? (
         <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#F0F9FF] border border-[#BAE6FD] rounded-lg py-3 px-4">

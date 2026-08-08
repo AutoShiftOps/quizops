@@ -20,7 +20,20 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)', borderRadius: 12 }}
     >
       <div className="flex items-start justify-between mb-3">
-        <span className="text-3xl">{bank.emoji}</span>
+        {/* bank.emoji already includes the U+FE0F variation selector needed
+            for colour presentation, and this renders it as plain text (not
+            an icon font) — but some Windows/Chromium combos still pick a
+            monochrome symbol font over the colour emoji font for characters
+            like ⚙ unless one is named explicitly in the stack. */}
+        <span
+          className="text-3xl"
+          style={{
+            fontFamily:
+              '"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji",sans-serif',
+          }}
+        >
+          {bank.emoji}
+        </span>
       </div>
       <h3 className="font-heading text-lg font-semibold mb-1 text-[#18181B]">{bank.name}</h3>
       <p className="text-[#71717A] text-sm mb-4">{bank.description}</p>
