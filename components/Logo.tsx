@@ -1,6 +1,7 @@
 type LogoProps = {
   size?: 'sm' | 'md' | 'lg';
   showTagline?: boolean;
+  variant?: 'light' | 'dark';
 };
 
 const ICON_SIZES: Record<NonNullable<LogoProps['size']>, number> = {
@@ -9,8 +10,10 @@ const ICON_SIZES: Record<NonNullable<LogoProps['size']>, number> = {
   lg: 72,
 };
 
-export default function Logo({ size = 'md', showTagline = false }: LogoProps) {
+export default function Logo({ size = 'md', showTagline = false, variant = 'dark' }: LogoProps) {
   const iconSize = ICON_SIZES[size];
+  const textColor = variant === 'light' ? '#18181B' : '#ffffff';
+  const taglineColor = variant === 'light' ? 'text-[#A1A1AA]' : 'text-gray-400';
 
   return (
     <div className="flex items-center gap-3">
@@ -46,11 +49,11 @@ export default function Logo({ size = 'md', showTagline = false }: LogoProps) {
           className="font-heading"
           style={{ fontSize: 22, letterSpacing: '-0.5px', fontWeight: 500 }}
         >
-          <span style={{ color: 'var(--foreground)' }}>Quiz</span>
+          <span style={{ color: textColor }}>Quiz</span>
           <span style={{ color: '#3E7BFA' }}>Ops</span>
         </span>
         {showTagline && (
-          <span className="font-body text-gray-400" style={{ fontSize: 12 }}>
+          <span className={`font-body ${taglineColor}`} style={{ fontSize: 12 }}>
             test your knowledge
           </span>
         )}

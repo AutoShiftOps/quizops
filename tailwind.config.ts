@@ -33,6 +33,19 @@ const config: Config = {
           light: 'rgba(239,68,68,0.1)',
           border: 'rgba(239,68,68,0.2)',
         },
+        // Enterprise Light theme (M1-01) — used by marketing + dashboard
+        // pages. Quiz/exam/reader pages intentionally keep the dark tokens
+        // above; this is a second, parallel palette, not a replacement.
+        light: {
+          bg: '#FAFAFA',
+          surface: '#FFFFFF',
+          surface2: '#F4F4F5',
+          border: '#E4E4E7',
+          border2: '#D4D4D8',
+          text: '#18181B',
+          text2: '#71717A',
+          text3: '#A1A1AA',
+        },
       },
       fontFamily: {
         heading: ['var(--font-space-grotesk)', 'sans-serif'],

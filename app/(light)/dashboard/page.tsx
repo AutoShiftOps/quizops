@@ -120,7 +120,7 @@ export default function DashboardPage() {
   }
 
   if (loading) {
-    return <div className="mt-8 text-center text-gray-500">Loading…</div>;
+    return <div className="mt-8 text-center text-[#71717A]">Loading…</div>;
   }
 
   if (!user) return null; // redirecting to home
@@ -138,10 +138,10 @@ export default function DashboardPage() {
     <div className="max-w-[900px] mx-auto px-6 mt-8">
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-heading text-2xl font-semibold mb-1">
+          <h1 className="font-heading text-2xl font-semibold mb-1 text-[#18181B]">
             Welcome, {publisher.display_name}
           </h1>
-          <p className="text-sm text-gray-500 mb-3">
+          <p className="text-sm text-[#71717A] mb-3">
             {origin ? origin.replace(/^https?:\/\//, '') : 'quiz.autoshiftops.com'}/q/
             {publisher.username}
           </p>
@@ -150,7 +150,7 @@ export default function DashboardPage() {
         {limitReached ? (
           <button
             onClick={() => setShowUpgradeModal(true)}
-            className="px-5 py-2.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/40 font-medium hover:bg-amber-500/25 transition-colors shrink-0"
+            className="px-5 py-2.5 rounded-md bg-warning/10 text-warning border border-warning/40 font-medium hover:bg-warning/20 transition-colors shrink-0"
           >
             Upgrade to create more
           </button>
@@ -165,37 +165,49 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-surface border border-border rounded-xl p-5">
+        <div
+          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+        >
           <p className="text-3xl font-bold text-accent mb-1">{publishedCount}</p>
-          <p className="text-sm">Published quizzes</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm text-[#18181B]">Published quizzes</p>
+          <p className="text-xs text-[#A1A1AA]">
             {publisher.tier === 'free' ? `${remainingFree} remaining on free` : 'Unlimited'}
           </p>
         </div>
-        <div className="bg-surface border border-border rounded-xl p-5">
-          <p className="text-3xl font-bold mb-1">{stats.totalAttempts}</p>
-          <p className="text-sm">Total attempts</p>
-          <p className="text-xs text-gray-500">Across all quizzes</p>
+        <div
+          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+        >
+          <p className="text-3xl font-bold mb-1 text-[#18181B]">{stats.totalAttempts}</p>
+          <p className="text-sm text-[#18181B]">Total attempts</p>
+          <p className="text-xs text-[#A1A1AA]">Across all quizzes</p>
         </div>
-        <div className="bg-surface border border-border rounded-xl p-5">
-          <p className="text-3xl font-bold mb-1">
+        <div
+          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+        >
+          <p className="text-3xl font-bold mb-1 text-[#18181B]">
             {stats.avgPassRate === null ? '—' : `${stats.avgPassRate}%`}
           </p>
-          <p className="text-sm">Avg pass rate</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm text-[#18181B]">Avg pass rate</p>
+          <p className="text-xs text-[#A1A1AA]">
             {stats.avgPassRate === null ? 'No attempts yet' : 'Across all attempts'}
           </p>
         </div>
-        <div className="bg-surface border border-border rounded-xl p-5">
-          <p className="text-3xl font-bold text-green mb-1">{stats.readersThisWeek}</p>
-          <p className="text-sm">Readers this week</p>
-          <p className="text-xs text-gray-500">Share your quiz link</p>
+        <div
+          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+        >
+          <p className="text-3xl font-bold text-success mb-1">{stats.readersThisWeek}</p>
+          <p className="text-sm text-[#18181B]">Readers this week</p>
+          <p className="text-xs text-[#A1A1AA]">Share your quiz link</p>
         </div>
       </div>
 
       {!hasAnyAttempts && (
-        <div className="bg-accent/10 border border-accent/30 rounded-xl p-5 mb-8">
-          <p className="text-sm text-accent/90">
+        <div className="bg-accent/5 border border-accent/20 rounded-xl p-5 mb-8">
+          <p className="text-sm text-[#18181B]">
             💡 <span className="font-semibold text-accent">Get your first reader:</span>{' '}
             Copy your quiz link and add &quot;Test your understanding →&quot; at the end
             of your article. That one CTA typically drives 8–12% click-through from
@@ -205,10 +217,10 @@ export default function DashboardPage() {
       )}
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
+        <h2 className="text-xs font-semibold tracking-wider text-[#71717A] uppercase">
           Your quizzes
         </h2>
-        <span className="text-sm text-gray-500">{publishedCount} published</span>
+        <span className="text-sm text-[#71717A]">{publishedCount} published</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -224,15 +236,17 @@ export default function DashboardPage() {
         ))}
 
         {limitReached ? (
-          <div className="bg-surface border border-amber-500/30 rounded-xl p-6 flex flex-col items-center justify-center text-center">
-            <span className="w-12 h-12 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-4">
+          <div className="bg-white border border-warning/30 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+            <span className="w-12 h-12 rounded-lg bg-warning/10 text-warning flex items-center justify-center text-xl mb-4">
               🔒
             </span>
-            <p className="font-heading font-semibold mb-2">Upgrade to add more quizzes</p>
-            <p className="text-sm text-gray-400 mb-5">You&apos;ve used all 3 free slots.</p>
+            <p className="font-heading font-semibold mb-2 text-[#18181B]">
+              Upgrade to add more quizzes
+            </p>
+            <p className="text-sm text-[#71717A] mb-5">You&apos;ve used all 3 free slots.</p>
             <button
               onClick={() => setShowUpgradeModal(true)}
-              className="px-4 py-2 rounded-md border border-amber-500/40 text-amber-300 text-sm hover:bg-amber-500/10 transition-colors"
+              className="px-4 py-2 rounded-md border border-warning/40 text-warning text-sm hover:bg-warning/10 transition-colors"
             >
               Learn about Pro →
             </button>
@@ -240,16 +254,16 @@ export default function DashboardPage() {
         ) : (
           <Link
             href="/dashboard/new"
-            className="bg-surface border border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-accent transition-colors"
+            className="bg-white border border-[#E4E4E7] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-[#D4D4D8] transition-colors"
           >
-            <span className="w-12 h-12 rounded-lg bg-accent/20 text-accent flex items-center justify-center text-xl mb-4">
+            <span className="w-12 h-12 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-xl mb-4">
               ✨
             </span>
-            <p className="font-heading font-semibold mb-2">Create your next quiz</p>
-            <p className="text-sm text-gray-400 mb-5">
+            <p className="font-heading font-semibold mb-2 text-[#18181B]">Create your next quiz</p>
+            <p className="text-sm text-[#71717A] mb-5">
               Generate from an article with AI, or write your own questions from scratch.
             </p>
-            <span className="px-4 py-2 rounded-md border border-border text-sm">
+            <span className="px-4 py-2 rounded-md border border-[#E4E4E7] text-sm text-[#18181B]">
               + Create quiz
             </span>
           </Link>
@@ -257,15 +271,15 @@ export default function DashboardPage() {
       </div>
 
       {showUpgradeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-6">
-            <h3 className="font-heading text-lg font-semibold mb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-xl border border-[#E4E4E7] bg-white p-6">
+            <h3 className="font-heading text-lg font-semibold mb-2 text-[#18181B]">
               You&apos;ve reached the free limit
             </h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-[#71717A] mb-4">
               Free tier includes 3 published quizzes. Upgrade to Pro for:
             </p>
-            <ul className="text-sm text-gray-300 space-y-1.5 mb-6">
+            <ul className="text-sm text-[#18181B] space-y-1.5 mb-6">
               <li>✓ Unlimited quizzes</li>
               <li>✓ Full analytics history</li>
               <li>✓ Remove QuizOps branding</li>
@@ -274,7 +288,7 @@ export default function DashboardPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowUpgradeModal(false)}
-                className="flex-1 px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+                className="flex-1 px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
               >
                 Cancel
               </button>
@@ -293,7 +307,7 @@ export default function DashboardPage() {
       )}
 
       {toast && (
-        <div className="fixed bottom-6 right-6 bg-surface border border-border px-4 py-2.5 rounded-md shadow-lg text-sm">
+        <div className="fixed bottom-6 right-6 bg-white border border-[#E4E4E7] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#18181B]">
           {toast}
         </div>
       )}

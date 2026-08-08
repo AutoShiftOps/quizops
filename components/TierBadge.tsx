@@ -7,17 +7,15 @@ export default function TierBadge({ publisher }: { publisher: Publisher }) {
   return (
     <span
       className={`inline-flex items-center gap-2.5 text-xs font-semibold px-3 py-1.5 rounded-full ${
-        isFree ? 'bg-amber-500/10 text-amber-400' : 'bg-green/10 text-green'
+        isFree ? 'bg-[#EFF6FF] text-[#1D4ED8]' : 'bg-success/10 text-success'
       }`}
     >
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${isFree ? 'bg-amber-400' : 'bg-green'}`}
-      />
+      <span className={`w-1.5 h-1.5 rounded-full ${isFree ? 'bg-[#1D4ED8]' : 'bg-success'}`} />
       {isFree ? `Free · ${publisher.quiz_count} of 3 quizzes used` : 'Pro · Unlimited'}
       {isFree && (
-        <span className="w-14 h-1.5 rounded-full bg-black/30 overflow-hidden">
+        <span className="w-14 h-1.5 rounded-full bg-[#BFDBFE] overflow-hidden">
           <span
-            className="block h-full rounded-full bg-amber-400"
+            className="block h-full rounded-full bg-[#1D4ED8]"
             style={{ width: `${pct}%` }}
           />
         </span>

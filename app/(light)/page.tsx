@@ -9,7 +9,7 @@ export default function HomePage() {
       {banks.length > 0 ? (
         <BankGrid banks={banks} />
       ) : (
-        <p className="text-center text-gray-500">No quiz banks found yet.</p>
+        <p className="text-center text-[#71717A]">No quiz banks found yet.</p>
       )}
     </div>
   );

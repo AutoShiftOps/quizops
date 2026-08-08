@@ -21,14 +21,14 @@ function CopyRow({ label, value }: { label: string; value: string }) {
 
   return (
     <div className="mb-6">
-      <p className="text-sm font-medium mb-2">{label}</p>
+      <p className="text-sm font-medium mb-2 text-[#18181B]">{label}</p>
       <div className="flex items-stretch gap-2">
-        <code className="flex-1 px-3 py-2 rounded-md bg-background border border-border text-xs text-gray-400 overflow-x-auto whitespace-nowrap">
+        <code className="flex-1 px-3 py-2 rounded-md bg-[#F4F4F5] border border-[#E4E4E7] text-xs text-[#71717A] overflow-x-auto whitespace-nowrap">
           {value}
         </code>
         <button
           onClick={handleCopy}
-          className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm shrink-0"
+          className="px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm shrink-0"
         >
           {copied ? 'Copied!' : `Copy ${label.split(' ')[0].toLowerCase()}`}
         </button>
@@ -41,7 +41,7 @@ export default function SharePanel({ url, embedHtml, badgeMarkdown, onCreateAnot
   return (
     <div className="mt-8 max-w-xl mx-auto text-center">
       <p className="text-4xl mb-4">🎉</p>
-      <h1 className="font-heading text-2xl font-semibold mb-8">Quiz published!</h1>
+      <h1 className="font-heading text-2xl font-semibold mb-8 text-[#18181B]">Quiz published!</h1>
 
       <div className="text-left">
         <CopyRow label="Share link" value={url} />
@@ -60,13 +60,13 @@ export default function SharePanel({ url, embedHtml, badgeMarkdown, onCreateAnot
         </a>
         <button
           onClick={onCreateAnother}
-          className="px-5 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+          className="px-5 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
         >
           Create another quiz
         </button>
         <Link
           href="/dashboard"
-          className="px-5 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+          className="px-5 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
         >
           Go to dashboard
         </Link>

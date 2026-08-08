@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PublishedQuiz, Question } from '@/lib/types';
 import QuestionEditor from '@/components/QuestionEditor';
@@ -230,14 +229,7 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="max-w-2xl mx-auto px-6 mt-8">
-      <Link
-        href="/dashboard"
-        className="text-sm text-gray-400 hover:text-accent transition-colors"
-      >
-        ← Back to dashboard
-      </Link>
-
-      <div className="flex items-center justify-between mt-4 mb-8">
+      <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-2">
           <h1 className="font-heading text-xl font-semibold">Edit quiz</h1>
           {quiz.status === 'draft' && (

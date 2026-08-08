@@ -8,7 +8,12 @@ import { getPublisher } from '@/lib/publisher';
 import LoginButton from './LoginButton';
 import Logo from './Logo';
 
-export default function NavBar() {
+// Light-theme NavBar (M1-01) used on marketing + dashboard pages. Dashboard
+// is reached via the avatar only — no separate "Dashboard" text link here,
+// per the redundant-navigation cleanup (see the publisher strip on the
+// homepage and the post-publish share screen for the other two allowed
+// entry points).
+export default function LightNavBar() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasPublisherProfile, setHasPublisherProfile] = useState(false);
@@ -54,41 +59,53 @@ export default function NavBar() {
   }
 
   return (
-    <header className="border-b border-border">
+    <header className="bg-white border-b border-[#E4E4E7]">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center">
-          <Logo size="sm" showTagline={false} />
+          <Logo size="sm" showTagline={false} variant="light" />
         </Link>
 
-        <div>
+        <div className="flex items-center gap-5">
+          <Link
+            href="/pricing"
+            className="text-sm text-[#71717A] hover:text-[#18181B] transition-colors"
+          >
+            Pricing
+          </Link>
+
           {loading ? null : user ? (
             <div className="flex items-center gap-3">
               <Link
                 href="/dashboard"
-                className="text-sm px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
+                title={hasPublisherProfile ? 'Dashboard' : 'Become a publisher'}
+                className="shrink-0"
               >
-                {hasPublisherProfile ? 'Dashboard' : 'Become a publisher'}
+                {user.user_metadata?.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt={user.email ?? 'avatar'}
+                    className="w-8 h-8 rounded-full hover:opacity-80 transition-opacity"
+                  />
+                ) : (
+                  <span className="w-8 h-8 rounded-full bg-accent/10 text-accent flex items-center justify-center text-sm font-semibold hover:bg-accent/20 transition-colors">
+                    {(user.email ?? '?')[0].toUpperCase()}
+                  </span>
+                )}
               </Link>
-              {user.user_metadata?.avatar_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user.user_metadata.avatar_url}
-                  alt={user.email ?? 'avatar'}
-                  className="w-8 h-8 rounded-full"
-                />
-              )}
-              <span className="text-sm text-gray-400 hidden sm:inline">
-                {user.email}
-              </span>
+              <span className="text-sm text-[#71717A] hidden sm:inline">{user.email}</span>
               <button
                 onClick={handleSignOut}
-                className="text-sm px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
+                className="text-sm px-3 py-1.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
               >
                 Sign out
               </button>
             </div>
           ) : (
-            <LoginButton />
+            <div className="flex items-center gap-2">
+              <LoginButton label="Sign in" variant="ghost" />
+              <LoginButton label="Start for free" variant="accent" />
+            </div>
           )}
         </div>
       </div>

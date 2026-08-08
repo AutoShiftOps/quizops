@@ -326,7 +326,7 @@ export default function NewQuizPage() {
   }
 
   if (loadingPublisher) {
-    return <div className="mt-8 text-center text-gray-500">Loading…</div>;
+    return <div className="mt-8 text-center text-[#71717A]">Loading…</div>;
   }
 
   if (!publisher) return null;
@@ -349,25 +349,22 @@ export default function NewQuizPage() {
   // Hard gate: even a direct URL visit to /dashboard/new must hit this wall
   // when the free tier limit is reached — the API already rejects publishes
   // past the limit, but the UI shouldn't let someone reach the create flow
-  // at all in that state.
+  // at all in that state. No "back to dashboard" link here (M1-01 removed
+  // it) — the navbar avatar is the way back.
   if (checkTierLimit(publisher)) {
     return (
       <div className="mt-16 max-w-md mx-auto text-center">
-        <div className="w-16 h-16 mx-auto rounded-full bg-amber-500/15 text-amber-400 flex items-center justify-center text-3xl mb-6">
+        <div className="w-16 h-16 mx-auto rounded-full bg-warning/10 text-warning flex items-center justify-center text-3xl mb-6">
           🔒
         </div>
-        <h1 className="font-heading text-xl font-semibold mb-2">Free tier limit reached</h1>
-        <p className="text-sm text-gray-400 mb-8">
+        <h1 className="font-heading text-xl font-semibold mb-2 text-[#18181B]">
+          Free tier limit reached
+        </h1>
+        <p className="text-sm text-[#71717A] mb-8">
           You&apos;ve published 3 of 3 free quizzes. Upgrade to Pro for unlimited
           quizzes, advanced analytics, and more.
         </p>
-        <div className="flex items-center justify-center gap-3">
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="px-5 py-2.5 rounded-md border border-border hover:border-accent transition-colors text-sm"
-          >
-            ← Back to dashboard
-          </button>
+        <div className="flex items-center justify-center">
           <button
             onClick={() => {
               setUpgradeToast(true);
@@ -379,7 +376,7 @@ export default function NewQuizPage() {
           </button>
         </div>
         {upgradeToast && (
-          <div className="fixed bottom-6 right-6 bg-surface border border-border px-4 py-2.5 rounded-md shadow-lg text-sm">
+          <div className="fixed bottom-6 right-6 bg-white border border-[#E4E4E7] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#18181B]">
             Pro tier coming soon! We&apos;ll notify you when it&apos;s available.
           </div>
         )}
@@ -390,19 +387,21 @@ export default function NewQuizPage() {
   if (step === 'select') {
     return (
       <div className="mt-8 max-w-2xl mx-auto">
-        <h1 className="font-heading text-2xl font-semibold mb-1">Create a quiz</h1>
-        <p className="text-gray-400 mb-6">
+        <h1 className="font-heading text-2xl font-semibold mb-1 text-[#18181B]">Create a quiz</h1>
+        <p className="text-[#71717A] mb-6">
           Choose how you want to build it — generate from your article or write questions
           yourself.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
             onClick={handleSelectAi}
-            className="text-left p-6 rounded-xl border-2 border-accent bg-accent/10 transition-colors"
+            className="text-left p-6 rounded-xl border-2 border-accent bg-accent/5 transition-colors"
           >
             <span className="text-2xl text-accent">✨</span>
-            <h2 className="font-heading font-semibold mt-3 mb-1">Generate from article</h2>
-            <p className="text-sm text-gray-400 mb-4">
+            <h2 className="font-heading font-semibold mt-3 mb-1 text-[#18181B]">
+              Generate from article
+            </h2>
+            <p className="text-sm text-[#71717A] mb-4">
               Paste your article URL or text. AI writes 10 questions in under 60 seconds.
               Review and edit before publishing.
             </p>
@@ -410,15 +409,17 @@ export default function NewQuizPage() {
           </button>
           <button
             onClick={handleSelectManual}
-            className="text-left p-6 rounded-xl border border-border hover:border-green transition-colors"
+            className="text-left p-6 rounded-xl border border-[#E4E4E7] bg-white hover:border-success transition-colors"
           >
-            <span className="text-2xl text-green">✎</span>
-            <h2 className="font-heading font-semibold mt-3 mb-1">Write questions manually</h2>
-            <p className="text-sm text-gray-400 mb-4">
+            <span className="text-2xl text-success">✎</span>
+            <h2 className="font-heading font-semibold mt-3 mb-1 text-[#18181B]">
+              Write questions manually
+            </h2>
+            <p className="text-sm text-[#71717A] mb-4">
               Start with a blank quiz. Add your own questions, options, and explanations at
               your own pace.
             </p>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success">
               Full control
             </span>
           </button>
@@ -430,29 +431,29 @@ export default function NewQuizPage() {
   if (step === 'generating') {
     return (
       <div className="mt-8 max-w-xl mx-auto">
-        <h1 className="font-heading text-xl font-semibold mb-6 text-center">
+        <h1 className="font-heading text-xl font-semibold mb-6 text-center text-[#18181B]">
           ✨ Generating your quiz...
         </h1>
         <div className="space-y-2 mb-6">
           {questions.map((q, i) => (
-            <p key={q.id ?? i} className="text-sm animate-fade-in">
+            <p key={q.id ?? i} className="text-sm text-[#18181B] animate-fade-in">
               ✓ Q{i + 1}: {q.text?.slice(0, 60)}
               {q.text?.length > 60 ? '…' : ''}
             </p>
           ))}
           {questions.length < questionCount && (
-            <p className="text-sm text-gray-500 animate-pulse">
+            <p className="text-sm text-[#71717A] animate-pulse">
               ⟳ Generating Q{questions.length + 1}...
             </p>
           )}
         </div>
-        <p className="text-sm text-gray-400 text-center mb-6">
+        <p className="text-sm text-[#71717A] text-center mb-6">
           Generated {questions.length} of {questionCount} questions
         </p>
         <div className="text-center">
           <button
             onClick={handleCancelGeneration}
-            className="px-5 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+            className="px-5 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
           >
             ✕ Cancel
           </button>
@@ -466,12 +467,13 @@ export default function NewQuizPage() {
 
     return (
       <div className="mt-8 max-w-2xl mx-auto">
-        <h1 className="font-heading text-xl font-semibold mb-6">
+        <h1 className="font-heading text-xl font-semibold mb-6 text-[#18181B]">
           {mode === 'manual' ? 'Write your quiz' : 'Review your quiz'}
         </h1>
 
         <div className="mb-6">
           <QuizMetadataForm
+            theme="light"
             title={title}
             onTitleChange={setTitle}
             titleTouched={titleTouched}
@@ -491,12 +493,12 @@ export default function NewQuizPage() {
           />
         </div>
 
-        <p className="text-center text-sm text-gray-500 mb-4">
+        <p className="text-center text-sm text-[#71717A] mb-4">
           questions ({questions.length} of minimum 3)
         </p>
 
         {belowMinimum && (
-          <div className="mb-6 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+          <div className="mb-6 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
             Add at least 3 questions to publish. Each question needs 4 options and one
             correct answer marked.
           </div>
@@ -506,6 +508,7 @@ export default function NewQuizPage() {
           {questions.map((q, i) => (
             <QuestionEditor
               key={q.id ?? i}
+              theme="light"
               question={q}
               index={i}
               onChange={(updated) => handleQuestionChange(i, updated)}
@@ -522,19 +525,19 @@ export default function NewQuizPage() {
 
         <button
           onClick={handleAddQuestion}
-          className="w-full mb-8 px-4 py-2 rounded-md border border-dashed border-border hover:border-accent transition-colors text-sm text-gray-400"
+          className="w-full mb-8 px-4 py-2 rounded-md border border-dashed border-[#D4D4D8] hover:border-accent transition-colors text-sm text-[#71717A]"
         >
           + Add question
         </button>
 
-        {publishError && <p className="text-sm text-red-400 mb-4">{publishError}</p>}
+        {publishError && <p className="text-sm text-danger mb-4">{publishError}</p>}
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E4E4E7] pt-6">
           <div className="flex gap-2">
             {mode === 'manual' ? (
               <button
                 onClick={resetToSelect}
-                className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+                className="px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
               >
                 ← Back
               </button>
@@ -542,13 +545,13 @@ export default function NewQuizPage() {
               <>
                 <button
                   onClick={handleStartOver}
-                  className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+                  className="px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
                 >
                   ↺ Start over
                 </button>
                 <button
                   onClick={handleRegenerate}
-                  className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+                  className="px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
                 >
                   ↺ Regenerate
                 </button>
@@ -559,7 +562,7 @@ export default function NewQuizPage() {
             <button
               onClick={() => submitQuiz('draft')}
               disabled={savingDraft || publishing || questions.length < 1 || !title.trim()}
-              className="px-4 py-2.5 rounded-md border border-border hover:border-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+              className="px-4 py-2.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
             >
               {savingDraft ? 'Saving…' : 'Save draft'}
             </button>
@@ -579,7 +582,7 @@ export default function NewQuizPage() {
   // step === 'input' (AI path)
   return (
     <div className="mt-8 max-w-lg mx-auto">
-      <h1 className="font-heading text-2xl font-semibold mb-6 text-center">
+      <h1 className="font-heading text-2xl font-semibold mb-6 text-center text-[#18181B]">
         Create a quiz from your article
       </h1>
 
@@ -591,7 +594,7 @@ export default function NewQuizPage() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://your-article-url.com"
-              className="flex-1 px-4 py-2 rounded-md bg-background border border-border focus:border-accent outline-none"
+              className="flex-1 px-4 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none text-[#18181B]"
             />
           </div>
           <button
@@ -606,20 +609,22 @@ export default function NewQuizPage() {
       {showPasteArea && (
         <>
           <div className="mb-2">
-            <span className="text-sm text-gray-400">or</span>
+            <span className="text-sm text-[#71717A]">or</span>
           </div>
           <textarea
             value={pastedText}
             onChange={(e) => setPastedText(e.target.value)}
             rows={8}
             placeholder="Paste your article text here…"
-            className="w-full px-4 py-2 rounded-md bg-background border border-border focus:border-accent outline-none resize-none mb-6"
+            className="w-full px-4 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none resize-none mb-6 text-[#18181B]"
           />
         </>
       )}
 
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-1.5">Number of questions</label>
+        <label className="block text-sm font-medium mb-1.5 text-[#18181B]">
+          Number of questions
+        </label>
         <div className="flex gap-2">
           {[5, 10, 15].map((count) => (
             <button
@@ -629,7 +634,7 @@ export default function NewQuizPage() {
               className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
                 questionCount === count
                   ? 'border-accent bg-accent/10 text-accent'
-                  : 'border-border hover:border-accent'
+                  : 'border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8]'
               }`}
             >
               {count}
@@ -638,12 +643,12 @@ export default function NewQuizPage() {
         </div>
       </div>
 
-      {inputError && <p className="text-sm text-red-400 mb-4">{inputError}</p>}
+      {inputError && <p className="text-sm text-danger mb-4">{inputError}</p>}
 
       <div className="flex items-center gap-2">
         <button
           onClick={resetToSelect}
-          className="px-4 py-2.5 rounded-md border border-border hover:border-accent transition-colors text-sm"
+          className="px-4 py-2.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
         >
           ← Back
         </button>

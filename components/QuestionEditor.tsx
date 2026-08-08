@@ -14,6 +14,9 @@ type Props = {
   isFirst: boolean;
   isLast: boolean;
   startInEditMode?: boolean;
+  // Defaults to 'dark' — shared between the (dark) edit page and the
+  // (light) manual/AI creation flow (M1-01).
+  theme?: 'light' | 'dark';
 };
 
 export default function QuestionEditor({
@@ -27,10 +30,12 @@ export default function QuestionEditor({
   isFirst,
   isLast,
   startInEditMode,
+  theme = 'dark',
 }: Props) {
   const [editing, setEditing] = useState(startInEditMode ?? false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [draft, setDraft] = useState<Question>(question);
+  const light = theme === 'light';
 
   function startEdit() {
     setDraft(question);
@@ -53,6 +58,29 @@ export default function QuestionEditor({
     setDraft({ ...draft, options });
   }
 
+  const card = light
+    ? 'bg-white border border-[#E4E4E7] rounded-xl p-5'
+    : 'bg-surface border border-border rounded-xl p-5';
+  const cardEditing = light
+    ? 'bg-white border border-accent rounded-xl p-5'
+    : 'bg-surface border border-accent rounded-xl p-5';
+  const textArea = light
+    ? 'w-full px-3 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none mb-3 text-[#18181B]'
+    : 'w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none mb-3';
+  const iconBtn = light
+    ? 'w-8 h-8 flex items-center justify-center rounded-md border border-[#E4E4E7] text-sm hover:border-[#D4D4D8] transition-colors disabled:opacity-30 disabled:cursor-not-allowed'
+    : 'w-8 h-8 flex items-center justify-center rounded-md border border-border text-sm hover:border-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed';
+  const optionInput = (isCorrect: boolean) =>
+    light
+      ? `flex-1 min-w-0 px-3 py-1.5 rounded-md bg-white border outline-none text-[#18181B] ${
+          isCorrect ? 'border-success' : 'border-[#E4E4E7] focus:border-accent'
+        }`
+      : `flex-1 min-w-0 px-3 py-1.5 rounded-md bg-background border outline-none ${
+          isCorrect ? 'border-green' : 'border-border focus:border-accent'
+        }`;
+  const bodyText = light ? 'text-[#18181B]' : '';
+  const mutedText = light ? 'text-[#71717A]' : 'text-gray-400';
+
   const moveControls = (
     <div className="flex items-center gap-1 shrink-0">
       <button
@@ -60,7 +88,7 @@ export default function QuestionEditor({
         onClick={onMoveUp}
         disabled={isFirst}
         title="Move up"
-        className="w-8 h-8 flex items-center justify-center rounded-md border border-border text-sm hover:border-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className={iconBtn}
       >
         ▲
       </button>
@@ -69,7 +97,7 @@ export default function QuestionEditor({
         onClick={onMoveDown}
         disabled={isLast}
         title="Move down"
-        className="w-8 h-8 flex items-center justify-center rounded-md border border-border text-sm hover:border-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className={iconBtn}
       >
         ▼
       </button>
@@ -78,7 +106,11 @@ export default function QuestionEditor({
         onClick={onDelete}
         disabled={!canDelete}
         title={!canDelete ? 'At least 1 question required' : 'Delete question'}
-        className="w-8 h-8 flex items-center justify-center rounded-md border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className={
+          light
+            ? 'w-8 h-8 flex items-center justify-center rounded-md border border-danger/40 text-danger hover:bg-danger/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed'
+            : 'w-8 h-8 flex items-center justify-center rounded-md border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed'
+        }
       >
         🗑️
       </button>
@@ -87,17 +119,12 @@ export default function QuestionEditor({
 
   if (editing) {
     return (
-      <div className="bg-surface border border-accent rounded-xl p-5">
+      <div className={cardEditing}>
         <div className="flex items-center justify-between gap-3 mb-3">
-          <p className="text-sm text-gray-400">
+          <p className={`text-sm ${mutedText}`}>
             Question {index + 1} <span className="text-accent">— editing</span>
           </p>
-          <button
-            type="button"
-            onClick={cancel}
-            title="Cancel"
-            className="w-8 h-8 flex items-center justify-center rounded-md border border-border text-sm hover:border-accent transition-colors shrink-0"
-          >
+          <button type="button" onClick={cancel} title="Cancel" className={`${iconBtn} shrink-0`}>
             ✕
           </button>
         </div>
@@ -106,7 +133,7 @@ export default function QuestionEditor({
           onChange={(e) => setDraft({ ...draft, text: e.target.value })}
           rows={2}
           placeholder="Question text..."
-          className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none mb-3"
+          className={textArea}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
           {draft.options.map((option, i) => {
@@ -118,7 +145,11 @@ export default function QuestionEditor({
                   onClick={() => setDraft({ ...draft, answer: i })}
                   title={`Mark ${String.fromCharCode(65 + i)} as correct`}
                   className={`w-6 h-6 shrink-0 rounded-md text-xs font-semibold flex items-center justify-center transition-colors ${
-                    isCorrect ? 'bg-green text-background' : 'bg-border text-gray-400 hover:bg-white/10'
+                    isCorrect
+                      ? 'bg-success text-white'
+                      : light
+                      ? 'bg-[#F4F4F5] text-[#71717A] hover:bg-[#E4E4E7]'
+                      : 'bg-border text-gray-400 hover:bg-white/10'
                   }`}
                 >
                   {String.fromCharCode(65 + i)}
@@ -128,11 +159,9 @@ export default function QuestionEditor({
                   value={option}
                   onChange={(e) => updateOption(i, e.target.value)}
                   placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                  className={`flex-1 min-w-0 px-3 py-1.5 rounded-md bg-background border outline-none ${
-                    isCorrect ? 'border-green' : 'border-border focus:border-accent'
-                  }`}
+                  className={optionInput(isCorrect)}
                 />
-                {isCorrect && <span className="text-xs text-green shrink-0">correct</span>}
+                {isCorrect && <span className="text-xs text-success shrink-0">correct</span>}
               </div>
             );
           })}
@@ -142,7 +171,7 @@ export default function QuestionEditor({
           onChange={(e) => setDraft({ ...draft, explanation: e.target.value })}
           rows={2}
           placeholder="Explanation (why is this correct?)"
-          className="w-full px-3 py-2 rounded-md bg-background border border-border focus:border-accent outline-none mb-3"
+          className={textArea}
         />
         <div className="flex gap-2">
           <button
@@ -153,7 +182,11 @@ export default function QuestionEditor({
           </button>
           <button
             onClick={cancel}
-            className="px-4 py-1.5 rounded-md border border-border text-sm hover:border-accent transition-colors"
+            className={
+              light
+                ? 'px-4 py-1.5 rounded-md border border-[#E4E4E7] text-sm text-[#18181B] hover:border-[#D4D4D8] transition-colors'
+                : 'px-4 py-1.5 rounded-md border border-border text-sm hover:border-accent transition-colors'
+            }
           >
             ✕ Cancel
           </button>
@@ -163,12 +196,12 @@ export default function QuestionEditor({
   }
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-5">
+    <div className={card}>
       <div className="flex items-start justify-between gap-3 mb-3">
-        <p className="font-medium">Question {index + 1}</p>
+        <p className={`font-medium ${bodyText}`}>Question {index + 1}</p>
         {moveControls}
       </div>
-      <p className="mb-3">{question.text}</p>
+      <p className={`mb-3 ${bodyText}`}>{question.text}</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
         {question.options.map((option, i) => {
           const isCorrect = i === question.answer;
@@ -176,12 +209,20 @@ export default function QuestionEditor({
             <div
               key={i}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm ${
-                isCorrect ? 'border-green bg-green/10 text-green' : 'border-border text-gray-400'
+                isCorrect
+                  ? 'border-success bg-success/10 text-success'
+                  : light
+                  ? 'border-[#E4E4E7] text-[#71717A]'
+                  : 'border-border text-gray-400'
               }`}
             >
               <span
                 className={`w-5 h-5 shrink-0 rounded text-xs font-semibold flex items-center justify-center ${
-                  isCorrect ? 'bg-green text-background' : 'bg-border text-gray-400'
+                  isCorrect
+                    ? 'bg-success text-white'
+                    : light
+                    ? 'bg-[#F4F4F5] text-[#71717A]'
+                    : 'bg-border text-gray-400'
                 }`}
               >
                 {String.fromCharCode(65 + i)}
@@ -194,7 +235,11 @@ export default function QuestionEditor({
       <div className="flex items-center gap-3 mb-3">
         <button
           onClick={startEdit}
-          className="px-3 py-1.5 rounded-md border border-border text-sm hover:border-accent transition-colors"
+          className={
+            light
+              ? 'px-3 py-1.5 rounded-md border border-[#E4E4E7] text-sm text-[#18181B] hover:border-[#D4D4D8] transition-colors'
+              : 'px-3 py-1.5 rounded-md border border-border text-sm hover:border-accent transition-colors'
+          }
         >
           ✎ Edit
         </button>
@@ -205,7 +250,7 @@ export default function QuestionEditor({
           {showExplanation ? 'Hide' : 'Show'} explanation
         </button>
       </div>
-      {showExplanation && <p className="text-sm text-gray-400">{question.explanation}</p>}
+      {showExplanation && <p className={`text-sm ${mutedText}`}>{question.explanation}</p>}
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Space_Grotesk, Inter } from 'next/font/google';
-import NavBar from '@/components/NavBar';
 import '@/styles/globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -42,13 +41,17 @@ export const metadata: Metadata = {
   },
 };
 
+// NavBar is no longer rendered here (M1-01) — marketing/dashboard pages use
+// LightNavBar and quiz/exam/reader/edit pages use DarkNavBar, each wired up
+// by their own route-group layout ((light)/layout.tsx, (dark)/layout.tsx),
+// since the two need different backgrounds and Next.js only allows one
+// <body> for the whole app. This root layout stays theme-agnostic; the
+// light background below is the default for everything that doesn't
+// override it via the dark route group.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
-      <body className="bg-background text-white font-body min-h-screen">
-        <NavBar />
-        <main>{children}</main>
-      </body>
+      <body className="bg-light-bg text-light-text font-body min-h-screen">{children}</body>
     </html>
   );
 }

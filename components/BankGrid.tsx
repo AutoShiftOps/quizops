@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { QuizBank } from '@/lib/types';
@@ -33,7 +34,6 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
   const [bestScore, setBestScore] = useState<number | null>(null);
   const [topQuizThisWeek, setTopQuizThisWeek] = useState<TopQuiz | null>(null);
   const [mostRecentQuiz, setMostRecentQuiz] = useState<RecentQuiz | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -45,10 +45,6 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       setLoadingUserData(true);
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-      // All four signed-in-only reads run in parallel — none depends on
-      // another's result (publisher_id === auth user id in this schema, so
-      // the publisher-strip queries don't need to wait on the publisher row
-      // resolving first).
       const [attemptsResult, publisherResult, weeklyReadersResult, quizzesResult] =
         await Promise.all([
           supabase
@@ -69,17 +65,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
             .order('created_at', { ascending: false }),
         ]);
 
-      console.log('[BankGrid] user:', u.id);
-      console.log('[BankGrid] quiz_attempts response:', attemptsResult);
-      console.log('[BankGrid] publishers response:', publisherResult);
-      console.log('[BankGrid] published_quiz_attempts (7d) response:', weeklyReadersResult);
-      console.log('[BankGrid] published_quizzes response:', quizzesResult);
-
       if (attemptsResult.error) {
-        // This is the failure mode that used to show up as "score badges
-        // just don't appear" with no trace of why — RLS denial, an expired
-        // token that failed to refresh, or a bad query would all land here
-        // and were previously swallowed because only `data` was destructured.
         console.error('[BankGrid] quiz_attempts query failed:', attemptsResult.error);
       }
       if (publisherResult.error) {
@@ -100,7 +86,6 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
         else if (row.mode === 'exam') acc[row.bank_slug].exam = score;
         return acc;
       }, {});
-      console.log('[BankGrid] scoreMap:', grouped);
 
       if (!active) return;
       setScoreMap(grouped);
@@ -112,10 +97,6 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       setUsername(publisher?.username ?? null);
       setPublishedCount(publisher?.quiz_count ?? 0);
 
-      // Find the quiz with the most reads in the last 7 days — the "ah
-      // moment" highlight. Quizzes with zero reads this week don't appear
-      // in weeklyReadersResult at all, so anything left over after grouping
-      // only covers quizzes that actually got attempts.
       const quizzes = quizzesResult.data ?? [];
       const perQuiz: Record<string, { count: number; passedCount: number }> = {};
       for (const row of weeklyReadersResult.data ?? []) {
@@ -157,22 +138,16 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      console.log('[BankGrid] session user on mount:', session?.user?.id ?? null);
 
       if (!active) return;
       setUser(session?.user ?? null);
 
-      // Guest: skip all signed-in-only fetches entirely and render immediately.
       if (!session?.user) {
         resetToGuest();
       } else {
         await loadSignedInData(supabase, session.user);
       }
 
-      // A one-time check on mount misses a sign-in that completes without a
-      // full page reload (e.g. the OAuth redirect lands back here before this
-      // effect's initial getSession() call resolves). Reacting to auth state
-      // changes closes that gap.
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((_event, newSession) => {
@@ -201,22 +176,65 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
   return (
     <>
       {isSignedIn && user && (
-        <div className="-mx-6 px-6 py-2 mb-10 bg-[rgba(62,123,250,0.08)] border-b border-[rgba(62,123,250,0.2)]">
-          <span className="text-[13px] text-[#6B8FFD]">
+        <div className="-mx-6 px-6 py-2 mb-10 bg-[#EFF6FF] border-b border-[#BFDBFE]">
+          <span className="text-[13px] text-[#1D4ED8]">
             👋 Welcome back, {getFirstName(user)}
           </span>
         </div>
       )}
 
       <section className="text-center mb-16">
-        <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">
-          Test your technical knowledge
+        {!isSignedIn && (
+          <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#1D4ED8] mb-5">
+            Publisher platform for technical writers
+          </span>
+        )}
+
+        <h1
+          className="font-heading font-extrabold text-[#18181B] mb-4"
+          style={{ fontSize: 40, letterSpacing: '-1px', lineHeight: 1.15 }}
+        >
+          {isSignedIn ? (
+            'Test your technical knowledge'
+          ) : (
+            <>
+              Quiz your readers.
+              <br />
+              Prove your content works.
+            </>
+          )}
         </h1>
-        <p className="text-gray-400 max-w-xl mx-auto">
+
+        <p className="text-[#71717A] max-w-[480px] mx-auto">
           {isSignedIn
             ? 'Pick up where you left off, or explore a new topic.'
-            : 'Bite-sized quizzes on DevOps, cloud, and engineering fundamentals — sign in to track your progress, or jump in as a guest.'}
+            : 'Paste your article URL. Get 10 quiz questions in 60 seconds. See how many readers actually understood what you wrote.'}
         </p>
+
+        {!isSignedIn && (
+          <p className="text-[13px] text-[#71717A] mt-4 flex items-center justify-center gap-4 flex-wrap">
+            <span>✓ AI-generated</span>
+            <span>✓ No code needed</span>
+            <span>✓ Free to start</span>
+          </p>
+        )}
+
+        {!isSignedIn && (
+          <div className="flex items-center justify-center gap-3 mt-7 flex-wrap">
+            <Link
+              href="/dashboard"
+              className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity"
+            >
+              Start for free →
+            </Link>
+            <Link
+              href="/about"
+              className="px-5 py-2.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
+            >
+              See how it works
+            </Link>
+          </div>
+        )}
 
         {isSignedIn && (
           <div className="grid grid-cols-3 gap-[10px] max-w-md mx-auto mt-8">
@@ -224,24 +242,34 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
               [0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="bg-[#111118] border border-border rounded-lg p-3 h-[68px] animate-pulse"
+                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 h-[68px] animate-pulse"
+                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
                 />
               ))
             ) : (
               <>
-                <div className="bg-[#111118] border border-border rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-[#3E7BFA]">{quizzesTaken}</p>
-                  <p className="text-[10px] uppercase text-[#6B6882] mt-1">Quizzes taken</p>
+                <div
+                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
+                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                >
+                  <p className="text-2xl font-bold text-accent">{quizzesTaken}</p>
+                  <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Quizzes taken</p>
                 </div>
-                <div className="bg-[#111118] border border-border rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-green-500">
+                <div
+                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
+                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                >
+                  <p className="text-2xl font-bold text-success">
                     {bestScore === null ? '—' : `${bestScore}%`}
                   </p>
-                  <p className="text-[10px] uppercase text-[#6B6882] mt-1">Best score</p>
+                  <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Best score</p>
                 </div>
-                <div className="bg-[#111118] border border-border rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-amber-500">{publishedCount}</p>
-                  <p className="text-[10px] uppercase text-[#6B6882] mt-1">Published</p>
+                <div
+                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
+                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                >
+                  <p className="text-2xl font-bold text-warning">{publishedCount}</p>
+                  <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Published</p>
                 </div>
               </>
             )}
@@ -250,7 +278,10 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       </section>
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold tracking-wider text-gray-500 uppercase">
+        <h2
+          className="text-[10px] font-semibold uppercase text-[#71717A]"
+          style={{ letterSpacing: '1px' }}
+        >
           {isSignedIn ? 'Continue learning' : 'Quiz banks'}
         </h2>
       </div>
@@ -271,78 +302,34 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       </section>
 
       {isSignedIn && hasPublisherProfile ? (
-        <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#111118] border border-[rgba(62,123,250,0.2)] rounded-lg py-3 px-4">
+        <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#F0F9FF] border border-[#BAE6FD] rounded-lg py-3 px-4">
           {topQuizThisWeek ? (
-            <>
-              <p className="text-[13px]">
-                📖 <span className="font-medium">{topQuizThisWeek.title}</span> was read by{' '}
-                {topQuizThisWeek.readers} {topQuizThisWeek.readers === 1 ? 'person' : 'people'}{' '}
-                this week — {topQuizThisWeek.passRate}% passed
-              </p>
-              <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href={`/q/${username}/${topQuizThisWeek.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
-                >
-                  View quiz
-                </a>
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity"
-                >
-                  Go to dashboard →
-                </button>
-              </div>
-            </>
+            <p className="text-[13px] text-[#1D4ED8]">
+              📖 <span className="font-medium">{topQuizThisWeek.title}</span> was read by{' '}
+              {topQuizThisWeek.readers} {topQuizThisWeek.readers === 1 ? 'person' : 'people'}{' '}
+              this week — {topQuizThisWeek.passRate}% passed
+            </p>
           ) : mostRecentQuiz ? (
-            <>
-              <div>
-                <p className="text-[13px] font-medium">Share your quiz to get your first reader</p>
-                <p className="text-[11px] text-[#6B6882] mt-0.5">
-                  {typeof window !== 'undefined' ? window.location.origin : ''}/q/{username}/
-                  {mostRecentQuiz.slug}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => {
-                    const url = `${window.location.origin}/q/${username}/${mostRecentQuiz.slug}`;
-                    navigator.clipboard.writeText(url);
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }}
-                  className="text-xs px-3 py-1.5 rounded-md border border-border hover:border-accent transition-colors"
-                >
-                  {copied ? 'Copied!' : 'Copy link'}
-                </button>
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity"
-                >
-                  Go to dashboard →
-                </button>
-              </div>
-            </>
+            <p className="text-[13px] text-[#1D4ED8]">
+              Share <span className="font-medium">{mostRecentQuiz.title}</span> to get your
+              first reader
+            </p>
           ) : (
-            <>
-              <p className="text-[13px] font-medium">You haven&apos;t published a quiz yet</p>
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="text-xs px-3 py-1.5 rounded-md bg-[#3E7BFA] text-white hover:opacity-90 transition-opacity shrink-0"
-              >
-                Go to dashboard →
-              </button>
-            </>
+            <p className="text-[13px] text-[#1D4ED8]">You haven&apos;t published a quiz yet</p>
           )}
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="text-xs px-3 py-1.5 rounded-md bg-accent text-white hover:opacity-90 transition-opacity shrink-0"
+          >
+            Dashboard →
+          </button>
         </div>
       ) : (
-        <section className="mt-20 text-center border-t border-border pt-10">
-          <h2 className="font-heading text-2xl font-semibold mb-2">
+        <section className="mt-20 text-center border-t border-[#E4E4E7] pt-10">
+          <h2 className="font-heading text-2xl font-semibold mb-2 text-[#18181B]">
             Have a topic to test?
           </h2>
-          <p className="text-gray-400">
+          <p className="text-[#71717A]">
             Anyone can contribute a new quiz bank — no coding required. See{' '}
             <span className="text-accent">CONTRIBUTING.md</span> in the repo to get
             started.
