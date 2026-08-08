@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Space_Grotesk, Inter } from 'next/font/google';
+import Footer from '@/components/Footer';
 import '@/styles/globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -51,7 +52,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
-      <body className="bg-light-bg text-light-text font-body min-h-screen">{children}</body>
+      <body className="bg-light-bg text-light-text font-body min-h-screen flex flex-col">
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }
