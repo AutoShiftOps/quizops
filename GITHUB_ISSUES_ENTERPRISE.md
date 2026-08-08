@@ -27,7 +27,7 @@ Run these in order in GitHub → Labels → New label:
 | `enterprise` | #F59E0B | Enterprise-specific |
 | `bug` | #DC2626 | Bug fix |
 | `chore` | #6B7280 | Maintenance |
-| `legal` | #DC2626 | Legal/compliance work |
+| `legal` | #CA8A04 | Legal/compliance work |
 
 ---
 
