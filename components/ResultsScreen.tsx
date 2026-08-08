@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { QuizBank, Question } from '@/lib/types';
+import { track } from '@/lib/analytics';
 
 type Props = {
   bank: QuizBank;
@@ -104,6 +105,7 @@ export default function ResultsScreen({
   }, [user]);
 
   async function handleShare() {
+    track('quiz_shared', { bank_slug: bank.slug });
     const emoji = passed ? '✅' : '📚';
     const verb = passed ? 'Passed' : 'Attempted';
     const text = [

@@ -5,6 +5,7 @@ import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { clearCheckpoint, loadCheckpoint, saveCheckpoint } from '@/lib/quizStorage';
 import { QuizBank, Question } from '@/lib/types';
+import { track } from '@/lib/analytics';
 import ResultsScreen from './ResultsScreen';
 
 type Props = {
@@ -23,6 +24,12 @@ export default function QuizEngine({ bank, questions }: Props) {
 
   const currentQuestion = questions[currentIndex];
   const answeredCurrent = answers[currentQuestion.id] !== undefined;
+
+  useEffect(() => {
+    track('quiz_started', { bank_slug: bank.slug });
+    // Fire once per mount only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -93,8 +100,19 @@ export default function QuizEngine({ bank, questions }: Props) {
 
   const finishQuiz = useCallback(() => {
     clearCheckpoint(bank.slug);
+    // ResultsScreen recomputes the same score/pass numbers for display via
+    // its own useMemo — duplicated here (small, cheap) so this fires right
+    // when the quiz is actually submitted, not whenever ResultsScreen next
+    // happens to render.
+    let correct = 0;
+    for (const q of questions) {
+      if (answers[q.id] === q.answer) correct += 1;
+    }
+    const pct = Math.round((correct / questions.length) * 100);
+    const passed = pct >= bank.pass_mark;
+    track('quiz_completed', { bank_slug: bank.slug, score: pct, passed: passed ? 1 : 0 });
     setFinished(true);
-  }, [bank.slug]);
+  }, [bank.slug, bank.pass_mark, questions, answers]);
 
   useEffect(() => {
     if (finished) return;

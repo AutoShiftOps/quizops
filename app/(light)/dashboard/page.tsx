@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { getPublisher, checkTierLimit } from '@/lib/publisher';
 import { Publisher, PublishedQuiz } from '@/lib/types';
+import { track } from '@/lib/analytics';
 import PublisherOnboarding from '@/components/PublisherOnboarding';
 import TierBadge from '@/components/TierBadge';
 import PublisherQuizCard from '@/components/PublisherQuizCard';
@@ -37,6 +38,16 @@ export default function DashboardPage() {
     setToast("Pro tier coming soon! We'll notify you when it's available.");
     setTimeout(() => setToast(null), 3000);
   }
+
+  // Placed before the loading/onboarding early returns below (hooks can't
+  // follow a conditional return), keyed off `publisher` directly rather
+  // than a `limitReached` local, since that's only computed after those
+  // returns.
+  useEffect(() => {
+    if (publisher && checkTierLimit(publisher)) {
+      track('upgrade_prompt_shown');
+    }
+  }, [publisher]);
 
   useEffect(() => {
     setOrigin(window.location.origin);

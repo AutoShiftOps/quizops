@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import { getPublisher, checkTierLimit } from '@/lib/publisher';
 import { Publisher, Question } from '@/lib/types';
+import { track } from '@/lib/analytics';
 import QuestionEditor from '@/components/QuestionEditor';
 import QuizMetadataForm from '@/components/QuizMetadataForm';
 import SharePanel from '@/components/SharePanel';
@@ -64,6 +65,9 @@ export default function NewQuizPage() {
   const [savingDraft, setSavingDraft] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [upgradeToast, setUpgradeToast] = useState(false);
+  const [moderationError, setModerationError] = useState<{ message: string; reason?: string } | null>(
+    null
+  );
 
   // Published step
   const [shareData, setShareData] = useState<{
@@ -91,6 +95,10 @@ export default function NewQuizPage() {
       setLoadingPublisher(false);
     })().catch(() => setLoadingPublisher(false));
   }, [router]);
+
+  useEffect(() => {
+    track('quiz_create_started');
+  }, []);
 
   function resetMetadata() {
     setTitle('');
@@ -131,6 +139,7 @@ export default function NewQuizPage() {
 
   async function startGeneration(payload: { url?: string; text?: string }) {
     setInputError(null);
+    setModerationError(null);
     setQuestions([]);
     setStep('generating');
 
@@ -158,6 +167,15 @@ export default function NewQuizPage() {
 
     if (response.status === 422) {
       const json = await response.json().catch(() => ({}));
+      if (json.error === 'content_not_allowed' || json.error === 'content_not_appropriate') {
+        track('content_blocked', { reason: json.reason || 'unspecified' });
+        setModerationError({
+          message: json.message || "This content isn't eligible for quiz generation.",
+          reason: json.reason,
+        });
+        setStep('input');
+        return;
+      }
       setInputError(json.message || 'Could not fetch that URL');
       setShowPasteArea(true);
       setStep('input');
@@ -176,6 +194,10 @@ export default function NewQuizPage() {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    // Tracked locally rather than read from `questions.length` afterwards —
+    // state updates inside this loop are async, so the outer closure's view
+    // of `questions` isn't reliably caught up by the time we're done here.
+    let receivedCount = 0;
 
     try {
       while (true) {
@@ -193,6 +215,7 @@ export default function NewQuizPage() {
               continue;
             }
             setQuestions((prev) => [...prev, parsed]);
+            receivedCount += 1;
           } catch {
             // skip malformed lines
           }
@@ -204,6 +227,7 @@ export default function NewQuizPage() {
       }
     }
 
+    track('quiz_generation_completed', { question_count: receivedCount });
     setStep('review');
   }
 
@@ -217,6 +241,7 @@ export default function NewQuizPage() {
         setInputError('Please paste some article text.');
         return;
       }
+      track('quiz_generation_started', { source: 'text' });
       startGeneration({ text: pastedText });
       return;
     }
@@ -231,6 +256,7 @@ export default function NewQuizPage() {
       setInputError('Please enter a valid URL.');
       return;
     }
+    track('quiz_generation_started', { source: 'url' });
     startGeneration({ url: url.trim() });
   }
 
@@ -319,6 +345,10 @@ export default function NewQuizPage() {
     setShareData(json);
     setStep('published');
     setPublishing(false);
+    // /api/publish doesn't return a raw slug field, just the full public
+    // URL — the slug is its last path segment.
+    const publishedSlug = json.url?.split('/').filter(Boolean).pop();
+    track('quiz_published', { bank_slug: publishedSlug ?? 'unknown' });
     // Keep the locally-held publisher in sync so the tier-limit gate below
     // re-evaluates correctly if they stay on this page (e.g. "Create
     // another quiz") right after publishing their 3rd free quiz.
@@ -642,6 +672,28 @@ export default function NewQuizPage() {
           ))}
         </div>
       </div>
+
+      {moderationError && (
+        <div className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm">
+          <p className="font-semibold text-danger mb-1">🚫 Content not allowed</p>
+          <p className="text-[#18181B] mb-1">{moderationError.message}</p>
+          {moderationError.reason && (
+            <p className="text-[#71717A] mb-2">Reason: {moderationError.reason}</p>
+          )}
+          <p className="text-[#71717A] mb-3">
+            QuizOps supports educational and technical content only.
+          </p>
+          <button
+            onClick={() => {
+              setModerationError(null);
+              setUrl('');
+            }}
+            className="px-3 py-1.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+          >
+            Try a different URL
+          </button>
+        </div>
+      )}
 
       {inputError && <p className="text-sm text-danger mb-4">{inputError}</p>}
 

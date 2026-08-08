@@ -77,6 +77,83 @@ function truncateWords(text: string, maxWords: number): string {
   return words.slice(0, maxWords).join(' ');
 }
 
+type ModerationResult = { ok: boolean; reason?: string };
+
+// Best-effort JSON parse: the moderation prompts ask for "ONLY valid JSON",
+// and gpt-4o-mini at temperature 0 is reliably compliant, but a stray code
+// fence or leading word would otherwise throw and incorrectly block (or
+// silently pass) real content. Falls back to extracting the first {...}
+// block before giving up.
+function parseModerationJson(raw: string): Record<string, unknown> {
+  try {
+    return JSON.parse(raw.trim());
+  } catch {
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch {
+        // fall through
+      }
+    }
+    return {};
+  }
+}
+
+// Layer 1 — domain intent check, run before ever fetching the URL.
+async function checkDomainAllowed(openai: OpenAI, domain: string): Promise<ModerationResult> {
+  try {
+    const res = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'user',
+          content: `Is the domain "${domain}" likely to contain adult content, gambling, hate speech, violence, or illegal material?\nReply with ONLY valid JSON:\n{"allowed": true} or {"allowed": false, "reason": "..."}`,
+        },
+      ],
+      max_tokens: 50,
+      temperature: 0,
+    });
+    const parsed = parseModerationJson(res.choices[0]?.message?.content ?? '');
+    if (parsed.allowed === false) {
+      return { ok: false, reason: typeof parsed.reason === 'string' ? parsed.reason : undefined };
+    }
+    return { ok: true };
+  } catch (err) {
+    // Fail open: a hiccup in this secondary safety check shouldn't take down
+    // the primary generation feature for every user. Logged so a spike in
+    // failures here is visible/monitorable rather than silently degrading.
+    console.error('[generate] domain moderation check failed, defaulting to allowed:', err);
+    return { ok: true };
+  }
+}
+
+// Layer 2 — content classification, run after extracting article text and
+// before generation.
+async function checkContentAppropriate(openai: OpenAI, articleText: string): Promise<ModerationResult> {
+  try {
+    const res = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'user',
+          content: `Is the following content appropriate for educational quiz generation? It must be informational, technical, or educational. Not adult, violent, or harmful.\nReply ONLY: {"appropriate": true} or {"appropriate": false, "reason": "..."}\n\nContent (first 500 chars):\n${articleText.slice(0, 500)}`,
+        },
+      ],
+      max_tokens: 50,
+      temperature: 0,
+    });
+    const parsed = parseModerationJson(res.choices[0]?.message?.content ?? '');
+    if (parsed.appropriate === false) {
+      return { ok: false, reason: typeof parsed.reason === 'string' ? parsed.reason : undefined };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error('[generate] content moderation check failed, defaulting to allowed:', err);
+    return { ok: true };
+  }
+}
+
 function buildSystemPrompt(questionCount: number): string {
   return `You are a technical quiz generator. Generate exactly ${questionCount} multiple-choice questions that test a reader's understanding of the article provided.
 
@@ -130,10 +207,32 @@ export async function POST(req: NextRequest) {
     questionCount?: number;
   };
 
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
   let articleText: string;
   let extractedTitle: string | null = null;
 
   if (url) {
+    // Layer 1 — domain intent check, before ever fetching the URL.
+    let domain = url;
+    try {
+      domain = new URL(url).hostname;
+    } catch {
+      // Malformed URL — let the fetch below produce the normal fetch_failed
+      // error rather than a moderation-shaped one.
+    }
+    const domainCheck = await checkDomainAllowed(openai, domain);
+    if (!domainCheck.ok) {
+      return NextResponse.json(
+        {
+          error: 'content_not_allowed',
+          message: 'This content is not eligible for quiz generation on QuizOps.',
+          reason: domainCheck.reason,
+        },
+        { status: 422 }
+      );
+    }
+
     let res: Response;
     try {
       res = await fetch(url, { headers: { 'User-Agent': 'QuizOps/1.0' } });
@@ -166,8 +265,21 @@ export async function POST(req: NextRequest) {
 
   articleText = truncateWords(articleText, MAX_WORDS);
 
+  // Layer 2 — content classification, after extracting article text and
+  // before spending tokens on generation.
+  const contentCheck = await checkContentAppropriate(openai, articleText);
+  if (!contentCheck.ok) {
+    return NextResponse.json(
+      {
+        error: 'content_not_appropriate',
+        message: "This content isn't eligible for quiz generation.",
+        reason: contentCheck.reason,
+      },
+      { status: 422 }
+    );
+  }
+
   const systemPrompt = buildSystemPrompt(questionCount);
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   const stream = await openai.chat.completions.create({
     model: process.env.AI_MODEL || 'gpt-4o-mini',

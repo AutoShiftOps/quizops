@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { track } from '@/lib/analytics';
 
 type Billing = 'monthly' | 'annual';
 
@@ -60,6 +61,10 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function PricingPage() {
   const [billing, setBilling] = useState<Billing>('monthly');
   const isAnnual = billing === 'annual';
+
+  useEffect(() => {
+    track('pricing_page_viewed');
+  }, []);
 
   return (
     <div>
@@ -215,6 +220,7 @@ export default function PricingPage() {
           </ul>
           <a
             href="mailto:admin@autoshiftops.com?subject=QuizOps Enterprise Enquiry"
+            onClick={() => track('enterprise_contact_clicked')}
             className="w-full text-center bg-[#18181B] text-white font-semibold hover:opacity-90 transition-opacity"
             style={{ borderRadius: 8, padding: 12 }}
           >
