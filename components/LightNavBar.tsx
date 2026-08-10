@@ -8,6 +8,16 @@ import { getPublisher } from '@/lib/publisher';
 import LoginButton from './LoginButton';
 import Logo from './Logo';
 
+// Center marketing nav (added for the enterprise homepage redesign). Hidden
+// below md — no hamburger menu was requested, and the right-hand auth
+// actions remain reachable at every width.
+const NAV_LINKS = [
+  { label: 'Features', href: '/#how-it-works' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Security', href: '/security' },
+  { label: 'About', href: '/about' },
+];
+
 // Light-theme NavBar (M1-01) used on marketing + dashboard pages. Dashboard
 // is reached via the avatar only — no separate "Dashboard" text link here,
 // per the redundant-navigation cleanup (see the publisher strip on the
@@ -61,18 +71,26 @@ export default function LightNavBar() {
   return (
     <header className="bg-white border-b border-[#E4E4E7]">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
-          <Logo size="sm" showTagline={false} variant="light" />
-        </Link>
-
-        <div className="flex items-center gap-5">
-          <Link
-            href="/pricing"
-            className="text-sm text-[#71717A] hover:text-[#18181B] transition-colors"
-          >
-            Pricing
+        <div className="flex-1 flex items-center">
+          <Link href="/" className="flex items-center">
+            <Logo size="sm" showTagline={false} variant="light" />
           </Link>
+        </div>
 
+        <nav className="hidden md:flex items-center" style={{ gap: 28 }}>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[#71717A] hover:text-[#18181B] transition-colors"
+              style={{ fontSize: 14 }}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex-1 flex items-center justify-end gap-5">
           {loading ? null : user ? (
             <div className="flex items-center gap-3">
               <Link

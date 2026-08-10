@@ -7,6 +7,9 @@ import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { QuizBank } from '@/lib/types';
 import QuizCard from './QuizCard';
+import Hero from './Hero';
+import HowItWorks from './HowItWorks';
+import PublisherCTA from './PublisherCTA';
 
 type Score = { percentage: number; passed: boolean };
 type ScoreMap = Record<string, { practice?: Score; exam?: Score }>;
@@ -176,199 +179,190 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
   return (
     <>
       {isSignedIn && user && (
-        <div className="-mx-6 px-6 py-2 mb-10 bg-[#EFF6FF] border-b border-[#BFDBFE]">
+        <div className="px-6 md:px-10 py-2 mb-10 bg-[#EFF6FF] border-b border-[#BFDBFE]">
           <span className="text-[13px] text-[#1D4ED8]">
             👋 Welcome back, {getFirstName(user)}
           </span>
         </div>
       )}
 
-      <section className="text-center mb-16">
-        {!isSignedIn && (
-          <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#1D4ED8] mb-5">
-            Publisher platform for technical writers
-          </span>
-        )}
-
-        <h1
-          className="font-heading font-extrabold text-[#18181B] mb-4"
-          style={{ fontSize: 40, letterSpacing: '-1px', lineHeight: 1.15 }}
-        >
-          {isSignedIn ? (
-            'Test your technical knowledge'
-          ) : (
-            <>
-              Quiz your readers.
-              <br />
-              Prove your content works.
-            </>
-          )}
-        </h1>
-
-        <p className="text-[#71717A] max-w-[480px] mx-auto">
-          {isSignedIn
-            ? 'Pick up where you left off, or explore a new topic.'
-            : 'Paste your article URL. Get 10 quiz questions in 60 seconds. See how many readers actually understood what you wrote.'}
-        </p>
-
-        {!isSignedIn && (
-          <p className="text-[13px] text-[#71717A] mt-4 flex items-center justify-center gap-4 flex-wrap">
-            <span>✓ AI-generated</span>
-            <span>✓ No code needed</span>
-            <span>✓ Free to start</span>
-          </p>
-        )}
-
-        {!isSignedIn && (
-          <div className="flex items-center justify-center gap-3 mt-7 flex-wrap">
-            <Link
-              href="/dashboard"
-              className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity"
+      {isSignedIn ? (
+        <div className="max-w-6xl mx-auto px-6 pt-12">
+          <section className="text-center mb-16">
+            <h1
+              className="font-heading font-extrabold text-[#18181B] mb-4"
+              style={{ fontSize: 40, letterSpacing: '-1px', lineHeight: 1.15 }}
             >
-              Start for free →
-            </Link>
-            <Link
-              href="/about"
-              className="px-5 py-2.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
-            >
-              See how it works
-            </Link>
-          </div>
-        )}
+              Test your technical knowledge
+            </h1>
 
-        {isSignedIn && (
-          <div className="grid grid-cols-3 gap-[10px] max-w-md mx-auto mt-8">
-            {loadingUserData ? (
-              [0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 h-[68px] animate-pulse"
-                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                />
-              ))
-            ) : (
-              <>
-                <div
-                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
-                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                >
-                  <p className="text-2xl font-bold text-accent">{quizzesTaken}</p>
-                  <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Quizzes taken</p>
-                </div>
-                <div
-                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
-                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                >
-                  <p className="text-2xl font-bold text-success">
-                    {bestScore === null ? '—' : `${bestScore}%`}
-                  </p>
-                  <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Best score</p>
-                </div>
-                <div
-                  className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
-                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                >
-                  <p className="text-2xl font-bold text-warning">{publishedCount}</p>
-                  <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Published</p>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </section>
+            <p className="text-[#71717A] max-w-[480px] mx-auto">
+              Pick up where you left off, or explore a new topic.
+            </p>
 
-      <div className="flex items-center justify-between mb-4">
-        <h2
-          className="text-[10px] font-semibold uppercase text-[#71717A]"
-          style={{ letterSpacing: '1px' }}
-        >
-          {isSignedIn ? 'Continue learning' : 'Quiz banks'}
-        </h2>
-      </div>
-
-      {(() => {
-        // A lone card left-aligned in a wide grid looks abandoned, so the
-        // "contribute" invite fills the row out to 2 whenever there's only
-        // one real bank. Once there are 2+ banks the grid is already
-        // visually populated and the invite isn't needed.
-        const showInvite = banks.length === 1;
-        const totalItems = banks.length + (showInvite ? 1 : 0);
-        const gridClass =
-          totalItems === 1
-            ? 'grid grid-cols-1 max-w-[420px] mx-auto gap-6'
-            : totalItems === 2
-            ? 'grid grid-cols-1 sm:grid-cols-2 max-w-[700px] mx-auto gap-6'
-            : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-[960px] mx-auto gap-6';
-
-        return (
-          <section className={gridClass}>
-            {banks.map((bank) => {
-              const scores = scoreMap[bank.slug];
-              return (
-                <QuizCard
-                  key={bank.slug}
-                  bank={bank}
-                  practiceScore={scores?.practice ?? null}
-                  examScore={scores?.exam ?? null}
-                  hasAttempted={Boolean(scores?.practice || scores?.exam)}
-                />
-              );
-            })}
-            {showInvite && (
-              <a
-                href="https://github.com/AutoShiftOps/quizops/blob/main/CONTRIBUTING.md"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center text-center rounded-xl p-6 hover:border-[#A1A1AA] transition-colors"
-                style={{ border: '1px dashed #D4D4D8', background: '#FAFAFA' }}
-              >
-                <span className="text-3xl mb-3">➕</span>
-                <p className="font-heading font-semibold text-[#18181B] mb-1">Add a quiz bank</p>
-                <p className="text-sm text-[#71717A] mb-3">
-                  Contribute questions on any technical topic — no coding required.
-                </p>
-                <span className="text-sm text-accent font-medium">See CONTRIBUTING.md →</span>
-              </a>
-            )}
+            <div className="grid grid-cols-3 gap-[10px] max-w-md mx-auto mt-8">
+              {loadingUserData ? (
+                [0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 h-[68px] animate-pulse"
+                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                  />
+                ))
+              ) : (
+                <>
+                  <div
+                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
+                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                  >
+                    <p className="text-2xl font-bold text-accent">{quizzesTaken}</p>
+                    <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Quizzes taken</p>
+                  </div>
+                  <div
+                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
+                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                  >
+                    <p className="text-2xl font-bold text-success">
+                      {bestScore === null ? '—' : `${bestScore}%`}
+                    </p>
+                    <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Best score</p>
+                  </div>
+                  <div
+                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
+                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+                  >
+                    <p className="text-2xl font-bold text-warning">{publishedCount}</p>
+                    <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Published</p>
+                  </div>
+                </>
+              )}
+            </div>
           </section>
-        );
-      })()}
-
-      {isSignedIn && hasPublisherProfile ? (
-        <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#F0F9FF] border border-[#BAE6FD] rounded-lg py-3 px-4">
-          {topQuizThisWeek ? (
-            <p className="text-[13px] text-[#1D4ED8]">
-              📖 <span className="font-medium">{topQuizThisWeek.title}</span> was read by{' '}
-              {topQuizThisWeek.readers} {topQuizThisWeek.readers === 1 ? 'person' : 'people'}{' '}
-              this week — {topQuizThisWeek.passRate}% passed
-            </p>
-          ) : mostRecentQuiz ? (
-            <p className="text-[13px] text-[#1D4ED8]">
-              Share <span className="font-medium">{mostRecentQuiz.title}</span> to get your
-              first reader
-            </p>
-          ) : (
-            <p className="text-[13px] text-[#1D4ED8]">You haven&apos;t published a quiz yet</p>
-          )}
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="text-xs px-3 py-1.5 rounded-md bg-accent text-white hover:opacity-90 transition-opacity shrink-0"
-          >
-            Dashboard →
-          </button>
         </div>
       ) : (
-        <section className="mt-20 text-center border-t border-[#E4E4E7] pt-10">
-          <h2 className="font-heading text-2xl font-semibold mb-2 text-[#18181B]">
-            Have a topic to test?
-          </h2>
-          <p className="text-[#71717A]">
-            Anyone can contribute a new quiz bank — no coding required. See{' '}
-            <span className="text-accent">CONTRIBUTING.md</span> in the repo to get
-            started.
-          </p>
-        </section>
+        <Hero />
       )}
+
+      <HowItWorks />
+
+      <div className="max-w-6xl mx-auto px-6 md:px-10 py-12">
+        <div className="flex items-center justify-between mb-4">
+          {isSignedIn ? (
+            <h2
+              className="text-[10px] font-semibold uppercase text-[#71717A]"
+              style={{ letterSpacing: '1px' }}
+            >
+              Continue learning
+            </h2>
+          ) : (
+            <div className="text-center w-full mb-2">
+              <span
+                className="inline-block font-semibold uppercase text-[#71717A] mb-3"
+                style={{ fontSize: 11, letterSpacing: 1 }}
+              >
+                Community quiz banks
+              </span>
+              <h2
+                className="font-heading font-extrabold text-[#18181B] mb-2"
+                style={{ fontSize: 28, letterSpacing: '-0.5px' }}
+              >
+                Test your knowledge
+              </h2>
+              <p style={{ color: '#71717A', fontSize: 15 }}>
+                Take a quiz as a reader, or create your own as a publisher.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {(() => {
+          // A lone card left-aligned in a wide grid looks abandoned, so the
+          // "contribute" invite plus a "more banks coming" placeholder fill
+          // the row out to 3 whenever there's only one real bank. Once
+          // there are 2+ banks the grid is already visually populated and
+          // neither is needed.
+          const showInvite = banks.length === 1;
+          const totalItems = banks.length + (showInvite ? 2 : 0);
+          const gridClass =
+            totalItems === 1
+              ? 'grid grid-cols-1 max-w-[420px] mx-auto gap-6'
+              : totalItems === 2
+              ? 'grid grid-cols-1 sm:grid-cols-2 max-w-[700px] mx-auto gap-6'
+              : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-[960px] mx-auto gap-6';
+
+          return (
+            <section className={gridClass}>
+              {banks.map((bank) => {
+                const scores = scoreMap[bank.slug];
+                return (
+                  <QuizCard
+                    key={bank.slug}
+                    bank={bank}
+                    practiceScore={scores?.practice ?? null}
+                    examScore={scores?.exam ?? null}
+                    hasAttempted={Boolean(scores?.practice || scores?.exam)}
+                  />
+                );
+              })}
+              {showInvite && (
+                <a
+                  href="https://github.com/AutoShiftOps/quizops/blob/main/CONTRIBUTING.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center justify-center text-center rounded-xl p-6 hover:border-[#A1A1AA] transition-colors"
+                  style={{ border: '1px dashed #D4D4D8', background: '#FAFAFA' }}
+                >
+                  <span className="text-3xl mb-3">➕</span>
+                  <p className="font-heading font-semibold text-[#18181B] mb-1">Add a quiz bank</p>
+                  <p className="text-sm text-[#71717A] mb-3">
+                    Contribute questions on any technical topic — no coding required.
+                  </p>
+                  <span className="text-sm text-accent font-medium">See CONTRIBUTING.md →</span>
+                </a>
+              )}
+              {showInvite && (
+                <div
+                  className="flex flex-col items-center justify-center text-center rounded-xl p-6"
+                  style={{ border: '1px solid #E4E4E7', background: '#FAFAFA', opacity: 0.5 }}
+                >
+                  <span className="text-3xl mb-3">🔒</span>
+                  <p className="font-heading font-semibold text-[#18181B] mb-1">More banks coming</p>
+                  <p className="text-sm text-[#71717A]">
+                    Terraform, Kubernetes, AWS, Python and more — contributed by the community.
+                  </p>
+                </div>
+              )}
+            </section>
+          );
+        })()}
+
+        {isSignedIn && hasPublisherProfile && (
+          <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#F0F9FF] border border-[#BAE6FD] rounded-lg py-3 px-4">
+            {topQuizThisWeek ? (
+              <p className="text-[13px] text-[#1D4ED8]">
+                📖 <span className="font-medium">{topQuizThisWeek.title}</span> was read by{' '}
+                {topQuizThisWeek.readers} {topQuizThisWeek.readers === 1 ? 'person' : 'people'}{' '}
+                this week — {topQuizThisWeek.passRate}% passed
+              </p>
+            ) : mostRecentQuiz ? (
+              <p className="text-[13px] text-[#1D4ED8]">
+                Share <span className="font-medium">{mostRecentQuiz.title}</span> to get your
+                first reader
+              </p>
+            ) : (
+              <p className="text-[13px] text-[#1D4ED8]">You haven&apos;t published a quiz yet</p>
+            )}
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="text-xs px-3 py-1.5 rounded-md bg-accent text-white hover:opacity-90 transition-opacity shrink-0"
+            >
+              Dashboard →
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!(isSignedIn && hasPublisherProfile) && <PublisherCTA />}
     </>
   );
 }
