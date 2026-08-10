@@ -72,7 +72,10 @@ export default function LightNavBar() {
 
   return (
     <header className="bg-white border-b border-[#E4E4E7]">
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div
+        className="mx-auto px-6 md:px-10 py-4 flex items-center justify-between"
+        style={{ maxWidth: 1080 }}
+      >
         <div className="flex-1 flex items-center">
           <Link href="/" className="flex items-center">
             <Logo size="sm" showTagline={false} variant="light" />

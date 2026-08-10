@@ -1,7 +1,10 @@
 export default function Footer() {
   return (
     <footer className="bg-white border-t border-[#E4E4E7] mt-auto" style={{ padding: '24px 40px' }}>
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center">
+      <div
+        className="mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center"
+        style={{ maxWidth: 1080 }}
+      >
         <p style={{ fontSize: 13, color: '#71717A' }}>© 2026 QuizOps by AutoShiftOps</p>
         <nav className="flex flex-wrap items-center justify-center gap-4" style={{ fontSize: 13 }}>
           <a href="/legal/terms" className="text-[#3E7BFA] hover:underline">

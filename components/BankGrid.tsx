@@ -178,64 +178,43 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
 
   return (
     <>
-      {/* Hero is identical for every visitor — signed-in personalisation
-          (welcome bar + mini stats) sits below it rather than replacing
-          it, so the social proof bar is always part of the page. */}
-      <Hero />
-
+      {/* Slim dark announcement bar, immediately below the NavBar and above
+          the hero — the quiz/score/published counts that used to live in a
+          separate white-card row are folded into this single line instead,
+          so there's one personalised element, not two saying similar
+          things. Hero itself (incl. the social proof bar) is identical for
+          every visitor. */}
       {isSignedIn && user && (
-        <>
-          <div className="px-6 md:px-10 py-2 bg-[#EFF6FF] border-b border-[#BFDBFE]">
-            <span className="text-[13px] text-[#1D4ED8]">
+        <div style={{ background: '#18181B', color: '#fff', fontSize: 13, padding: '8px 40px' }}>
+          <div
+            className="mx-auto flex items-center justify-between gap-3 flex-wrap"
+            style={{ maxWidth: 1080 }}
+          >
+            <span>
               👋 Welcome back, {getFirstName(user)}
-            </span>
-          </div>
-
-          <div className="max-w-6xl mx-auto px-6 md:px-10" style={{ paddingTop: 24, paddingBottom: 24 }}>
-            <div className="grid grid-cols-3 gap-[10px] max-w-md mx-auto">
-              {loadingUserData ? (
-                [0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 h-[68px] animate-pulse"
-                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                  />
-                ))
-              ) : (
+              {!loadingUserData && (
                 <>
-                  <div
-                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
-                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                  >
-                    <p className="text-2xl font-bold text-accent">{quizzesTaken}</p>
-                    <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Quizzes taken</p>
-                  </div>
-                  <div
-                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
-                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                  >
-                    <p className="text-2xl font-bold text-success">
-                      {bestScore === null ? '—' : `${bestScore}%`}
-                    </p>
-                    <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Best score</p>
-                  </div>
-                  <div
-                    className="bg-white border border-[#E4E4E7] rounded-lg p-3 text-center"
-                    style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-                  >
-                    <p className="text-2xl font-bold text-warning">{publishedCount}</p>
-                    <p className="text-[10px] uppercase text-[#A1A1AA] mt-1">Published</p>
-                  </div>
+                  {' '}
+                  · {quizzesTaken} {quizzesTaken === 1 ? 'quiz' : 'quizzes'} taken ·{' '}
+                  {bestScore === null ? '—' : `${bestScore}%`} best · {publishedCount} published
                 </>
               )}
-            </div>
+            </span>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="text-white hover:underline shrink-0"
+            >
+              Dashboard →
+            </button>
           </div>
-        </>
+        </div>
       )}
+
+      <Hero />
 
       <HowItWorks />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-10" style={{ paddingTop: 40, paddingBottom: 40 }}>
+      <div className="mx-auto px-6 md:px-10" style={{ maxWidth: 1080, paddingTop: 40, paddingBottom: 40 }}>
         <div className="flex items-center justify-between mb-4">
           {isSignedIn ? (
             <h2

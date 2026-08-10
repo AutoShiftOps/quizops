@@ -25,9 +25,10 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
           // Windows Chrome even with the colour-emoji font stack named
           // explicitly below — that font-matching behaviour isn't something
           // we can fix from here without a real Windows Chrome to verify
-          // against, so this bank gets a deterministic text badge instead:
-          // no emoji glyph involved, so nothing for the OS/browser to
-          // second-guess.
+          // against. A "/>" code-icon glyph sidesteps the problem entirely:
+          // it's plain monospace text, not an emoji, so there's no font a
+          // browser could second-guess — and it reads as "DevOps/code"
+          // rather than a placeholder abbreviation.
           <div
             style={{
               width: 44,
@@ -37,12 +38,13 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 15,
-              fontWeight: 800,
-              color: '#1D4ED8',
+              fontSize: 20,
+              color: '#3E7BFA',
+              fontWeight: 700,
+              fontFamily: 'monospace',
             }}
           >
-            CI
+            {'/>'}
           </div>
         ) : (
           <span

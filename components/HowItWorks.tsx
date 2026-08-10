@@ -37,7 +37,7 @@ export default function HowItWorks() {
         scrollMarginTop: '80px',
       }}
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto" style={{ maxWidth: 1080 }}>
         <div className="text-center mb-10">
           <span
             className="inline-block font-semibold uppercase text-[#71717A] mb-3"
