@@ -58,7 +58,25 @@ export default function DashboardPage() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session?.user) {
-        router.replace('/');
+        // Every "Start for free" CTA site-wide (Hero, Pricing, PublisherCTA,
+        // WaitlistModal) links straight here — this used to just bounce
+        // guests back to '/' with router.replace, silently, no sign-in
+        // prompt at all. From a visitor's perspective clicking the button
+        // did nothing (flash back to the same homepage). Trigger Google
+        // sign-in directly instead, same as NavBar's own button, and land
+        // them back on /dashboard (not just the origin) once it completes
+        // so they don't have to click twice.
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo:
+              typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+          },
+        });
+        if (error) {
+          console.error('[dashboard] sign-in redirect failed:', error);
+          router.replace('/');
+        }
         return;
       }
       setUser(session.user);
