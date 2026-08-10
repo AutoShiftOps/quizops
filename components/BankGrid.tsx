@@ -178,29 +178,21 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
 
   return (
     <>
+      {/* Hero is identical for every visitor — signed-in personalisation
+          (welcome bar + mini stats) sits below it rather than replacing
+          it, so the social proof bar is always part of the page. */}
+      <Hero />
+
       {isSignedIn && user && (
-        <div className="px-6 md:px-10 py-2 mb-10 bg-[#EFF6FF] border-b border-[#BFDBFE]">
-          <span className="text-[13px] text-[#1D4ED8]">
-            👋 Welcome back, {getFirstName(user)}
-          </span>
-        </div>
-      )}
+        <>
+          <div className="px-6 md:px-10 py-2 bg-[#EFF6FF] border-b border-[#BFDBFE]">
+            <span className="text-[13px] text-[#1D4ED8]">
+              👋 Welcome back, {getFirstName(user)}
+            </span>
+          </div>
 
-      {isSignedIn ? (
-        <div className="max-w-6xl mx-auto px-6 pt-12">
-          <section className="text-center mb-16">
-            <h1
-              className="font-heading font-extrabold text-[#18181B] mb-4"
-              style={{ fontSize: 40, letterSpacing: '-1px', lineHeight: 1.15 }}
-            >
-              Test your technical knowledge
-            </h1>
-
-            <p className="text-[#71717A] max-w-[480px] mx-auto">
-              Pick up where you left off, or explore a new topic.
-            </p>
-
-            <div className="grid grid-cols-3 gap-[10px] max-w-md mx-auto mt-8">
+          <div className="max-w-6xl mx-auto px-6 md:px-10" style={{ paddingTop: 24, paddingBottom: 24 }}>
+            <div className="grid grid-cols-3 gap-[10px] max-w-md mx-auto">
               {loadingUserData ? (
                 [0, 1, 2].map((i) => (
                   <div
@@ -237,10 +229,8 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
                 </>
               )}
             </div>
-          </section>
-        </div>
-      ) : (
-        <Hero />
+          </div>
+        </>
       )}
 
       <HowItWorks />

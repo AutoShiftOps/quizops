@@ -30,7 +30,12 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       className="px-6 md:px-10 scroll-mt-20"
-      style={{ paddingTop: 40, paddingBottom: 40, borderBottom: '1px solid #E4E4E7' }}
+      style={{
+        paddingTop: 40,
+        paddingBottom: 40,
+        borderBottom: '1px solid #E4E4E7',
+        scrollMarginTop: '80px',
+      }}
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">

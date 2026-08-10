@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -24,6 +25,7 @@ const NAV_LINKS = [
 // homepage and the post-publish share screen for the other two allowed
 // entry points).
 export default function LightNavBar() {
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasPublisherProfile, setHasPublisherProfile] = useState(false);
@@ -78,16 +80,29 @@ export default function LightNavBar() {
         </div>
 
         <nav className="hidden md:flex items-center" style={{ gap: 28 }}>
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-[#71717A] hover:text-[#18181B] transition-colors"
-              style={{ fontSize: 14 }}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            // "Features" is an anchor on the homepage, not its own route, so
+            // there's no scroll-position tracking here — just a simple
+            // proxy: treat it as active whenever we're on '/' at all.
+            const isActive = link.href === '/#how-it-works' && pathname === '/';
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={
+                  isActive
+                    ? 'transition-colors hover:font-medium'
+                    : 'text-[#71717A] hover:text-[#18181B] hover:font-medium transition-colors'
+                }
+                style={{
+                  fontSize: 14,
+                  ...(isActive ? { color: '#3E7BFA', fontWeight: 600 } : undefined),
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex-1 flex items-center justify-end gap-5">
