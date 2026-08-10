@@ -97,6 +97,36 @@ h6 {
   }
 }
 
+/* Streaming quiz lines (bento card A, "AI generation") — each new line
+   fades and slides up into the fixed-height terminal window; the terminal
+   box's own height/overflow (inline styles, StreamingText's container)
+   keep the card from resizing as lines cycle through. */
+.stream-line {
+  animation: stream-line-in 300ms ease-out;
+}
+
+@keyframes stream-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Blinking terminal cursor, trailing the most recent streamed line */
+.stream-cursor {
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* Grain texture overlay — opt-in via className="grain" on a container,
    since a fixed full-viewport ::after is too heavy-handed to apply
    unconditionally to <body> (would sit on top of every modal/dropdown). */

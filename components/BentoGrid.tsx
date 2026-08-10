@@ -10,7 +10,13 @@ const STREAM_LINES = [
   'Q1: What is the primary goal of CI?',
   'Q2: Which strategy reduces deployment risk?',
   'Q3: What does "shift-left" mean in DevOps?',
+  'Q4: Name a key benefit of trunk-based dev.',
+  'Q5: What triggers a CI pipeline run?',
 ];
+
+const STREAM_LINE_INTERVAL_MS = 1200;
+const STREAM_RESTART_PAUSE_MS = 2000;
+const STREAM_WINDOW_SIZE = 3;
 
 const PLATFORM_PILLS = ['Medium', 'dev.to', 'Substack', 'Hashnode', 'Your blog', 'Any URL'];
 
@@ -20,34 +26,48 @@ const INSIGHT_ROWS = [
   { label: 'Q7: Blue-green deploy', pct: 34 },
 ];
 
-// Lines appear one at a time, 800ms apart; once all are shown, pauses 3s
-// then restarts. Scheduled with chained setTimeouts (not setInterval) so
-// the pause-then-restart timing is explicit rather than approximated.
+// Sliding window of 3 lines: starts with lines[0], adds one new line every
+// 1200ms (pushing the oldest out once 3 are showing), then pauses 2s once
+// all lines have appeared before restarting from the top. The terminal box
+// this renders into has a fixed height + overflow: hidden (see the style on
+// its container below), so the window cycling never resizes the card —
+// only its contents change.
 function StreamingText() {
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [visible, setVisible] = useState<string[]>([STREAM_LINES[0]]);
 
   useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    let nextIndex = 1;
+    let timer: ReturnType<typeof setTimeout>;
 
-    function schedule() {
-      setVisibleCount(0);
-      STREAM_LINES.forEach((_, i) => {
-        timers.push(setTimeout(() => setVisibleCount(i + 1), i * 800));
-      });
-      timers.push(setTimeout(schedule, STREAM_LINES.length * 800 + 3000));
+    function tick() {
+      if (nextIndex < STREAM_LINES.length) {
+        const line = STREAM_LINES[nextIndex];
+        setVisible((prev) => {
+          const next = [...prev, line];
+          return next.length > STREAM_WINDOW_SIZE ? next.slice(next.length - STREAM_WINDOW_SIZE) : next;
+        });
+        nextIndex += 1;
+        timer = setTimeout(tick, STREAM_LINE_INTERVAL_MS);
+      } else {
+        timer = setTimeout(() => {
+          nextIndex = 1;
+          setVisible([STREAM_LINES[0]]);
+          timer = setTimeout(tick, STREAM_LINE_INTERVAL_MS);
+        }, STREAM_RESTART_PAUSE_MS);
+      }
     }
-    schedule();
 
-    return () => timers.forEach(clearTimeout);
+    timer = setTimeout(tick, STREAM_LINE_INTERVAL_MS);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <>
-      {STREAM_LINES.slice(0, visibleCount).map((line, i) => (
-        <p key={line} style={{ margin: 0, minHeight: 20 }}>
+      {visible.map((line, i) => (
+        <p key={line} className="stream-line" style={{ margin: 0, minHeight: 20 }}>
           {line}
-          {i === visibleCount - 1 && (
-            <span className="animate-pulse" aria-hidden="true">
+          {i === visible.length - 1 && (
+            <span className="stream-cursor" aria-hidden="true">
               |
             </span>
           )}
@@ -108,6 +128,9 @@ export default function BentoGrid() {
                 borderRadius: 8,
                 padding: '16px',
                 marginTop: 16,
+                height: 140, // fixed — fits 3 lines; card must not resize as lines cycle
+                overflow: 'hidden',
+                position: 'relative',
                 fontFamily: 'var(--font-jetbrains-mono), ui-monospace, monospace',
                 fontSize: 13,
                 lineHeight: 1.8,
