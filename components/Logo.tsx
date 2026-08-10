@@ -4,14 +4,24 @@ type LogoProps = {
   variant?: 'light' | 'dark';
 };
 
+// sm is the NavBar's size — deliberately smaller/tighter than md/lg (used
+// on marketing hero-adjacent contexts) so the icon square doesn't dominate
+// the wordmark next to it.
 const ICON_SIZES: Record<NonNullable<LogoProps['size']>, number> = {
-  sm: 40,
+  sm: 28,
   md: 56,
   lg: 72,
 };
 
+const WORDMARK: Record<NonNullable<LogoProps['size']>, { fontSize: number; fontWeight: number; letterSpacing: string }> = {
+  sm: { fontSize: 18, fontWeight: 700, letterSpacing: '-0.4px' },
+  md: { fontSize: 22, fontWeight: 500, letterSpacing: '-0.5px' },
+  lg: { fontSize: 22, fontWeight: 500, letterSpacing: '-0.5px' },
+};
+
 export default function Logo({ size = 'md', showTagline = false, variant = 'dark' }: LogoProps) {
   const iconSize = ICON_SIZES[size];
+  const wordmark = WORDMARK[size];
   const textColor = variant === 'light' ? '#18181B' : '#ffffff';
   const taglineColor = variant === 'light' ? 'text-[#A1A1AA]' : 'text-gray-400';
 
@@ -45,10 +55,7 @@ export default function Logo({ size = 'md', showTagline = false, variant = 'dark
       </svg>
 
       <div className="flex flex-col justify-center leading-tight">
-        <span
-          className="font-heading"
-          style={{ fontSize: 22, letterSpacing: '-0.5px', fontWeight: 500 }}
-        >
+        <span className="font-heading" style={wordmark}>
           <span style={{ color: textColor }}>Quiz</span>
           <span style={{ color: '#3E7BFA' }}>Ops</span>
         </span>

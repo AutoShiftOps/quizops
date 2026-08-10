@@ -24,12 +24,27 @@ export default function Hero() {
   return (
     <section
       className="relative overflow-hidden text-center flex flex-col items-center justify-center px-6 md:px-10"
-      style={{ background: '#080C14', paddingTop: 96, paddingBottom: 80, minHeight: '85vh' }}
+      style={{ background: '#080C14', paddingTop: 96, paddingBottom: 40, minHeight: '85vh' }}
     >
-      <div className="hero-glow" aria-hidden="true" />
+      <div className="hero-glow" aria-hidden="true" style={{ zIndex: 0 }} />
+      {/* Second, subtler glow in the opposite corner for depth — green
+          accent, no animation (the blue one already carries the motion). */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          bottom: -100,
+          right: -100,
+          width: 400,
+          height: 400,
+          background: 'radial-gradient(ellipse, rgba(34,197,94,0.06) 0%, transparent 70%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
 
       <span
-        className="relative inline-flex items-center mb-6"
+        className="relative z-10 inline-flex items-center mb-6"
         style={{
           gap: 8,
           padding: '5px 14px 5px 8px',
@@ -46,14 +61,16 @@ export default function Hero() {
       </span>
 
       <h1
-        className="relative font-heading font-extrabold mx-auto text-[40px] md:text-[64px]"
+        className="relative z-10 font-heading font-extrabold mx-auto text-[40px] md:text-[64px]"
         style={{ letterSpacing: '-2.5px', lineHeight: 1.05, color: '#F1F5F9', maxWidth: 700 }}
       >
-        Turn articles into <span className="gradient-text">knowledge tests.</span>
+        Turn articles into{' '}
+        <br className="hidden sm:block" />
+        <span className="gradient-text">knowledge tests.</span>
       </h1>
 
       <p
-        className="relative mx-auto"
+        className="relative z-10 mx-auto"
         style={{
           color: '#94A3B8',
           fontSize: 18,
@@ -67,7 +84,7 @@ export default function Hero() {
       </p>
 
       <p
-        className="relative flex items-center justify-center flex-wrap gap-x-2 gap-y-1"
+        className="relative z-10 flex items-center justify-center flex-wrap gap-x-2 gap-y-1"
         style={{ color: '#475569', fontSize: 13, marginBottom: 36 }}
       >
         {TRUST_ITEMS.map((item, i) => (
@@ -80,7 +97,7 @@ export default function Hero() {
         ))}
       </p>
 
-      <div className="relative flex items-center justify-center gap-3 flex-wrap">
+      <div className="relative z-10 flex items-center justify-center gap-3 flex-wrap">
         <Link
           href="/dashboard"
           className="btn-glow rounded-[10px] bg-brand-blue text-white hover:opacity-90 transition-opacity"
@@ -98,24 +115,37 @@ export default function Hero() {
       </div>
 
       <div
-        className="relative mx-auto flex items-center overflow-x-auto"
+        className="relative z-10 mx-auto flex items-center"
         style={{
           background: '#0F1520',
           border: '1px solid #1E2D45',
           borderRadius: 12,
           maxWidth: 680,
-          padding: '16px 40px',
-          marginTop: 48,
+          width: '100%',
+          padding: '16px 24px',
+          marginTop: 32,
+          overflow: 'hidden',
+          flexWrap: 'nowrap',
         }}
       >
         {STATS.map((stat, i) => (
           <div
             key={stat.label}
-            className="text-center shrink-0"
-            style={i > 0 ? { borderLeft: '1px solid #1E2D45', paddingLeft: 40, marginLeft: 40 } : undefined}
+            className="text-center flex-1"
+            style={{
+              minWidth: 0,
+              ...(i > 0 ? { borderLeft: '1px solid #1E2D45', paddingLeft: 16, marginLeft: 16 } : undefined),
+            }}
           >
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#F1F5F9' }}>{stat.value}</p>
-            <p style={{ fontSize: 12, color: '#475569' }}>{stat.label}</p>
+            <p
+              className="truncate"
+              style={{ fontSize: 26, fontWeight: 800, color: '#F1F5F9' }}
+            >
+              {stat.value}
+            </p>
+            <p className="truncate" style={{ fontSize: 12, color: '#475569' }}>
+              {stat.label}
+            </p>
           </div>
         ))}
       </div>

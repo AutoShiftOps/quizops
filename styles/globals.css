@@ -65,6 +65,7 @@ h6 {
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
+  z-index: 0;
   animation: pulse-glow 4s ease-in-out infinite alternate;
 }
 

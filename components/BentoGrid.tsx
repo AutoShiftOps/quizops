@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react';
 
 const STREAM_LINES = [
   'Q1: What is the primary goal of CI?',
-  'Q2: Which tool is used for...',
-  'Q3: What does shift-left mean...',
+  'Q2: Which strategy reduces deployment risk?',
+  'Q3: What does "shift-left" mean in DevOps?',
 ];
 
 const PLATFORM_PILLS = ['Medium', 'dev.to', 'Substack', 'Hashnode', 'Your blog', 'Any URL'];
@@ -20,41 +20,40 @@ const INSIGHT_ROWS = [
   { label: 'Q7: Blue-green deploy', pct: 34 },
 ];
 
-function StreamingPreview() {
-  const [visibleLines, setVisibleLines] = useState(0);
+// Lines appear one at a time, 800ms apart; once all are shown, pauses 3s
+// then restarts. Scheduled with chained setTimeouts (not setInterval) so
+// the pause-then-restart timing is explicit rather than approximated.
+function StreamingText() {
+  const [visibleCount, setVisibleCount] = useState(0);
 
   useEffect(() => {
-    setVisibleLines(0);
-    const timers = STREAM_LINES.map((_, i) =>
-      setTimeout(() => setVisibleLines(i + 1), 500 + i * 700)
-    );
-    // Loop the mock stream so a visitor lingering on the page keeps seeing
-    // motion rather than a one-shot animation that finishes and goes static.
-    const loop = setInterval(() => setVisibleLines(0), 500 + STREAM_LINES.length * 700 + 2000);
-    return () => {
-      timers.forEach(clearTimeout);
-      clearInterval(loop);
-    };
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    function schedule() {
+      setVisibleCount(0);
+      STREAM_LINES.forEach((_, i) => {
+        timers.push(setTimeout(() => setVisibleCount(i + 1), i * 800));
+      });
+      timers.push(setTimeout(schedule, STREAM_LINES.length * 800 + 3000));
+    }
+    schedule();
+
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   return (
-    <div
-      style={{
-        background: '#080C14',
-        borderRadius: 8,
-        padding: 16,
-        fontSize: 13,
-        color: '#22C55E',
-        fontFamily: 'var(--font-jetbrains-mono), ui-monospace, monospace',
-      }}
-    >
-      {STREAM_LINES.map((line, i) => (
-        <p key={line} style={{ minHeight: 20, opacity: i < visibleLines ? 1 : 0, transition: 'opacity 0.2s' }}>
-          {i < visibleLines ? line : ''}
-          {i === visibleLines - 1 && <span className="animate-pulse">▍</span>}
+    <>
+      {STREAM_LINES.slice(0, visibleCount).map((line, i) => (
+        <p key={line} style={{ margin: 0, minHeight: 20 }}>
+          {line}
+          {i === visibleCount - 1 && (
+            <span className="animate-pulse" aria-hidden="true">
+              |
+            </span>
+          )}
         </p>
       ))}
-    </div>
+    </>
   );
 }
 
@@ -63,7 +62,7 @@ export default function BentoGrid() {
     <section
       id="how-it-works"
       className="px-6 md:px-10 scroll-mt-20"
-      style={{ paddingTop: 64, paddingBottom: 64, background: '#080C14', borderTop: '1px solid #1E2D45' }}
+      style={{ paddingTop: 40, paddingBottom: 64, background: '#080C14' }}
     >
       <div className="mx-auto" style={{ maxWidth: 1080 }}>
         <div className="text-center mb-8">
@@ -103,7 +102,20 @@ export default function BentoGrid() {
             <p className="mb-4" style={{ color: '#94A3B8', fontSize: 14 }}>
               Watch questions stream in as AI reads your article.
             </p>
-            <StreamingPreview />
+            <div
+              style={{
+                background: '#080C14',
+                borderRadius: 8,
+                padding: '16px',
+                marginTop: 16,
+                fontFamily: 'var(--font-jetbrains-mono), ui-monospace, monospace',
+                fontSize: 13,
+                lineHeight: 1.8,
+                color: '#22C55E',
+              }}
+            >
+              <StreamingText />
+            </div>
           </div>
 
           {/* Card B — Stats, col-span 1 */}

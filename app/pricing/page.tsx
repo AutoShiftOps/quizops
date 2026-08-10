@@ -309,7 +309,7 @@ export default function PricingPage() {
       {/* Bottom CTA */}
       <div
         className="text-center relative overflow-hidden"
-        style={{ background: '#0D1420', borderTop: '1px solid #1E2D45', padding: '64px 24px' }}
+        style={{ background: '#0D1420', padding: '64px 24px' }}
       >
         <h2 className="font-heading font-bold mb-3" style={{ fontSize: 28, color: '#F1F5F9' }}>
           Ready to know if your readers actually understand your writing?

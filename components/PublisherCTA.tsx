@@ -9,7 +9,6 @@ export default function PublisherCTA() {
       className="relative overflow-hidden text-center px-6 md:px-10"
       style={{
         background: 'linear-gradient(135deg, #080C14 0%, #0D1829 50%, #080C14 100%)',
-        borderTop: '1px solid #1E2D45',
         borderBottom: '1px solid #1E2D45',
         paddingTop: 64,
         paddingBottom: 64,

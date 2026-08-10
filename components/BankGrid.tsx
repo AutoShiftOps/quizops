@@ -216,7 +216,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
 
       <div
         className="mx-auto px-6 md:px-10"
-        style={{ maxWidth: 1080, paddingTop: 40, paddingBottom: 40, background: '#080C14', borderTop: '1px solid #1E2D45' }}
+        style={{ maxWidth: 1080, paddingTop: 40, paddingBottom: 40, background: '#080C14' }}
       >
         <div className="flex items-center justify-between mb-4">
           {isSignedIn ? (
@@ -284,7 +284,20 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
                   className="flex flex-col items-center justify-center text-center rounded-xl p-6 transition-colors"
                   style={{ border: '1px dashed #253447', background: '#0D1420' }}
                 >
-                  <span className="text-3xl mb-3">➕</span>
+                  <div
+                    className="flex items-center justify-center mb-3"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 8,
+                      background: 'rgba(62,123,250,0.1)',
+                      border: '1px solid rgba(62,123,250,0.2)',
+                      fontSize: 18,
+                      color: '#3E7BFA',
+                    }}
+                  >
+                    +
+                  </div>
                   <p className="font-heading font-semibold mb-1" style={{ color: '#F1F5F9' }}>
                     Add a quiz bank
                   </p>
@@ -301,7 +314,21 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
                   className="flex flex-col items-center justify-center text-center rounded-xl p-6"
                   style={{ border: '1px solid #1E2D45', background: '#0D1420', opacity: 0.5 }}
                 >
-                  <span className="text-3xl mb-3">🔒</span>
+                  <div
+                    className="flex items-center justify-center mb-3"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 8,
+                      background: 'rgba(148,163,184,0.1)',
+                      border: '1px solid rgba(148,163,184,0.1)',
+                      fontSize: 14,
+                      color: '#475569',
+                      fontWeight: 700,
+                    }}
+                  >
+                    ···
+                  </div>
                   <p className="font-heading font-semibold mb-1" style={{ color: '#F1F5F9' }}>
                     More banks coming
                   </p>
