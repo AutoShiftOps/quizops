@@ -13,7 +13,7 @@ export default function Logo({
   href = '/',
 }: LogoProps) {
   const dimensions = {
-    sm: 28, md: 36, lg: 48
+    sm: 32, md: 40, lg: 56
   };
   const px = dimensions[size];
 
@@ -52,17 +52,17 @@ export default function Logo({
       <circle
         cx="40" cy="38" r="16"
         stroke="url(#qo-grad)"
-        strokeWidth="5"
+        strokeWidth="6"
         fill="none"
         strokeLinecap="round"
-        strokeDasharray="80 20"
-        strokeDashoffset="15"
+        strokeDasharray="75 25"
+        strokeDashoffset="10"
       />
       {/* Check tail */}
       <path
-        d="M50 48 L56 54 L66 42"
+        d="M48 48 L55 55 L68 40"
         stroke="#22C55E"
-        strokeWidth="4.5"
+        strokeWidth="6"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
@@ -72,9 +72,9 @@ export default function Logo({
 
   const wordmark = showWordmark ? (
     <span style={{
-      fontSize: size === 'sm' ? 18 : size === 'md' ? 20 : 26,
-      fontWeight: 700,
-      letterSpacing: '-0.5px',
+      fontSize: size === 'sm' ? 20 : size === 'md' ? 22 : 28,
+      fontWeight: 800,
+      letterSpacing: '-0.6px',
       lineHeight: 1,
     }}>
       <span style={{ color: '#F1F5F9' }}>Quiz</span>

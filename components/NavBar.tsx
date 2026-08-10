@@ -81,7 +81,7 @@ export default function NavBar() {
         style={{ maxWidth: 1080, height: 64, padding: '0 40px' }}
       >
         <div className="flex-1 flex items-center">
-          <Logo size="sm" showWordmark={true} href="/" />
+          <Logo size="md" showWordmark={true} href="/" />
         </div>
 
         <nav className="hidden md:flex items-center" style={{ gap: 28 }}>
