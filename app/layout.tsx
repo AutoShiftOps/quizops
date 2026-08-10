@@ -35,6 +35,7 @@ export const metadata: Metadata = {
     'Open-source, content-agnostic quiz engine for technical certifications and content-linked knowledge checks.',
   icons: {
     icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   openGraph: {
     title: 'QuizOps — Test your technical knowledge',
