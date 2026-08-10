@@ -21,20 +21,20 @@
 
 
 
-<!-- New logo mark (brand update) — same top-left slot as the old 96x96
-     logo, new mark rendered at 56x56 and centred within that footprint so
-     the adjacent wordmark text (untouched, below) stays balanced. -->
-<defs>
-  <linearGradient id="qo-grad-og" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-    <stop offset="0%" stop-color="#3E7BFA"/>
-    <stop offset="100%" stop-color="#22C55E"/>
-  </linearGradient>
-</defs>
-<g transform="translate(100,100) scale(0.7)">
-  <rect width="80" height="80" rx="18" fill="#0D1829"/>
-  <rect width="80" height="80" rx="18" fill="none" stroke="url(#qo-grad-og)" stroke-width="1.5" opacity="0.5"/>
-  <circle cx="40" cy="38" r="16" stroke="url(#qo-grad-og)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="80 20" stroke-dashoffset="15"/>
-  <path d="M50 48 L56 54 L66 42" stroke="#22C55E" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<!-- Logo mark (brand update) — same top-left slot as the old 96x96 logo,
+     new Q-check mark rendered natively at 56x56 so the adjacent wordmark
+     text (untouched, below) stays balanced. -->
+<g transform="translate(100,100)">
+  <rect width="56" height="56" rx="13" fill="#0D1829"/>
+  <rect width="56" height="56" rx="13" fill="none" stroke="url(#qo-grad)" stroke-width="1" opacity="0.5"/>
+  <defs>
+    <linearGradient id="qo-grad" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3E7BFA"/>
+      <stop offset="100%" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <circle cx="28" cy="26" r="11" stroke="url(#qo-grad)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="52 18" stroke-dashoffset="7"/>
+  <path d="M34 33 L38 38 L46 28" stroke="#22C55E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </g>
 
 
