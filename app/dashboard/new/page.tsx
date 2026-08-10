@@ -356,7 +356,7 @@ export default function NewQuizPage() {
   }
 
   if (loadingPublisher) {
-    return <div className="mt-8 text-center text-[#71717A]">Loading…</div>;
+    return <div className="mt-8 text-center text-[#94A3B8]">Loading…</div>;
   }
 
   if (!publisher) return null;
@@ -387,10 +387,10 @@ export default function NewQuizPage() {
         <div className="w-16 h-16 mx-auto rounded-full bg-warning/10 text-warning flex items-center justify-center text-3xl mb-6">
           🔒
         </div>
-        <h1 className="font-heading text-xl font-semibold mb-2 text-[#18181B]">
+        <h1 className="font-heading text-xl font-semibold mb-2 text-[#F1F5F9]">
           Free tier limit reached
         </h1>
-        <p className="text-sm text-[#71717A] mb-8">
+        <p className="text-sm text-[#94A3B8] mb-8">
           You&apos;ve published 3 of 3 free quizzes. Upgrade to Pro for unlimited
           quizzes, advanced analytics, and more.
         </p>
@@ -406,7 +406,7 @@ export default function NewQuizPage() {
           </button>
         </div>
         {upgradeToast && (
-          <div className="fixed bottom-6 right-6 bg-white border border-[#E4E4E7] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#18181B]">
+          <div className="fixed bottom-6 right-6 bg-[#0F1520] border border-[#1E2D45] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#F1F5F9]">
             Pro tier coming soon! We&apos;ll notify you when it&apos;s available.
           </div>
         )}
@@ -417,8 +417,8 @@ export default function NewQuizPage() {
   if (step === 'select') {
     return (
       <div className="mt-8 max-w-2xl mx-auto">
-        <h1 className="font-heading text-2xl font-semibold mb-1 text-[#18181B]">Create a quiz</h1>
-        <p className="text-[#71717A] mb-6">
+        <h1 className="font-heading text-2xl font-semibold mb-1 text-[#F1F5F9]">Create a quiz</h1>
+        <p className="text-[#94A3B8] mb-6">
           Choose how you want to build it — generate from your article or write questions
           yourself.
         </p>
@@ -428,10 +428,10 @@ export default function NewQuizPage() {
             className="text-left p-6 rounded-xl border-2 border-accent bg-accent/5 transition-colors"
           >
             <span className="text-2xl text-accent">✨</span>
-            <h2 className="font-heading font-semibold mt-3 mb-1 text-[#18181B]">
+            <h2 className="font-heading font-semibold mt-3 mb-1 text-[#F1F5F9]">
               Generate from article
             </h2>
-            <p className="text-sm text-[#71717A] mb-4">
+            <p className="text-sm text-[#94A3B8] mb-4">
               Paste your article URL or text. AI writes 10 questions in under 60 seconds.
               Review and edit before publishing.
             </p>
@@ -439,13 +439,13 @@ export default function NewQuizPage() {
           </button>
           <button
             onClick={handleSelectManual}
-            className="text-left p-6 rounded-xl border border-[#E4E4E7] bg-white hover:border-success transition-colors"
+            className="text-left p-6 rounded-xl border border-[#1E2D45] bg-[#0F1520] hover:border-success transition-colors"
           >
             <span className="text-2xl text-success">✎</span>
-            <h2 className="font-heading font-semibold mt-3 mb-1 text-[#18181B]">
+            <h2 className="font-heading font-semibold mt-3 mb-1 text-[#F1F5F9]">
               Write questions manually
             </h2>
-            <p className="text-sm text-[#71717A] mb-4">
+            <p className="text-sm text-[#94A3B8] mb-4">
               Start with a blank quiz. Add your own questions, options, and explanations at
               your own pace.
             </p>
@@ -461,29 +461,29 @@ export default function NewQuizPage() {
   if (step === 'generating') {
     return (
       <div className="mt-8 max-w-xl mx-auto">
-        <h1 className="font-heading text-xl font-semibold mb-6 text-center text-[#18181B]">
+        <h1 className="font-heading text-xl font-semibold mb-6 text-center text-[#F1F5F9]">
           ✨ Generating your quiz...
         </h1>
         <div className="space-y-2 mb-6">
           {questions.map((q, i) => (
-            <p key={q.id ?? i} className="text-sm text-[#18181B] animate-fade-in">
+            <p key={q.id ?? i} className="text-sm text-[#F1F5F9] animate-fade-in">
               ✓ Q{i + 1}: {q.text?.slice(0, 60)}
               {q.text?.length > 60 ? '…' : ''}
             </p>
           ))}
           {questions.length < questionCount && (
-            <p className="text-sm text-[#71717A] animate-pulse">
+            <p className="text-sm text-[#94A3B8] animate-pulse">
               ⟳ Generating Q{questions.length + 1}...
             </p>
           )}
         </div>
-        <p className="text-sm text-[#71717A] text-center mb-6">
+        <p className="text-sm text-[#94A3B8] text-center mb-6">
           Generated {questions.length} of {questionCount} questions
         </p>
         <div className="text-center">
           <button
             onClick={handleCancelGeneration}
-            className="px-5 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+            className="px-5 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
           >
             ✕ Cancel
           </button>
@@ -497,13 +497,12 @@ export default function NewQuizPage() {
 
     return (
       <div className="mt-8 max-w-2xl mx-auto">
-        <h1 className="font-heading text-xl font-semibold mb-6 text-[#18181B]">
+        <h1 className="font-heading text-xl font-semibold mb-6 text-[#F1F5F9]">
           {mode === 'manual' ? 'Write your quiz' : 'Review your quiz'}
         </h1>
 
         <div className="mb-6">
           <QuizMetadataForm
-            theme="light"
             title={title}
             onTitleChange={setTitle}
             titleTouched={titleTouched}
@@ -523,7 +522,7 @@ export default function NewQuizPage() {
           />
         </div>
 
-        <p className="text-center text-sm text-[#71717A] mb-4">
+        <p className="text-center text-sm text-[#94A3B8] mb-4">
           questions ({questions.length} of minimum 3)
         </p>
 
@@ -538,7 +537,6 @@ export default function NewQuizPage() {
           {questions.map((q, i) => (
             <QuestionEditor
               key={q.id ?? i}
-              theme="light"
               question={q}
               index={i}
               onChange={(updated) => handleQuestionChange(i, updated)}
@@ -555,19 +553,19 @@ export default function NewQuizPage() {
 
         <button
           onClick={handleAddQuestion}
-          className="w-full mb-8 px-4 py-2 rounded-md border border-dashed border-[#D4D4D8] hover:border-accent transition-colors text-sm text-[#71717A]"
+          className="w-full mb-8 px-4 py-2 rounded-md border border-dashed border-[#253447] hover:border-accent transition-colors text-sm text-[#94A3B8]"
         >
           + Add question
         </button>
 
         {publishError && <p className="text-sm text-danger mb-4">{publishError}</p>}
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E4E4E7] pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#1E2D45] pt-6">
           <div className="flex gap-2">
             {mode === 'manual' ? (
               <button
                 onClick={resetToSelect}
-                className="px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+                className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
               >
                 ← Back
               </button>
@@ -575,13 +573,13 @@ export default function NewQuizPage() {
               <>
                 <button
                   onClick={handleStartOver}
-                  className="px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+                  className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
                 >
                   ↺ Start over
                 </button>
                 <button
                   onClick={handleRegenerate}
-                  className="px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+                  className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
                 >
                   ↺ Regenerate
                 </button>
@@ -592,7 +590,7 @@ export default function NewQuizPage() {
             <button
               onClick={() => submitQuiz('draft')}
               disabled={savingDraft || publishing || questions.length < 1 || !title.trim()}
-              className="px-4 py-2.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+              className="px-4 py-2.5 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
             >
               {savingDraft ? 'Saving…' : 'Save draft'}
             </button>
@@ -612,7 +610,7 @@ export default function NewQuizPage() {
   // step === 'input' (AI path)
   return (
     <div className="mt-8 max-w-lg mx-auto">
-      <h1 className="font-heading text-2xl font-semibold mb-6 text-center text-[#18181B]">
+      <h1 className="font-heading text-2xl font-semibold mb-6 text-center text-[#F1F5F9]">
         Create a quiz from your article
       </h1>
 
@@ -624,7 +622,7 @@ export default function NewQuizPage() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://your-article-url.com"
-              className="flex-1 px-4 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none text-[#18181B]"
+              className="flex-1 px-4 py-2 rounded-md bg-[#0F1520] border border-[#1E2D45] focus:border-accent outline-none text-[#F1F5F9]"
             />
           </div>
           <button
@@ -639,20 +637,20 @@ export default function NewQuizPage() {
       {showPasteArea && (
         <>
           <div className="mb-2">
-            <span className="text-sm text-[#71717A]">or</span>
+            <span className="text-sm text-[#94A3B8]">or</span>
           </div>
           <textarea
             value={pastedText}
             onChange={(e) => setPastedText(e.target.value)}
             rows={8}
             placeholder="Paste your article text here…"
-            className="w-full px-4 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none resize-none mb-6 text-[#18181B]"
+            className="w-full px-4 py-2 rounded-md bg-[#0F1520] border border-[#1E2D45] focus:border-accent outline-none resize-none mb-6 text-[#F1F5F9]"
           />
         </>
       )}
 
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-1.5 text-[#18181B]">
+        <label className="block text-sm font-medium mb-1.5 text-[#F1F5F9]">
           Number of questions
         </label>
         <div className="flex gap-2">
@@ -664,7 +662,7 @@ export default function NewQuizPage() {
               className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
                 questionCount === count
                   ? 'border-accent bg-accent/10 text-accent'
-                  : 'border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8]'
+                  : 'border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447]'
               }`}
             >
               {count}
@@ -676,11 +674,11 @@ export default function NewQuizPage() {
       {moderationError && (
         <div className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm">
           <p className="font-semibold text-danger mb-1">🚫 Content not allowed</p>
-          <p className="text-[#18181B] mb-1">{moderationError.message}</p>
+          <p className="text-[#F1F5F9] mb-1">{moderationError.message}</p>
           {moderationError.reason && (
-            <p className="text-[#71717A] mb-2">Reason: {moderationError.reason}</p>
+            <p className="text-[#94A3B8] mb-2">Reason: {moderationError.reason}</p>
           )}
-          <p className="text-[#71717A] mb-3">
+          <p className="text-[#94A3B8] mb-3">
             QuizOps supports educational and technical content only.
           </p>
           <button
@@ -688,7 +686,7 @@ export default function NewQuizPage() {
               setModerationError(null);
               setUrl('');
             }}
-            className="px-3 py-1.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+            className="px-3 py-1.5 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
           >
             Try a different URL
           </button>
@@ -700,7 +698,7 @@ export default function NewQuizPage() {
       <div className="flex items-center gap-2">
         <button
           onClick={resetToSelect}
-          className="px-4 py-2.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+          className="px-4 py-2.5 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
         >
           ← Back
         </button>

@@ -1,9 +1,8 @@
 import Link from 'next/link';
 
-// Guest-only marketing hero (enterprise homepage redesign). Rendered by
-// BankGrid in place of the old inline guest hero — signed-in users still get
-// the compact personalised header (see BankGrid.tsx), this is the
-// full-bleed pitch for anonymous visitors.
+// Full-dark homepage hero (M2-03 redesign). Guest and signed-in visitors
+// both get the identical hero — personalisation lives in the slim
+// announcement bar BankGrid renders above this, not here.
 
 const TRUST_ITEMS = [
   'AI-generated questions',
@@ -24,33 +23,52 @@ const STATS = [
 export default function Hero() {
   return (
     <section
-      className="text-center px-6 md:px-10"
-      style={{
-        background: '#fff',
-        borderBottom: '1px solid #E4E4E7',
-        paddingTop: 56,
-        paddingBottom: 48,
-      }}
+      className="relative overflow-hidden text-center flex flex-col items-center justify-center px-6 md:px-10"
+      style={{ background: '#080C14', paddingTop: 96, paddingBottom: 80, minHeight: '85vh' }}
     >
-      <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#1D4ED8] mb-5">
-        Publisher platform for technical writers
+      <div className="hero-glow" aria-hidden="true" />
+
+      <span
+        className="relative inline-flex items-center mb-6"
+        style={{
+          gap: 8,
+          padding: '5px 14px 5px 8px',
+          border: '1px solid rgba(62,123,250,0.3)',
+          borderRadius: 20,
+          background: 'rgba(62,123,250,0.08)',
+        }}
+      >
+        <span
+          className="pulse-dot"
+          style={{ width: 7, height: 7, borderRadius: '50%', background: '#22C55E' }}
+        />
+        <span style={{ color: '#94A3B8', fontSize: 13 }}>Publisher platform · Beta</span>
       </span>
 
       <h1
-        className="font-heading font-extrabold mx-auto text-[36px] md:text-[52px]"
-        style={{ letterSpacing: '-2px', lineHeight: 1.1, color: '#18181B', maxWidth: 680 }}
+        className="relative font-heading font-extrabold mx-auto text-[40px] md:text-[64px]"
+        style={{ letterSpacing: '-2.5px', lineHeight: 1.05, color: '#F1F5F9', maxWidth: 700 }}
       >
-        Turn articles into <span style={{ color: '#3E7BFA' }}>knowledge tests</span>.
+        Turn articles into <span className="gradient-text">knowledge tests.</span>
       </h1>
 
-      <p className="mx-auto mt-4" style={{ fontSize: 18, color: '#71717A', maxWidth: 520, marginBottom: 28 }}>
-        Paste your article URL. Get 10 quiz questions in 60 seconds. See exactly how many
+      <p
+        className="relative mx-auto"
+        style={{
+          color: '#94A3B8',
+          fontSize: 18,
+          lineHeight: 1.7,
+          maxWidth: 520,
+          margin: '16px auto 32px',
+        }}
+      >
+        Paste your article URL. AI generates 10 questions in 60 seconds. See exactly how many
         readers understood what you wrote.
       </p>
 
       <p
-        className="flex items-center justify-center flex-wrap gap-x-2 gap-y-1 mb-7"
-        style={{ fontSize: 13, color: '#71717A' }}
+        className="relative flex items-center justify-center flex-wrap gap-x-2 gap-y-1"
+        style={{ color: '#475569', fontSize: 13, marginBottom: 36 }}
       >
         {TRUST_ITEMS.map((item, i) => (
           <span key={item} className="flex items-center gap-2">
@@ -62,53 +80,42 @@ export default function Hero() {
         ))}
       </p>
 
-      <div className="flex items-center justify-center gap-3 flex-wrap" style={{ marginBottom: 32 }}>
+      <div className="relative flex items-center justify-center gap-3 flex-wrap">
         <Link
           href="/dashboard"
-          className="rounded-md bg-accent text-white hover:opacity-90 transition-opacity"
-          style={{
-            padding: '14px 28px',
-            fontSize: 15,
-            fontWeight: 700,
-            boxShadow: '0 4px 16px rgba(62,123,250,0.3)',
-          }}
+          className="btn-glow rounded-[10px] bg-brand-blue text-white hover:opacity-90 transition-opacity"
+          style={{ padding: '14px 28px', fontSize: 15, fontWeight: 700 }}
         >
           Start for free →
         </Link>
         <Link
-          href="/pricing"
-          className="rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
-          style={{ padding: '14px 28px', fontSize: 15, fontWeight: 700 }}
+          href="/#how-it-works"
+          className="rounded-[10px] border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
+          style={{ padding: '14px 24px', fontSize: 15, fontWeight: 700, background: 'transparent' }}
         >
-          View pricing
+          See how it works
         </Link>
       </div>
 
-      {/* Flexbox, not grid — space-around + nowrap keeps all 4 stats on one
-          row with dividers doing the spacing instead of a gap, so a 4th
-          item can't wrap onto its own line. overflow-x-auto is just a
-          safety net for very narrow screens; it never fires above ~380px. */}
       <div
-        className="mx-auto flex items-center overflow-x-auto"
+        className="relative mx-auto flex items-center overflow-x-auto"
         style={{
-          background: '#F8FAFF',
-          border: '1px solid #E4E4E7',
+          background: '#0F1520',
+          border: '1px solid #1E2D45',
           borderRadius: 12,
           maxWidth: 680,
-          padding: '20px 40px',
-          flexDirection: 'row',
-          flexWrap: 'nowrap',
-          justifyContent: 'space-around',
+          padding: '16px 40px',
+          marginTop: 48,
         }}
       >
         {STATS.map((stat, i) => (
           <div
             key={stat.label}
             className="text-center shrink-0"
-            style={i > 0 ? { borderLeft: '1px solid #E4E4E7', paddingLeft: 20, marginLeft: 20 } : undefined}
+            style={i > 0 ? { borderLeft: '1px solid #1E2D45', paddingLeft: 40, marginLeft: 40 } : undefined}
           >
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#18181B' }}>{stat.value}</p>
-            <p style={{ fontSize: 12, color: '#71717A' }}>{stat.label}</p>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#F1F5F9' }}>{stat.value}</p>
+            <p style={{ fontSize: 12, color: '#475569' }}>{stat.label}</p>
           </div>
         ))}
       </div>

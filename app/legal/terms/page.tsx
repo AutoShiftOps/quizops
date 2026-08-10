@@ -26,16 +26,27 @@ export default function TermsOfServicePage() {
 
   return (
     <>
-      <h1 className="font-heading text-3xl font-bold text-[#18181B] mb-3">Terms of Service</h1>
-      <div className="inline-flex flex-wrap items-center gap-3 text-sm text-[#71717A] bg-[#F4F4F5] rounded-md px-3 py-2 mb-8">
+      <h1 className="font-heading text-3xl font-bold mb-3" style={{ color: '#F1F5F9' }}>
+        Terms of Service
+      </h1>
+      <div
+        className="inline-flex flex-wrap items-center gap-3 text-sm rounded-md px-3 py-2 mb-8"
+        style={{ color: '#94A3B8', background: '#161D2E' }}
+      >
         {effectiveMatch && (
           <span>
-            <span className="font-semibold text-[#18181B]">Effective:</span> {effectiveMatch[1]}
+            <span className="font-semibold" style={{ color: '#F1F5F9' }}>
+              Effective:
+            </span>{' '}
+            {effectiveMatch[1]}
           </span>
         )}
         {updatedMatch && (
           <span>
-            <span className="font-semibold text-[#18181B]">Last updated:</span> {updatedMatch[1]}
+            <span className="font-semibold" style={{ color: '#F1F5F9' }}>
+              Last updated:
+            </span>{' '}
+            {updatedMatch[1]}
           </span>
         )}
       </div>

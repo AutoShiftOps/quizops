@@ -10,17 +10,15 @@ type Props = {
   hasAttempted?: boolean;
 };
 
-// Topic-colour initials badge — replaces emoji rendering entirely (broken
-// on Windows Chrome) and the "/>" code-glyph fallback (looked like a
-// placeholder). Plain system-ui text in a coloured square: nothing for any
-// OS/browser font-matching to get wrong, and it generalises to every bank's
-// topic instead of special-casing DevOps.
+// Topic-colour initials badge — plain system-ui text in a coloured square,
+// no emoji glyph involved (avoids the Windows Chrome colour-emoji
+// font-matching problem entirely) and generalises to every bank's topic.
 const TOPIC_COLORS: Record<string, { bg: string; color: string }> = {
-  DevOps: { bg: '#EFF6FF', color: '#1D4ED8' },
-  Cloud: { bg: '#F0FDF4', color: '#15803D' },
-  Security: { bg: '#FFF7ED', color: '#C2410C' },
-  Frontend: { bg: '#FDF4FF', color: '#7E22CE' },
-  default: { bg: '#F4F4F5', color: '#71717A' },
+  DevOps: { bg: 'rgba(62,123,250,0.12)', color: '#3E7BFA' },
+  Cloud: { bg: 'rgba(34,197,94,0.12)', color: '#22C55E' },
+  Security: { bg: 'rgba(245,158,11,0.12)', color: '#F59E0B' },
+  Frontend: { bg: 'rgba(168,85,247,0.12)', color: '#A855F7' },
+  default: { bg: '#161D2E', color: '#94A3B8' },
 };
 
 function BankIcon({ topic }: { topic: string }) {
@@ -56,34 +54,45 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
   const hasAnyScore = Boolean(practiceScore) || Boolean(examScore);
 
   return (
-    <div
-      className="bg-white border border-[#E4E4E7] hover:border-[#D4D4D8] transition-colors rounded-xl p-6"
-      style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)', borderRadius: 12 }}
-    >
+    <div className="dark-card hover:border-dark-border2 transition-colors p-6">
       <div className="flex items-start justify-between mb-3">
         <BankIcon topic={bank.topic} />
       </div>
-      <h3 className="font-heading text-lg font-semibold mb-1 text-[#18181B]">{bank.name}</h3>
-      <p className="text-[#71717A] text-sm mb-4">{bank.description}</p>
-      <div className="flex items-center gap-3 text-xs text-[#71717A] mb-4">
-        <span className="px-2 py-1 rounded-full bg-[#EFF6FF] text-[#1D4ED8]">{bank.topic}</span>
+      <h3 className="font-heading text-lg font-semibold mb-1 text-content-primary">{bank.name}</h3>
+      <p className="text-content-secondary text-sm mb-4">{bank.description}</p>
+      <div className="flex items-center gap-3 text-xs text-content-secondary mb-4">
+        <span
+          className="px-2 py-1 rounded-full"
+          style={{ background: '#161D2E', color: '#3E7BFA' }}
+        >
+          {bank.topic}
+        </span>
         <span>{bank.question_count} questions</span>
         <span>{minutes} min</span>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-5">
         {!hasAnyScore && (
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-[#F4F4F5] text-[#71717A] self-start">
+          <span
+            className="text-xs font-semibold px-2 py-1 rounded-full self-start"
+            style={{ background: '#161D2E', color: '#94A3B8' }}
+          >
             Not attempted
           </span>
         )}
         {practiceScore && (
-          <span className="text-xs font-semibold px-2 py-1 rounded-full border border-success text-success bg-transparent self-start">
+          <span
+            className="text-xs font-semibold px-2 py-1 rounded-full self-start"
+            style={{ border: '1px solid #22C55E', color: '#22C55E', background: 'transparent' }}
+          >
             Practice {practiceScore.percentage}% ✓
           </span>
         )}
         {examScore && (
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-accent/10 text-accent self-start">
+          <span
+            className="text-xs font-semibold px-2 py-1 rounded-full self-start"
+            style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}
+          >
             Exam {examScore.percentage}% ✓
           </span>
         )}
@@ -92,13 +101,13 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
       <div className="flex items-center gap-3">
         <Link
           href={`/quiz/${bank.slug}`}
-          className="flex-1 text-center text-sm px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
+          className="flex-1 text-center text-sm px-4 py-2 rounded-md border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
         >
           {hasAttempted ? 'Practice again' : 'Practice'}
         </Link>
         <Link
           href={`/exam/${bank.slug}`}
-          className="flex-1 text-center text-sm px-4 py-2 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity"
+          className="flex-1 text-center text-sm px-4 py-2 rounded-md bg-brand-blue text-white font-medium hover:opacity-90 transition-opacity"
         >
           Take Exam
         </Link>

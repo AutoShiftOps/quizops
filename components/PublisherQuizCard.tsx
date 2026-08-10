@@ -75,7 +75,7 @@ export default function PublisherQuizCard({
 
   return (
     <div
-      className="bg-white border border-[#E4E4E7] rounded-xl p-6"
+      className="bg-[#0F1520] border border-[#1E2D45] rounded-xl p-6"
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
     >
       <div className="flex items-start justify-between mb-4">
@@ -84,29 +84,29 @@ export default function PublisherQuizCard({
           className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
             quiz.status === 'published'
               ? 'bg-success/10 text-success'
-              : 'bg-[#F4F4F5] text-[#71717A]'
+              : 'bg-[#161D2E] text-[#94A3B8]'
           }`}
         >
           {quiz.status === 'published' ? '✓ Published' : '✎ Draft'}
         </span>
       </div>
 
-      <h3 className="font-heading font-semibold text-lg mb-1 text-[#18181B]">{quiz.title}</h3>
+      <h3 className="font-heading font-semibold text-lg mb-1 text-[#F1F5F9]">{quiz.title}</h3>
 
       {quiz.source_url && (
-        <p className="text-xs text-[#A1A1AA] truncate mb-4">
+        <p className="text-xs text-[#475569] truncate mb-4">
           {quiz.source_url.replace(/^https?:\/\//, '')}
         </p>
       )}
 
-      <div className="flex items-center gap-4 text-sm text-[#71717A] mb-4">
+      <div className="flex items-center gap-4 text-sm text-[#94A3B8] mb-4">
         <span>{quiz.attempt_count} attempts</span>
         <span>{passRate === null ? '—' : `${passRate}%`} pass rate</span>
       </div>
 
       {publishError && <p className="text-xs text-danger mb-3">{publishError}</p>}
 
-      <div className="border-t border-[#E4E4E7] pt-4 flex items-center gap-2 text-sm">
+      <div className="border-t border-[#1E2D45] pt-4 flex items-center gap-2 text-sm">
         {isDraft ? (
           <button
             onClick={handlePublish}
@@ -120,21 +120,21 @@ export default function PublisherQuizCard({
             href={`/q/${username}/${quiz.slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-1.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
+            className="px-3 py-1.5 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors"
           >
             View
           </a>
         )}
         <Link
           href={`/dashboard/quiz/${quiz.id}`}
-          className="px-3 py-1.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
+          className="px-3 py-1.5 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors"
         >
           ✎ Edit
         </Link>
         {!isDraft && (
           <button
             onClick={handleShare}
-            className="px-3 py-1.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
+            className="px-3 py-1.5 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors"
           >
             {copied ? 'Copied!' : '🔗 Share'}
           </button>
@@ -150,11 +150,11 @@ export default function PublisherQuizCard({
 
       {confirmingDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-sm rounded-xl border border-[#E4E4E7] bg-white p-6 text-center">
-            <h3 className="font-heading text-lg font-semibold mb-2 text-[#18181B]">
+          <div className="w-full max-w-sm rounded-xl border border-[#1E2D45] bg-[#0F1520] p-6 text-center">
+            <h3 className="font-heading text-lg font-semibold mb-2 text-[#F1F5F9]">
               Delete this quiz?
             </h3>
-            <p className="text-sm text-[#71717A] mb-6">
+            <p className="text-sm text-[#94A3B8] mb-6">
               This permanently deletes &quot;{quiz.title}&quot; and its attempt history.
             </p>
             <div className="flex flex-col gap-2">
@@ -167,7 +167,7 @@ export default function PublisherQuizCard({
               </button>
               <button
                 onClick={() => setConfirmingDelete(false)}
-                className="px-5 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
+                className="px-5 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors"
               >
                 Cancel
               </button>

@@ -36,8 +36,8 @@ const FAQS = [
 
 function Feature({ children, included = true }: { children: React.ReactNode; included?: boolean }) {
   return (
-    <li className={`flex items-start gap-2 text-sm ${included ? 'text-[#18181B]' : 'text-[#A1A1AA]'}`}>
-      <span className={included ? 'text-success' : 'text-[#D4D4D8]'}>{included ? '✓' : '✗'}</span>
+    <li className="flex items-start gap-2 text-sm" style={{ color: included ? '#F1F5F9' : '#475569' }}>
+      <span style={{ color: included ? '#22C55E' : '#253447' }}>{included ? '✓' : '✗'}</span>
       <span>{children}</span>
     </li>
   );
@@ -46,15 +46,23 @@ function Feature({ children, included = true }: { children: React.ReactNode; inc
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-[#E4E4E7] py-4">
+    <div style={{ borderBottom: '1px solid #1E2D45', padding: '16px 0' }}>
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between text-left"
       >
-        <span className="font-medium text-[#18181B]">{q}</span>
-        <span className="text-[#71717A] shrink-0 ml-4">{open ? '−' : '+'}</span>
+        <span className="font-medium" style={{ color: '#F1F5F9' }}>
+          {q}
+        </span>
+        <span className="shrink-0 ml-4" style={{ color: '#94A3B8' }}>
+          {open ? '−' : '+'}
+        </span>
       </button>
-      {open && <p className="text-sm text-[#71717A] mt-2 leading-relaxed">{a}</p>}
+      {open && (
+        <p className="text-sm mt-2 leading-relaxed" style={{ color: '#94A3B8' }}>
+          {a}
+        </p>
+      )}
     </div>
   );
 }
@@ -77,36 +85,45 @@ export default function PricingPage() {
   }, []);
 
   return (
-    <div>
+    <div style={{ background: '#080C14' }}>
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto px-6" style={{ paddingTop: 64 }}>
-        <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#1D4ED8] mb-5">
+        <span
+          className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-5"
+          style={{ background: 'rgba(62,123,250,0.08)', border: '1px solid rgba(62,123,250,0.3)', color: '#94A3B8' }}
+        >
           Simple, transparent pricing
         </span>
-        <h1
-          className="font-heading font-extrabold text-[#18181B] mb-3"
-          style={{ fontSize: 36 }}
-        >
+        <h1 className="font-heading font-extrabold mb-3" style={{ fontSize: 36, color: '#F1F5F9' }}>
           Start free. Scale when ready.
         </h1>
-        <p className="text-[#71717A] mb-6">
+        <p className="mb-6" style={{ color: '#94A3B8' }}>
           No credit card required to start. Upgrade when you need more.
         </p>
 
-        <div className="inline-flex items-center bg-[#F4F4F5] rounded-md p-1 mb-4">
+        <div
+          className="inline-flex items-center rounded-md p-1 mb-4"
+          style={{ background: '#161D2E' }}
+        >
           <button
             onClick={() => setBilling('monthly')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              billing === 'monthly' ? 'bg-white text-[#18181B] shadow-sm' : 'text-[#71717A]'
-            }`}
+            className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+            style={
+              billing === 'monthly'
+                ? { background: '#0F1520', color: '#F1F5F9' }
+                : { color: '#94A3B8' }
+            }
           >
             Monthly
           </button>
           <button
             onClick={() => setBilling('annual')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              billing === 'annual' ? 'bg-white text-[#18181B] shadow-sm' : 'text-[#71717A]'
-            }`}
+            className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+            style={
+              billing === 'annual'
+                ? { background: '#0F1520', color: '#F1F5F9' }
+                : { color: '#94A3B8' }
+            }
           >
             Annual — save 22%
           </button>
@@ -120,18 +137,22 @@ export default function PricingPage() {
       >
         {/* Free */}
         <div
-          className="bg-white border border-[#E4E4E7] flex flex-col"
-          style={{ borderRadius: 16, padding: 32 }}
+          className="flex flex-col"
+          style={{ background: '#0F1520', border: '1px solid #1E2D45', borderRadius: 16, padding: 32 }}
         >
-          <p className="text-[13px] font-semibold text-[#71717A] uppercase">Free</p>
-          <p className="font-heading font-extrabold text-[#18181B] mt-2" style={{ fontSize: 40 }}>
+          <p className="text-[13px] font-semibold uppercase" style={{ color: '#94A3B8' }}>
+            Free
+          </p>
+          <p className="font-heading font-extrabold mt-2" style={{ fontSize: 40, color: '#F1F5F9' }}>
             $0
           </p>
-          <p className="text-sm text-[#71717A] mb-4">forever</p>
-          <p className="text-sm text-[#71717A] mb-5">
+          <p className="text-sm mb-4" style={{ color: '#94A3B8' }}>
+            forever
+          </p>
+          <p className="text-sm mb-5" style={{ color: '#94A3B8' }}>
             Perfect for individual writers testing the waters.
           </p>
-          <hr className="border-[#E4E4E7] mb-5" />
+          <hr className="mb-5" style={{ borderColor: '#1E2D45' }} />
           <ul className="space-y-2.5 mb-6 flex-1">
             <Feature>3 published quizzes</Feature>
             <Feature>AI question generation</Feature>
@@ -143,8 +164,14 @@ export default function PricingPage() {
           </ul>
           <Link
             href="/dashboard"
-            className="w-full text-center bg-white text-[#18181B] border border-[#E4E4E7] hover:border-[#D4D4D8] transition-colors font-medium"
-            style={{ borderRadius: 8, padding: 12 }}
+            className="w-full text-center font-medium transition-colors"
+            style={{
+              borderRadius: 8,
+              padding: 12,
+              background: 'transparent',
+              border: '1px solid #1E2D45',
+              color: '#F1F5F9',
+            }}
           >
             Start for free →
           </Link>
@@ -152,36 +179,51 @@ export default function PricingPage() {
 
         {/* Pro */}
         <div
-          className="bg-white flex flex-col relative"
+          className="flex flex-col relative"
           style={{
-            border: '2px solid #3E7BFA',
+            background: 'linear-gradient(135deg, #0F1520, #0D1829)',
+            border: '1px solid #3E7BFA',
             borderRadius: 16,
             padding: 32,
-            boxShadow: '0 8px 32px rgba(62,123,250,0.12)',
+            boxShadow: '0 0 40px rgba(62,123,250,0.1)',
           }}
         >
           <span
-            className="absolute bg-accent text-white font-semibold"
-            style={{ fontSize: 11, padding: '4px 12px', borderRadius: 20, top: -12, right: 24 }}
+            className="btn-glow absolute font-semibold"
+            style={{
+              fontSize: 11,
+              padding: '4px 12px',
+              borderRadius: 20,
+              top: -12,
+              right: 24,
+              background: '#3E7BFA',
+              color: '#fff',
+            }}
           >
             Most popular
           </span>
-          <p className="text-[13px] font-semibold text-accent uppercase">Pro</p>
+          <p className="text-[13px] font-semibold uppercase" style={{ color: '#3E7BFA' }}>
+            Pro
+          </p>
           <div className="flex items-end gap-1 mt-2">
-            <p className="font-heading font-extrabold text-[#18181B]" style={{ fontSize: 40 }}>
+            <p className="font-heading font-extrabold" style={{ fontSize: 40, color: '#F1F5F9' }}>
               {isAnnual ? '$7' : '$9'}
             </p>
-            <p className="text-sm text-[#71717A] mb-2">/month</p>
+            <p className="text-sm mb-2" style={{ color: '#94A3B8' }}>
+              /month
+            </p>
           </div>
           {isAnnual ? (
-            <p className="text-xs text-[#71717A] mb-4">Billed $84/year (save $24)</p>
+            <p className="text-xs mb-4" style={{ color: '#94A3B8' }}>
+              Billed $84/year (save $24)
+            </p>
           ) : (
-            <p className="text-sm text-[#71717A] mb-4">&nbsp;</p>
+            <p className="text-sm mb-4">&nbsp;</p>
           )}
-          <p className="text-sm text-[#71717A] mb-5">
+          <p className="text-sm mb-5" style={{ color: '#94A3B8' }}>
             For serious publishers who want full control and insights.
           </p>
-          <hr className="border-[#E4E4E7] mb-5" />
+          <hr className="mb-5" style={{ borderColor: '#1E2D45' }} />
           <ul className="space-y-2.5 mb-6 flex-1">
             <Feature>Unlimited quizzes</Feature>
             <Feature>AI question generation</Feature>
@@ -194,13 +236,13 @@ export default function PricingPage() {
           </ul>
           <button
             onClick={() => setShowWaitlist(true)}
-            className="w-full text-center bg-accent text-white font-semibold hover:opacity-90 transition-opacity"
-            style={{ borderRadius: 8, padding: 12 }}
+            className="btn-glow w-full text-center font-semibold hover:opacity-90 transition-opacity"
+            style={{ borderRadius: 8, padding: 12, background: '#3E7BFA', color: '#fff' }}
           >
             Join Pro waitlist →
           </button>
           {waitlistCount !== null && waitlistCount > 0 && (
-            <p className="text-center mt-2" style={{ color: '#71717A', fontSize: 12 }}>
+            <p className="text-center mt-2" style={{ color: '#475569', fontSize: 12 }}>
               {waitlistCount} {waitlistCount === 1 ? 'publisher' : 'publishers'} on the waitlist
             </p>
           )}
@@ -208,18 +250,22 @@ export default function PricingPage() {
 
         {/* Enterprise */}
         <div
-          className="border border-[#E4E4E7] flex flex-col"
-          style={{ borderRadius: 16, padding: 32, background: '#FAFAFA' }}
+          className="flex flex-col"
+          style={{ border: '1px solid #1E2D45', borderRadius: 16, padding: 32, background: '#0D1420' }}
         >
-          <p className="text-[13px] font-semibold text-[#71717A] uppercase">Enterprise</p>
-          <p className="font-heading font-extrabold text-[#18181B] mt-2" style={{ fontSize: 32 }}>
+          <p className="text-[13px] font-semibold uppercase" style={{ color: '#94A3B8' }}>
+            Enterprise
+          </p>
+          <p className="font-heading font-extrabold mt-2" style={{ fontSize: 32, color: '#F1F5F9' }}>
             Custom
           </p>
-          <p className="text-sm text-[#71717A] mb-4">pricing</p>
-          <p className="text-sm text-[#71717A] mb-5">
+          <p className="text-sm mb-4" style={{ color: '#94A3B8' }}>
+            pricing
+          </p>
+          <p className="text-sm mb-5" style={{ color: '#94A3B8' }}>
             For teams, platforms, and publications that need more.
           </p>
-          <hr className="border-[#E4E4E7] mb-5" />
+          <hr className="mb-5" style={{ borderColor: '#1E2D45' }} />
           <ul className="space-y-2.5 mb-6 flex-1">
             <Feature>Everything in Pro</Feature>
             <Feature>Team seats (unlimited authors)</Feature>
@@ -236,21 +282,21 @@ export default function PricingPage() {
           <a
             href="mailto:admin@autoshiftops.com?subject=QuizOps Enterprise Enquiry"
             onClick={() => track('enterprise_contact_clicked')}
-            className="w-full text-center bg-[#18181B] text-white font-semibold hover:opacity-90 transition-opacity"
-            style={{ borderRadius: 8, padding: 12 }}
+            className="w-full text-center font-semibold hover:opacity-90 transition-opacity"
+            style={{ borderRadius: 8, padding: 12, background: '#F1F5F9', color: '#080C14' }}
           >
             Contact us →
           </a>
         </div>
       </div>
 
-      <p className="text-center text-[13px] text-[#71717A] -mt-4 mb-8">
+      <p className="text-center text-[13px] -mt-4 mb-8" style={{ color: '#94A3B8' }}>
         🔒 All plans include SSL, GDPR compliance, and data stored securely in Canada/US.
       </p>
 
       {/* FAQ */}
       <div className="max-w-2xl mx-auto px-6" style={{ marginTop: 64, marginBottom: 32 }}>
-        <h2 className="font-heading font-bold text-[#18181B] text-center mb-8" style={{ fontSize: 24 }}>
+        <h2 className="font-heading font-bold text-center mb-8" style={{ fontSize: 24, color: '#F1F5F9' }}>
           Frequently asked questions
         </h2>
         <div>
@@ -261,23 +307,28 @@ export default function PricingPage() {
       </div>
 
       {/* Bottom CTA */}
-      <div className="text-center" style={{ background: '#F4F4F5', padding: '64px 24px' }}>
-        <h2 className="font-heading font-bold text-[#18181B] mb-3" style={{ fontSize: 28 }}>
+      <div
+        className="text-center relative overflow-hidden"
+        style={{ background: '#0D1420', borderTop: '1px solid #1E2D45', padding: '64px 24px' }}
+      >
+        <h2 className="font-heading font-bold mb-3" style={{ fontSize: 28, color: '#F1F5F9' }}>
           Ready to know if your readers actually understand your writing?
         </h2>
-        <p className="text-[#71717A] mb-6 max-w-xl mx-auto">
+        <p className="mb-6 max-w-xl mx-auto" style={{ color: '#94A3B8' }}>
           Join technical writers using QuizOps to add comprehension to their content.
         </p>
         <div className="flex items-center justify-center gap-3 flex-wrap">
           <Link
             href="/dashboard"
-            className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity"
+            className="btn-glow px-5 py-2.5 rounded-md font-medium hover:opacity-90 transition-opacity"
+            style={{ background: '#3E7BFA', color: '#fff' }}
           >
             Start for free →
           </Link>
           <a
             href="mailto:admin@autoshiftops.com"
-            className="px-5 py-2.5 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors"
+            className="px-5 py-2.5 rounded-md transition-colors"
+            style={{ border: '1px solid #1E2D45', color: '#F1F5F9' }}
           >
             Talk to us
           </a>

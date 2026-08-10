@@ -70,27 +70,27 @@ export default function PublisherOnboarding({ userId }: { userId: string }) {
 
   return (
     <div className="mt-8 max-w-lg mx-auto">
-      <h1 className="font-heading text-2xl font-semibold mb-2 text-[#18181B]">
+      <h1 className="font-heading text-2xl font-semibold mb-2 text-[#F1F5F9]">
         Set up your publisher profile
       </h1>
-      <p className="text-[#71717A] text-sm mb-8">
+      <p className="text-[#94A3B8] text-sm mb-8">
         Choose a username — this appears in your quiz URLs:{' '}
         <span className="text-accent">quiz.autoshiftops.com/q/[username]/...</span>
       </p>
 
       <div className="space-y-5">
         <div>
-          <label className="block text-sm font-medium mb-1.5 text-[#18181B]">Username</label>
+          <label className="block text-sm font-medium mb-1.5 text-[#F1F5F9]">Username</label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value.toLowerCase())}
             placeholder="e.g. sajja"
             maxLength={20}
-            className="w-full px-4 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none text-[#18181B]"
+            className="w-full px-4 py-2 rounded-md bg-[#0F1520] border border-[#1E2D45] focus:border-accent outline-none text-[#F1F5F9]"
           />
           <p className="text-xs mt-1.5">
-            {availability === 'checking' && <span className="text-[#A1A1AA]">Checking…</span>}
+            {availability === 'checking' && <span className="text-[#475569]">Checking…</span>}
             {availability === 'available' && <span className="text-success">✓ Available</span>}
             {availability === 'taken' && <span className="text-danger">✗ Taken</span>}
             {availability === 'invalid' && (
@@ -103,25 +103,25 @@ export default function PublisherOnboarding({ userId }: { userId: string }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1.5 text-[#18181B]">Display name</label>
+          <label className="block text-sm font-medium mb-1.5 text-[#F1F5F9]">Display name</label>
           <input
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="e.g. Sudhakar Sajja"
             maxLength={50}
-            className="w-full px-4 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none text-[#18181B]"
+            className="w-full px-4 py-2 rounded-md bg-[#0F1520] border border-[#1E2D45] focus:border-accent outline-none text-[#F1F5F9]"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1.5 text-[#18181B]">Bio (optional)</label>
+          <label className="block text-sm font-medium mb-1.5 text-[#F1F5F9]">Bio (optional)</label>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             maxLength={160}
             rows={3}
-            className="w-full px-4 py-2 rounded-md bg-white border border-[#E4E4E7] focus:border-accent outline-none resize-none text-[#18181B]"
+            className="w-full px-4 py-2 rounded-md bg-[#0F1520] border border-[#1E2D45] focus:border-accent outline-none resize-none text-[#F1F5F9]"
           />
         </div>
 

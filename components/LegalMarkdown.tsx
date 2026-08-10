@@ -9,22 +9,44 @@ import type { Components } from 'react-markdown';
 // actual table.
 const components: Components = {
   h1: ({ children }) => (
-    <h1 className="font-heading text-3xl font-bold text-[#18181B] mb-2">{children}</h1>
+    <h1 className="font-heading text-3xl font-bold mb-2" style={{ color: '#F1F5F9' }}>
+      {children}
+    </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="font-heading text-xl font-semibold text-[#18181B] mt-10 mb-3">{children}</h2>
+    <h2 className="font-heading text-xl font-semibold mt-10 mb-3" style={{ color: '#F1F5F9' }}>
+      {children}
+    </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="font-heading text-base font-semibold text-[#18181B] mt-6 mb-2">{children}</h3>
+    <h3 className="font-heading text-base font-semibold mt-6 mb-2" style={{ color: '#F1F5F9' }}>
+      {children}
+    </h3>
   ),
-  p: ({ children }) => <p className="text-[#3F3F46] leading-relaxed mb-4">{children}</p>,
+  p: ({ children }) => (
+    <p className="leading-relaxed mb-4" style={{ color: '#94A3B8' }}>
+      {children}
+    </p>
+  ),
   ul: ({ children }) => (
-    <ul className="list-disc pl-5 space-y-1.5 text-[#3F3F46] mb-4">{children}</ul>
+    <ul className="list-disc pl-5 space-y-1.5 mb-4" style={{ color: '#94A3B8' }}>
+      {children}
+    </ul>
   ),
   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-  strong: ({ children }) => <strong className="font-semibold text-[#18181B]">{children}</strong>,
+  strong: ({ children }) => (
+    <strong className="font-semibold" style={{ color: '#F1F5F9' }}>
+      {children}
+    </strong>
+  ),
   a: ({ href, children }) => (
-    <a href={href} className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
+    <a
+      href={href}
+      className="hover:underline"
+      style={{ color: '#3E7BFA' }}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       {children}
     </a>
   ),
@@ -33,14 +55,18 @@ const components: Components = {
       <table className="w-full text-sm border-collapse">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead className="border-b border-[#E4E4E7]">{children}</thead>,
+  thead: ({ children }) => <thead style={{ borderBottom: '1px solid #1E2D45' }}>{children}</thead>,
   th: ({ children }) => (
-    <th className="text-left font-semibold text-[#18181B] py-2 pr-4">{children}</th>
+    <th className="text-left font-semibold py-2 pr-4" style={{ color: '#F1F5F9' }}>
+      {children}
+    </th>
   ),
   td: ({ children }) => (
-    <td className="text-[#3F3F46] py-2 pr-4 border-b border-[#F4F4F5]">{children}</td>
+    <td className="py-2 pr-4" style={{ color: '#94A3B8', borderBottom: '1px solid #161D2E' }}>
+      {children}
+    </td>
   ),
-  hr: () => <hr className="border-[#E4E4E7] my-8" />,
+  hr: () => <hr className="my-8" style={{ borderColor: '#1E2D45' }} />,
 };
 
 export default function LegalMarkdown({ content }: { content: string }) {

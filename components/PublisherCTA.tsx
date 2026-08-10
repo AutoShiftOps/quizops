@@ -1,45 +1,44 @@
 import Link from 'next/link';
 
-// New bold CTA section above the footer (enterprise homepage redesign).
-// Replaces the old "Have a topic to test?" section on BankGrid.
+// Bold CTA section above the footer (M2-03: dark gradient replaces the old
+// blue gradient). Renders on BankGrid unless the visitor is already a
+// publisher (who gets the "top quiz this week" strip instead).
 export default function PublisherCTA() {
   return (
     <section
-      className="text-center px-6 md:px-10"
+      className="relative overflow-hidden text-center px-6 md:px-10"
       style={{
-        background: 'linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 50%, #3E7BFA 100%)',
-        paddingTop: 40,
-        paddingBottom: 40,
+        background: 'linear-gradient(135deg, #080C14 0%, #0D1829 50%, #080C14 100%)',
+        borderTop: '1px solid #1E2D45',
+        borderBottom: '1px solid #1E2D45',
+        paddingTop: 64,
+        paddingBottom: 64,
       }}
     >
+      <div className="hero-glow" aria-hidden="true" style={{ top: '50%', marginTop: -200 }} />
+
       <h2
-        className="font-heading font-extrabold text-white mx-auto text-[28px] md:text-[36px]"
-        style={{ letterSpacing: '-0.8px' }}
+        className="relative font-heading font-extrabold mx-auto text-[28px] md:text-[36px]"
+        style={{ letterSpacing: '-0.8px', color: '#F1F5F9' }}
       >
         Ready to quiz your readers?
       </h2>
-      <p className="mx-auto mt-3" style={{ color: '#BFDBFE', fontSize: 16, maxWidth: 480 }}>
+      <p className="relative mx-auto mt-3" style={{ color: '#94A3B8', fontSize: 16, maxWidth: 480 }}>
         Join technical writers using QuizOps to add comprehension to their content. Free to
         start, no credit card required.
       </p>
-      <div className="flex items-center justify-center gap-3 flex-wrap mt-7">
+      <div className="relative flex items-center justify-center gap-3 flex-wrap mt-7">
         <Link
           href="/dashboard"
-          className="bg-white hover:opacity-90 transition-opacity"
-          style={{ color: '#1D4ED8', padding: '13px 24px', borderRadius: 9, fontWeight: 700, fontSize: 15 }}
+          className="btn-glow rounded-[10px] bg-brand-blue text-white hover:opacity-90 transition-opacity"
+          style={{ padding: '13px 24px', fontWeight: 700, fontSize: 15 }}
         >
           Start for free →
         </Link>
         <a
           href="mailto:admin@autoshiftops.com"
-          className="text-white hover:bg-white/10 transition-colors"
-          style={{
-            padding: '13px 24px',
-            borderRadius: 9,
-            fontWeight: 700,
-            fontSize: 15,
-            border: '1.5px solid rgba(255,255,255,0.4)',
-          }}
+          className="rounded-[10px] border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
+          style={{ padding: '13px 24px', fontWeight: 700, fontSize: 15 }}
         >
           Talk to us
         </a>

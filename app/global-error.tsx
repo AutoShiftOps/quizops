@@ -18,7 +18,7 @@ export default function GlobalError({
     <html>
       <body
         style={{
-          background: '#FAFAFA',
+          background: '#080C14',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -28,12 +28,13 @@ export default function GlobalError({
           gap: '16px',
         }}
       >
-        <h2 style={{ color: '#18181B', fontSize: '20px' }}>Something went wrong</h2>
-        <p style={{ color: '#71717A', fontSize: '14px' }}>
+        <h2 style={{ color: '#F1F5F9', fontSize: '20px' }}>Something went wrong</h2>
+        <p style={{ color: '#94A3B8', fontSize: '14px' }}>
           We&apos;ve been notified and are looking into it.
         </p>
         <button
           onClick={reset}
+          className="btn-glow"
           style={{
             padding: '8px 16px',
             background: '#3E7BFA',

@@ -131,7 +131,7 @@ export default function DashboardPage() {
   }
 
   if (loading) {
-    return <div className="mt-8 text-center text-[#71717A]">Loading…</div>;
+    return <div className="mt-8 text-center text-[#94A3B8]">Loading…</div>;
   }
 
   if (!user) return null; // redirecting to home
@@ -149,10 +149,10 @@ export default function DashboardPage() {
     <div className="max-w-[900px] mx-auto px-6 mt-8">
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="font-heading text-2xl font-semibold mb-1 text-[#18181B]">
+          <h1 className="font-heading text-2xl font-semibold mb-1 text-[#F1F5F9]">
             Welcome, {publisher.display_name}
           </h1>
-          <p className="text-sm text-[#71717A] mb-3">
+          <p className="text-sm text-[#94A3B8] mb-3">
             {origin ? origin.replace(/^https?:\/\//, '') : 'quiz.autoshiftops.com'}/q/
             {publisher.username}
           </p>
@@ -177,48 +177,48 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div
-          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          className="bg-[#0F1520] border border-[#1E2D45] rounded-xl p-5"
           style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
         >
           <p className="text-3xl font-bold text-accent mb-1">{publishedCount}</p>
-          <p className="text-sm text-[#18181B]">Published quizzes</p>
-          <p className="text-xs text-[#A1A1AA]">
+          <p className="text-sm text-[#F1F5F9]">Published quizzes</p>
+          <p className="text-xs text-[#475569]">
             {publisher.tier === 'free' ? `${remainingFree} remaining on free` : 'Unlimited'}
           </p>
         </div>
         <div
-          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          className="bg-[#0F1520] border border-[#1E2D45] rounded-xl p-5"
           style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
         >
-          <p className="text-3xl font-bold mb-1 text-[#18181B]">{stats.totalAttempts}</p>
-          <p className="text-sm text-[#18181B]">Total attempts</p>
-          <p className="text-xs text-[#A1A1AA]">Across all quizzes</p>
+          <p className="text-3xl font-bold mb-1 text-[#F1F5F9]">{stats.totalAttempts}</p>
+          <p className="text-sm text-[#F1F5F9]">Total attempts</p>
+          <p className="text-xs text-[#475569]">Across all quizzes</p>
         </div>
         <div
-          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          className="bg-[#0F1520] border border-[#1E2D45] rounded-xl p-5"
           style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
         >
-          <p className="text-3xl font-bold mb-1 text-[#18181B]">
+          <p className="text-3xl font-bold mb-1 text-[#F1F5F9]">
             {stats.avgPassRate === null ? '—' : `${stats.avgPassRate}%`}
           </p>
-          <p className="text-sm text-[#18181B]">Avg pass rate</p>
-          <p className="text-xs text-[#A1A1AA]">
+          <p className="text-sm text-[#F1F5F9]">Avg pass rate</p>
+          <p className="text-xs text-[#475569]">
             {stats.avgPassRate === null ? 'No attempts yet' : 'Across all attempts'}
           </p>
         </div>
         <div
-          className="bg-white border border-[#E4E4E7] rounded-xl p-5"
+          className="bg-[#0F1520] border border-[#1E2D45] rounded-xl p-5"
           style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
         >
           <p className="text-3xl font-bold text-success mb-1">{stats.readersThisWeek}</p>
-          <p className="text-sm text-[#18181B]">Readers this week</p>
-          <p className="text-xs text-[#A1A1AA]">Share your quiz link</p>
+          <p className="text-sm text-[#F1F5F9]">Readers this week</p>
+          <p className="text-xs text-[#475569]">Share your quiz link</p>
         </div>
       </div>
 
       {!hasAnyAttempts && (
         <div className="bg-accent/5 border border-accent/20 rounded-xl p-5 mb-8">
-          <p className="text-sm text-[#18181B]">
+          <p className="text-sm text-[#F1F5F9]">
             💡 <span className="font-semibold text-accent">Get your first reader:</span>{' '}
             Copy your quiz link and add &quot;Test your understanding →&quot; at the end
             of your article. That one CTA typically drives 8–12% click-through from
@@ -228,10 +228,10 @@ export default function DashboardPage() {
       )}
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold tracking-wider text-[#71717A] uppercase">
+        <h2 className="text-xs font-semibold tracking-wider text-[#94A3B8] uppercase">
           Your quizzes
         </h2>
-        <span className="text-sm text-[#71717A]">{publishedCount} published</span>
+        <span className="text-sm text-[#94A3B8]">{publishedCount} published</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -247,14 +247,14 @@ export default function DashboardPage() {
         ))}
 
         {limitReached ? (
-          <div className="bg-white border border-warning/30 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+          <div className="bg-[#0F1520] border border-warning/30 rounded-xl p-6 flex flex-col items-center justify-center text-center">
             <span className="w-12 h-12 rounded-lg bg-warning/10 text-warning flex items-center justify-center text-xl mb-4">
               🔒
             </span>
-            <p className="font-heading font-semibold mb-2 text-[#18181B]">
+            <p className="font-heading font-semibold mb-2 text-[#F1F5F9]">
               Upgrade to add more quizzes
             </p>
-            <p className="text-sm text-[#71717A] mb-5">You&apos;ve used all 3 free slots.</p>
+            <p className="text-sm text-[#94A3B8] mb-5">You&apos;ve used all 3 free slots.</p>
             <button
               onClick={() => setShowUpgradeModal(true)}
               className="px-4 py-2 rounded-md border border-warning/40 text-warning text-sm hover:bg-warning/10 transition-colors"
@@ -265,16 +265,16 @@ export default function DashboardPage() {
         ) : (
           <Link
             href="/dashboard/new"
-            className="bg-white border border-[#E4E4E7] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-[#D4D4D8] transition-colors"
+            className="bg-[#0F1520] border border-[#1E2D45] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-[#253447] transition-colors"
           >
             <span className="w-12 h-12 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-xl mb-4">
               ✨
             </span>
-            <p className="font-heading font-semibold mb-2 text-[#18181B]">Create your next quiz</p>
-            <p className="text-sm text-[#71717A] mb-5">
+            <p className="font-heading font-semibold mb-2 text-[#F1F5F9]">Create your next quiz</p>
+            <p className="text-sm text-[#94A3B8] mb-5">
               Generate from an article with AI, or write your own questions from scratch.
             </p>
-            <span className="px-4 py-2 rounded-md border border-[#E4E4E7] text-sm text-[#18181B]">
+            <span className="px-4 py-2 rounded-md border border-[#1E2D45] text-sm text-[#F1F5F9]">
               + Create quiz
             </span>
           </Link>
@@ -283,14 +283,14 @@ export default function DashboardPage() {
 
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-sm rounded-xl border border-[#E4E4E7] bg-white p-6">
-            <h3 className="font-heading text-lg font-semibold mb-2 text-[#18181B]">
+          <div className="w-full max-w-sm rounded-xl border border-[#1E2D45] bg-[#0F1520] p-6">
+            <h3 className="font-heading text-lg font-semibold mb-2 text-[#F1F5F9]">
               You&apos;ve reached the free limit
             </h3>
-            <p className="text-sm text-[#71717A] mb-4">
+            <p className="text-sm text-[#94A3B8] mb-4">
               Free tier includes 3 published quizzes. Upgrade to Pro for:
             </p>
-            <ul className="text-sm text-[#18181B] space-y-1.5 mb-6">
+            <ul className="text-sm text-[#F1F5F9] space-y-1.5 mb-6">
               <li>✓ Unlimited quizzes</li>
               <li>✓ Full analytics history</li>
               <li>✓ Remove QuizOps branding</li>
@@ -299,7 +299,7 @@ export default function DashboardPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowUpgradeModal(false)}
-                className="flex-1 px-4 py-2 rounded-md border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] transition-colors text-sm"
+                className="flex-1 px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
               >
                 Cancel
               </button>
@@ -318,7 +318,7 @@ export default function DashboardPage() {
       )}
 
       {toast && (
-        <div className="fixed bottom-6 right-6 bg-white border border-[#E4E4E7] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#18181B]">
+        <div className="fixed bottom-6 right-6 bg-[#0F1520] border border-[#1E2D45] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#F1F5F9]">
           {toast}
         </div>
       )}

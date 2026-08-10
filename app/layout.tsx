@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, Inter } from 'next/font/google';
+import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
+import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import '@/styles/globals.css';
 
@@ -15,6 +16,16 @@ const spaceGrotesk = Space_Grotesk({
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+// Used by the BentoGrid's mock streaming/analytics previews (M2-03) —
+// self-hosted via next/font like the other two, rather than a runtime
+// Google Fonts <link>, for the same reason: no extra network round-trip and
+// no flash of fallback monospace.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
   display: 'swap',
 });
 
@@ -45,17 +56,17 @@ export const metadata: Metadata = {
   },
 };
 
-// NavBar is no longer rendered here (M1-01) — marketing/dashboard pages use
-// LightNavBar and quiz/exam/reader/edit pages use DarkNavBar, each wired up
-// by their own route-group layout ((light)/layout.tsx, (dark)/layout.tsx),
-// since the two need different backgrounds and Next.js only allows one
-// <body> for the whole app. This root layout stays theme-agnostic; the
-// light background below is the default for everything that doesn't
-// override it via the dark route group.
+// Single root layout for the whole site (M2-03 full-dark redesign) — the
+// (light) and (dark) route groups are gone now that there's only one theme,
+// so NavBar renders here directly instead of via two separate group
+// layouts.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
-      <body className="bg-light-bg text-light-text font-body min-h-screen flex flex-col">
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+    >
+      <body className="font-body min-h-screen flex flex-col" style={{ background: '#080C14', color: '#F1F5F9' }}>
         {GA_ID && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
@@ -69,7 +80,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Script>
           </>
         )}
-        <div className="flex-1">{children}</div>
+        <NavBar />
+        <main className="flex-1">{children}</main>
         <Footer />
       </body>
     </html>

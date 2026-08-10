@@ -24,16 +24,18 @@ const LINKS = [
 
 export default function AboutPage() {
   return (
-    <div>
+    <div style={{ background: '#080C14' }}>
       <section className="text-center" style={{ padding: '48px 40px 40px' }}>
         <div
           className="mx-auto mb-4 flex items-center justify-center rounded-full"
-          style={{ width: 64, height: 64, background: '#EFF6FF' }}
+          style={{ width: 64, height: 64, background: 'rgba(62,123,250,0.12)' }}
         >
           <span style={{ color: '#3E7BFA', fontSize: 24, fontWeight: 700 }}>SS</span>
         </div>
-        <h1 className="font-heading text-3xl font-bold text-[#18181B] mb-2">About QuizOps</h1>
-        <p style={{ color: '#71717A', fontSize: 14 }}>
+        <h1 className="font-heading text-3xl font-bold mb-2" style={{ color: '#F1F5F9' }}>
+          About QuizOps
+        </h1>
+        <p style={{ color: '#94A3B8', fontSize: 14 }}>
           Built by Sudhakar Sajja · Application Architect · Mississauga, Canada
         </p>
       </section>
@@ -44,7 +46,7 @@ export default function AboutPage() {
             into the hero byline above instead, so it isn't said twice. */}
         <div
           className="mx-auto"
-          style={{ maxWidth: 600, fontSize: 16, lineHeight: 1.8, color: '#18181B' }}
+          style={{ maxWidth: 600, fontSize: 16, lineHeight: 1.8, color: '#F1F5F9' }}
         >
           <p className="mb-5">QuizOps started with a simple frustration.</p>
           <p className="mb-5">
@@ -62,13 +64,11 @@ export default function AboutPage() {
 
         <div className="grid grid-cols-3 gap-4 mx-auto mt-10 mb-12" style={{ maxWidth: 600 }}>
           {STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white border border-[#E4E4E7] text-center"
-              style={{ borderRadius: 10, padding: 16 }}
-            >
-              <p style={{ fontSize: 28, fontWeight: 800, color: '#18181B' }}>{stat.value}</p>
-              <p className="text-xs text-[#71717A] mt-1">{stat.label}</p>
+            <div key={stat.label} className="dark-card text-center" style={{ padding: 16 }}>
+              <p style={{ fontSize: 28, fontWeight: 800, color: '#F1F5F9' }}>{stat.value}</p>
+              <p className="text-xs mt-1" style={{ color: '#94A3B8' }}>
+                {stat.label}
+              </p>
             </div>
           ))}
         </div>
@@ -82,25 +82,30 @@ export default function AboutPage() {
                 href={link.href}
                 target={external ? '_blank' : undefined}
                 rel={external ? 'noopener noreferrer' : undefined}
-                className="flex items-center bg-white border border-[#E4E4E7] hover:border-[#3E7BFA] transition-colors"
-                style={{ borderRadius: 8, padding: '12px 16px', gap: 10 }}
+                className="dark-card flex items-center hover:border-dark-border2 transition-colors"
+                style={{ padding: '12px 16px', gap: 10 }}
               >
                 <span>{link.icon}</span>
-                <span className="text-accent font-medium">{link.label}</span>
-                <span className="text-[#71717A] text-sm">— {link.desc}</span>
+                <span className="font-medium" style={{ color: '#3E7BFA' }}>
+                  {link.label}
+                </span>
+                <span className="text-sm" style={{ color: '#94A3B8' }}>
+                  — {link.desc}
+                </span>
               </a>
             );
           })}
         </div>
 
-        <p className="text-sm text-[#71717A] leading-relaxed mx-auto text-center" style={{ maxWidth: 600 }}>
+        <p className="text-sm leading-relaxed mx-auto text-center" style={{ maxWidth: 600, color: '#94A3B8' }}>
           QuizOps is open source. The quiz engine is MIT licensed. Enterprise features are
           proprietary. Contributions to quiz banks are welcome — see{' '}
           <a
             href="https://github.com/AutoShiftOps/quizops/blob/main/CONTRIBUTING.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-accent hover:underline"
+            className="hover:underline"
+            style={{ color: '#3E7BFA' }}
           >
             CONTRIBUTING.md
           </a>

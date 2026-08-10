@@ -19,10 +19,12 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '10px 12px',
-  border: '1px solid #E4E4E7',
+  border: '1px solid #1E2D45',
   borderRadius: 8,
   fontSize: 14,
   marginBottom: 4,
+  background: '#080C14',
+  color: '#F1F5F9',
 };
 
 function validate(name: string, email: string, websiteUrl: string): FieldErrors {
@@ -121,26 +123,28 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white w-full"
+        className="w-full"
         style={{
+          background: '#0F1520',
+          border: '1px solid #1E2D45',
           borderRadius: 16,
           padding: 32,
           maxWidth: 440,
-          boxShadow: '0 24px 64px rgba(0,0,0,0.12)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.4)',
         }}
       >
         <div className="flex items-start justify-between mb-1">
           <div
             className="flex items-center justify-center"
-            style={{ width: 40, height: 40, borderRadius: 10, background: '#EFF6FF', fontSize: 20 }}
+            style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(62,123,250,0.12)', fontSize: 20 }}
           >
             🚀
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="hover:text-[#18181B] transition-colors"
-            style={{ color: '#71717A', fontSize: 20, lineHeight: 1 }}
+            className="hover:text-content-primary transition-colors"
+            style={{ color: '#94A3B8', fontSize: 20, lineHeight: 1 }}
           >
             ×
           </button>
@@ -149,10 +153,10 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
         {success ? (
           <div className="text-center pt-2">
             <div style={{ fontSize: 48, color: '#22C55E', marginBottom: 12 }}>✅</div>
-            <h3 className="font-heading font-bold text-[#18181B] mb-2" style={{ fontSize: 20 }}>
+            <h3 className="font-heading font-bold mb-2" style={{ fontSize: 20, color: '#F1F5F9' }}>
               You are on the list!
             </h3>
-            <p style={{ color: '#71717A', fontSize: 14, lineHeight: 1.6 }} className="mb-3">
+            <p style={{ color: '#94A3B8', fontSize: 14, lineHeight: 1.6 }} className="mb-3">
               We will email you at {email} when Pro launches. Check your inbox for a
               confirmation.
             </p>
@@ -163,14 +167,15 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
             )}
             <Link
               href="/dashboard"
-              className="block w-full text-center bg-accent text-white hover:opacity-90 transition-opacity"
+              className="btn-glow block w-full text-center bg-brand-blue text-white hover:opacity-90 transition-opacity"
               style={{ padding: 12, borderRadius: 8, fontWeight: 600, fontSize: 15, marginBottom: 12 }}
             >
               Start for free →
             </Link>
             <button
               onClick={onClose}
-              className="text-sm text-[#71717A] hover:text-[#18181B] transition-colors"
+              className="text-sm hover:text-content-primary transition-colors"
+              style={{ color: '#94A3B8' }}
             >
               Close
             </button>
@@ -178,12 +183,12 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
         ) : (
           <>
             <h2
-              className="font-heading font-bold text-[#18181B] mt-2 mb-2"
-              style={{ fontSize: 22, fontWeight: 700 }}
+              className="font-heading font-bold mt-2 mb-2"
+              style={{ fontSize: 22, fontWeight: 700, color: '#F1F5F9' }}
             >
               Join the Pro waitlist
             </h2>
-            <p style={{ color: '#71717A', fontSize: 14 }} className="mb-3">
+            <p style={{ color: '#94A3B8', fontSize: 14 }} className="mb-3">
               Be first to know when Pro launches. Early access pricing for waitlist members.
             </p>
 
@@ -193,12 +198,14 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
               </p>
             )}
             {countLoading && (
-              <p style={{ color: '#A1A1AA', fontSize: 13 }} className="mb-5">
+              <p style={{ color: '#475569', fontSize: 13 }} className="mb-5">
                 Loading waitlist count…
               </p>
             )}
 
-            <label className="block text-sm font-medium text-[#18181B] mb-1.5">Your name</label>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#F1F5F9' }}>
+              Your name
+            </label>
             <input
               type="text"
               value={name}
@@ -206,15 +213,15 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
               placeholder="Sudhakar Sajja"
               style={{
                 ...inputStyle,
-                borderColor: fieldErrors.name ? '#EF4444' : '#E4E4E7',
+                borderColor: fieldErrors.name ? '#EF4444' : '#1E2D45',
               }}
-              className="focus:outline-none focus:border-accent"
+              className="focus:outline-none"
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = '#3E7BFA';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(62,123,250,0.15)';
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = fieldErrors.name ? '#EF4444' : '#E4E4E7';
+                e.currentTarget.style.borderColor = fieldErrors.name ? '#EF4444' : '#1E2D45';
                 e.currentTarget.style.boxShadow = 'none';
               }}
             />
@@ -224,7 +231,9 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
               </p>
             )}
 
-            <label className="block text-sm font-medium text-[#18181B] mb-1.5 mt-3">Work email</label>
+            <label className="block text-sm font-medium mb-1.5 mt-3" style={{ color: '#F1F5F9' }}>
+              Work email
+            </label>
             <input
               type="email"
               value={email}
@@ -232,14 +241,14 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
               placeholder="you@company.com"
               style={{
                 ...inputStyle,
-                borderColor: fieldErrors.email ? '#EF4444' : '#E4E4E7',
+                borderColor: fieldErrors.email ? '#EF4444' : '#1E2D45',
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = '#3E7BFA';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(62,123,250,0.15)';
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = fieldErrors.email ? '#EF4444' : '#E4E4E7';
+                e.currentTarget.style.borderColor = fieldErrors.email ? '#EF4444' : '#1E2D45';
                 e.currentTarget.style.boxShadow = 'none';
               }}
             />
@@ -249,7 +258,7 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
               </p>
             )}
 
-            <label className="block text-sm font-medium text-[#18181B] mb-1.5 mt-3">
+            <label className="block text-sm font-medium mb-1.5 mt-3" style={{ color: '#F1F5F9' }}>
               Your website or blog
             </label>
             <input
@@ -259,14 +268,14 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
               placeholder="https://yourblog.com"
               style={{
                 ...inputStyle,
-                borderColor: fieldErrors.websiteUrl ? '#EF4444' : '#E4E4E7',
+                borderColor: fieldErrors.websiteUrl ? '#EF4444' : '#1E2D45',
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = '#3E7BFA';
                 e.currentTarget.style.boxShadow = '0 0 0 2px rgba(62,123,250,0.15)';
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = fieldErrors.websiteUrl ? '#EF4444' : '#E4E4E7';
+                e.currentTarget.style.borderColor = fieldErrors.websiteUrl ? '#EF4444' : '#1E2D45';
                 e.currentTarget.style.boxShadow = 'none';
               }}
             />
@@ -275,7 +284,7 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
                 {fieldErrors.websiteUrl}
               </p>
             ) : (
-              <p style={{ color: '#A1A1AA', fontSize: 12 }} className="mb-3 -mt-1">
+              <p style={{ color: '#475569', fontSize: 12 }} className="mb-3 -mt-1">
                 Where you publish your articles
               </p>
             )}
@@ -283,12 +292,12 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
             {alreadyOnWaitlist && (
               <div
                 style={{
-                  background: '#FFFBEB',
-                  border: '1px solid #FDE68A',
+                  background: 'rgba(245,158,11,0.1)',
+                  border: '1px solid rgba(245,158,11,0.3)',
                   borderRadius: 8,
                   padding: '10px 12px',
                   fontSize: 13,
-                  color: '#92400E',
+                  color: '#FBBF24',
                 }}
                 className="mb-4 mt-1"
               >
@@ -299,7 +308,7 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full bg-accent text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+              className="btn-glow w-full bg-brand-blue text-white hover:opacity-90 transition-opacity disabled:opacity-60"
               style={{ padding: 12, borderRadius: 8, fontSize: 15, fontWeight: 600, marginTop: 4 }}
             >
               {loading ? 'Joining...' : 'Join the waitlist →'}

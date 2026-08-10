@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { QuizBank } from '@/lib/types';
 import QuizCard from './QuizCard';
 import Hero from './Hero';
-import HowItWorks from './HowItWorks';
+import BentoGrid from './BentoGrid';
 import PublisherCTA from './PublisherCTA';
 
 type Score = { percentage: number; passed: boolean };
@@ -185,7 +184,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
           things. Hero itself (incl. the social proof bar) is identical for
           every visitor. */}
       {isSignedIn && user && (
-        <div style={{ background: '#18181B', color: '#fff', fontSize: 13, padding: '8px 40px' }}>
+        <div style={{ background: '#0D1420', borderBottom: '1px solid #1E2D45', color: '#F1F5F9', fontSize: 13, padding: '8px 40px' }}>
           <div
             className="mx-auto flex items-center justify-between gap-3 flex-wrap"
             style={{ maxWidth: 1080 }}
@@ -202,7 +201,8 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
             </span>
             <button
               onClick={() => router.push('/dashboard')}
-              className="text-white hover:underline shrink-0"
+              className="hover:underline shrink-0"
+              style={{ color: '#3E7BFA' }}
             >
               Dashboard →
             </button>
@@ -212,32 +212,35 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
 
       <Hero />
 
-      <HowItWorks />
+      <BentoGrid />
 
-      <div className="mx-auto px-6 md:px-10" style={{ maxWidth: 1080, paddingTop: 40, paddingBottom: 40 }}>
+      <div
+        className="mx-auto px-6 md:px-10"
+        style={{ maxWidth: 1080, paddingTop: 40, paddingBottom: 40, background: '#080C14', borderTop: '1px solid #1E2D45' }}
+      >
         <div className="flex items-center justify-between mb-4">
           {isSignedIn ? (
             <h2
-              className="text-[10px] font-semibold uppercase text-[#71717A]"
-              style={{ letterSpacing: '1px' }}
+              className="text-[10px] font-semibold uppercase"
+              style={{ letterSpacing: '1px', color: '#94A3B8' }}
             >
               Continue learning
             </h2>
           ) : (
             <div className="text-center w-full mb-2">
               <span
-                className="inline-block font-semibold uppercase text-[#71717A] mb-3"
-                style={{ fontSize: 11, letterSpacing: 1 }}
+                className="inline-block font-semibold uppercase mb-3"
+                style={{ fontSize: 11, letterSpacing: 1, color: '#94A3B8' }}
               >
                 Community quiz banks
               </span>
               <h2
-                className="font-heading font-extrabold text-[#18181B] mb-2"
-                style={{ fontSize: 28, letterSpacing: '-0.5px' }}
+                className="font-heading font-extrabold mb-2"
+                style={{ fontSize: 28, letterSpacing: '-0.5px', color: '#F1F5F9' }}
               >
                 Test your knowledge
               </h2>
-              <p style={{ color: '#71717A', fontSize: 15 }}>
+              <p style={{ color: '#94A3B8', fontSize: 15 }}>
                 Take a quiz as a reader, or create your own as a publisher.
               </p>
             </div>
@@ -278,25 +281,31 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
                   href="https://github.com/AutoShiftOps/quizops/blob/main/CONTRIBUTING.md"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center text-center rounded-xl p-6 hover:border-[#A1A1AA] transition-colors"
-                  style={{ border: '1px dashed #D4D4D8', background: '#FAFAFA' }}
+                  className="flex flex-col items-center justify-center text-center rounded-xl p-6 transition-colors"
+                  style={{ border: '1px dashed #253447', background: '#0D1420' }}
                 >
                   <span className="text-3xl mb-3">➕</span>
-                  <p className="font-heading font-semibold text-[#18181B] mb-1">Add a quiz bank</p>
-                  <p className="text-sm text-[#71717A] mb-3">
+                  <p className="font-heading font-semibold mb-1" style={{ color: '#F1F5F9' }}>
+                    Add a quiz bank
+                  </p>
+                  <p className="text-sm mb-3" style={{ color: '#94A3B8' }}>
                     Contribute questions on any technical topic — no coding required.
                   </p>
-                  <span className="text-sm text-accent font-medium">See CONTRIBUTING.md →</span>
+                  <span className="text-sm font-medium" style={{ color: '#3E7BFA' }}>
+                    See CONTRIBUTING.md →
+                  </span>
                 </a>
               )}
               {showInvite && (
                 <div
                   className="flex flex-col items-center justify-center text-center rounded-xl p-6"
-                  style={{ border: '1px solid #E4E4E7', background: '#FAFAFA', opacity: 0.5 }}
+                  style={{ border: '1px solid #1E2D45', background: '#0D1420', opacity: 0.5 }}
                 >
                   <span className="text-3xl mb-3">🔒</span>
-                  <p className="font-heading font-semibold text-[#18181B] mb-1">More banks coming</p>
-                  <p className="text-sm text-[#71717A]">
+                  <p className="font-heading font-semibold mb-1" style={{ color: '#F1F5F9' }}>
+                    More banks coming
+                  </p>
+                  <p className="text-sm" style={{ color: '#94A3B8' }}>
                     Terraform, Kubernetes, AWS, Python and more — contributed by the community.
                   </p>
                 </div>
@@ -306,24 +315,36 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
         })()}
 
         {isSignedIn && hasPublisherProfile && (
-          <div className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#F0F9FF] border border-[#BAE6FD] rounded-lg py-3 px-4">
+          <div
+            className="mt-10 mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg py-3 px-4"
+            style={{ background: 'rgba(62,123,250,0.08)', border: '1px solid rgba(62,123,250,0.2)' }}
+          >
             {topQuizThisWeek ? (
-              <p className="text-[13px] text-[#1D4ED8]">
-                📖 <span className="font-medium">{topQuizThisWeek.title}</span> was read by{' '}
-                {topQuizThisWeek.readers} {topQuizThisWeek.readers === 1 ? 'person' : 'people'}{' '}
-                this week — {topQuizThisWeek.passRate}% passed
+              <p className="text-[13px]" style={{ color: '#94A3B8' }}>
+                📖{' '}
+                <span className="font-medium" style={{ color: '#F1F5F9' }}>
+                  {topQuizThisWeek.title}
+                </span>{' '}
+                was read by {topQuizThisWeek.readers}{' '}
+                {topQuizThisWeek.readers === 1 ? 'person' : 'people'} this week —{' '}
+                {topQuizThisWeek.passRate}% passed
               </p>
             ) : mostRecentQuiz ? (
-              <p className="text-[13px] text-[#1D4ED8]">
-                Share <span className="font-medium">{mostRecentQuiz.title}</span> to get your
-                first reader
+              <p className="text-[13px]" style={{ color: '#94A3B8' }}>
+                Share{' '}
+                <span className="font-medium" style={{ color: '#F1F5F9' }}>
+                  {mostRecentQuiz.title}
+                </span>{' '}
+                to get your first reader
               </p>
             ) : (
-              <p className="text-[13px] text-[#1D4ED8]">You haven&apos;t published a quiz yet</p>
+              <p className="text-[13px]" style={{ color: '#94A3B8' }}>
+                You haven&apos;t published a quiz yet
+              </p>
             )}
             <button
               onClick={() => router.push('/dashboard')}
-              className="text-xs px-3 py-1.5 rounded-md bg-accent text-white hover:opacity-90 transition-opacity shrink-0"
+              className="text-xs px-3 py-1.5 rounded-md bg-brand-blue text-white hover:opacity-90 transition-opacity shrink-0"
             >
               Dashboard →
             </button>

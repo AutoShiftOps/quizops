@@ -8,9 +8,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#0A0E14',
-        surface: '#111827',
-        border: '#1F2937',
+        // Legacy dark tokens (pre-dates the M2-03 full-dark redesign) — kept
+        // so the quiz/exam/reader engine components (ExamEngine, QuizEngine,
+        // PublishedQuizEngine, etc.) don't need touching; their values are
+        // retuned to match the new deeper palette below so those pages
+        // inherit the new look with zero code changes.
+        background: '#080C14',
+        surface: '#0F1520',
+        border: '#1E2D45',
         green: '#3ECF8E',
         accent: {
           DEFAULT: '#3E7BFA',
@@ -33,29 +38,45 @@ const config: Config = {
           light: 'rgba(239,68,68,0.1)',
           border: 'rgba(239,68,68,0.2)',
         },
-        // Enterprise Light theme (M1-01) — used by marketing + dashboard
-        // pages. Quiz/exam/reader pages intentionally keep the dark tokens
-        // above; this is a second, parallel palette, not a replacement.
-        light: {
-          bg: '#FAFAFA',
-          surface: '#FFFFFF',
-          surface2: '#F4F4F5',
-          border: '#E4E4E7',
-          border2: '#D4D4D8',
-          text: '#18181B',
-          text2: '#71717A',
-          text3: '#A1A1AA',
+        // Full-dark redesign (M2-03) — Linear/Vercel/BetterStack aesthetic.
+        // Everything site-wide now uses these; the light.* token group from
+        // the M1-01 enterprise-light era has been removed along with the
+        // (light) route group it belonged to.
+        dark: {
+          bg: '#080C14',
+          surface: '#0F1520',
+          surface2: '#161D2E',
+          border: '#1E2D45',
+          border2: '#253447',
+        },
+        brand: {
+          blue: '#3E7BFA',
+          'blue-glow': 'rgba(62,123,250,0.15)',
+          'blue-subtle': 'rgba(62,123,250,0.08)',
+          green: '#22C55E',
+          'green-glow': 'rgba(34,197,94,0.15)',
+        },
+        content: {
+          primary: '#F1F5F9',
+          secondary: '#94A3B8',
+          muted: '#475569',
         },
       },
       fontFamily: {
         heading: ['var(--font-space-grotesk)', 'sans-serif'],
         body: ['var(--font-inter)', 'sans-serif'],
+        mono: ['var(--font-jetbrains-mono)', 'ui-monospace', 'monospace'],
       },
       keyframes: {
         'fade-in': {
           from: { opacity: '0', transform: 'translateY(4px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        // pulse-glow (hero blob) and pulse (eyebrow dot) live in
+        // globals.css as plain CSS instead of here — they're consumed by
+        // .hero-glow/.pulse-dot utility classes, not Tailwind's own
+        // animation-* utilities, so defining them a second time here would
+        // just be dead weight.
       },
       animation: {
         'fade-in': 'fade-in 0.3s ease-out',
