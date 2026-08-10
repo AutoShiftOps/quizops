@@ -71,7 +71,15 @@ export default function LightNavBar() {
   }
 
   return (
-    <header className="bg-white border-b border-[#E4E4E7]">
+    // sticky + top-0 + a z-index above page content keeps this visible
+    // through scroll — including the "Features" anchor jump to
+    // #how-it-works, which previously scrolled the NavBar off-screen along
+    // with everything else since it was never actually pinned. (No
+    // overflow: hidden/auto exists on any ancestor up to <body> in this
+    // codebase — checked (light)/layout.tsx, the root layout, and
+    // globals.css — so that wasn't the cause here; the header just needed
+    // position: sticky in the first place.)
+    <header className="bg-white border-b border-[#E4E4E7] sticky top-0 z-50">
       <div
         className="mx-auto px-6 md:px-10 py-4 flex items-center justify-between"
         style={{ maxWidth: 1080 }}

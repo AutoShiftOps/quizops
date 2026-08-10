@@ -10,6 +10,47 @@ type Props = {
   hasAttempted?: boolean;
 };
 
+// Topic-colour initials badge — replaces emoji rendering entirely (broken
+// on Windows Chrome) and the "/>" code-glyph fallback (looked like a
+// placeholder). Plain system-ui text in a coloured square: nothing for any
+// OS/browser font-matching to get wrong, and it generalises to every bank's
+// topic instead of special-casing DevOps.
+const TOPIC_COLORS: Record<string, { bg: string; color: string }> = {
+  DevOps: { bg: '#EFF6FF', color: '#1D4ED8' },
+  Cloud: { bg: '#F0FDF4', color: '#15803D' },
+  Security: { bg: '#FFF7ED', color: '#C2410C' },
+  Frontend: { bg: '#FDF4FF', color: '#7E22CE' },
+  default: { bg: '#F4F4F5', color: '#71717A' },
+};
+
+function BankIcon({ topic }: { topic: string }) {
+  const scheme = TOPIC_COLORS[topic] || TOPIC_COLORS.default;
+  const initials = topic.slice(0, 2).toUpperCase();
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 10,
+        background: scheme.bg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 13,
+        fontWeight: 700,
+        color: scheme.color,
+        letterSpacing: '-0.5px',
+        fontFamily: 'system-ui, sans-serif',
+        flexShrink: 0,
+      }}
+    >
+      {initials}
+    </div>
+  );
+}
+
 export default function QuizCard({ bank, practiceScore, examScore, hasAttempted }: Props) {
   const minutes = Math.round(bank.duration_seconds / 60);
   const hasAnyScore = Boolean(practiceScore) || Boolean(examScore);
@@ -20,43 +61,7 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)', borderRadius: 12 }}
     >
       <div className="flex items-start justify-between mb-3">
-        {bank.slug === 'devops-cicd' ? (
-          // The gear emoji (⚙️) still rendered as a flat grey glyph on
-          // Windows Chrome even with the colour-emoji font stack named
-          // explicitly below — that font-matching behaviour isn't something
-          // we can fix from here without a real Windows Chrome to verify
-          // against. A "/>" code-icon glyph sidesteps the problem entirely:
-          // it's plain monospace text, not an emoji, so there's no font a
-          // browser could second-guess — and it reads as "DevOps/code"
-          // rather than a placeholder abbreviation.
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 10,
-              background: '#EFF6FF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 20,
-              color: '#3E7BFA',
-              fontWeight: 700,
-              fontFamily: 'monospace',
-            }}
-          >
-            {'/>'}
-          </div>
-        ) : (
-          <span
-            className="text-3xl"
-            style={{
-              fontFamily:
-                '"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji",sans-serif',
-            }}
-          >
-            {bank.emoji}
-          </span>
-        )}
+        <BankIcon topic={bank.topic} />
       </div>
       <h3 className="font-heading text-lg font-semibold mb-1 text-[#18181B]">{bank.name}</h3>
       <p className="text-[#71717A] text-sm mb-4">{bank.description}</p>
