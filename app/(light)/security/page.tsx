@@ -122,9 +122,19 @@ export default function SecurityPage() {
 
       <section>
         <h2 className="font-heading text-xl font-semibold text-[#18181B] mb-3">Status</h2>
+        <p style={{ fontSize: 14 }} className="text-[#3F3F46] mb-2">
+          <span style={{ color: '#22C55E' }}>●</span> All systems operational
+        </p>
         <p className="text-[#3F3F46] leading-relaxed">
           Real-time uptime:{' '}
-          <span className="text-[#A1A1AA]">status page coming soon (UptimeRobot)</span>
+          <a
+            href="https://stats.uptimerobot.com/ri4adm0vP1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#3E7BFA] hover:underline"
+          >
+            View real-time status →
+          </a>
         </p>
         <p className="text-sm text-[#71717A] mt-6">
           Full source and change history:{' '}
