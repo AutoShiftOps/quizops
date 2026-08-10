@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import * as Sentry from '@sentry/nextjs';
 import { Publisher, PublishedQuiz } from './types';
 
 export async function getPublisherByUsername(
@@ -57,6 +58,9 @@ export async function savePublishedAttempt(
   // meant a reader's attempt could silently fail to save with zero trace.
   if (error) {
     console.error('savePublishedAttempt failed:', error.message, error.code);
+    Sentry.captureException(new Error(error.message), {
+      tags: { operation: 'savePublishedAttempt', code: error.code },
+    });
     return false;
   }
   return true;
@@ -76,6 +80,9 @@ export async function incrementAttemptCount(
   const { error } = await supabase.rpc('increment_attempt_count', { quiz_id: quizId });
   if (error) {
     console.error('incrementAttemptCount failed:', error.message, error.code);
+    Sentry.captureException(new Error(error.message), {
+      tags: { operation: 'incrementAttemptCount', code: error.code },
+    });
     return false;
   }
   return true;

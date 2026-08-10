@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
+import * as Sentry from '@sentry/nextjs';
 import { getSupabaseClient } from '@/lib/supabase';
 import { QuizBank, Question } from '@/lib/types';
 import { track } from '@/lib/analytics';
@@ -65,6 +66,9 @@ export default function ResultsScreen({
       // practice score could silently fail to save with zero trace anywhere.
       if (attemptError) {
         console.error('[ResultsScreen] quiz_attempts upsert failed:', attemptError);
+        Sentry.captureException(new Error(attemptError.message), {
+          tags: { operation: 'saveQuizAttempt', code: attemptError.code },
+        });
       } else {
         console.log('[ResultsScreen] quiz_attempts upsert succeeded');
       }
@@ -76,6 +80,9 @@ export default function ResultsScreen({
         .maybeSingle();
       if (progressReadError) {
         console.error('[ResultsScreen] quiz_progress read failed:', progressReadError);
+        Sentry.captureException(new Error(progressReadError.message), {
+          tags: { operation: 'quizProgressRead', code: progressReadError.code },
+        });
       }
 
       const banksDone = { ...(progress?.banks_done ?? {}), [bank.slug]: percentage };
@@ -96,9 +103,13 @@ export default function ResultsScreen({
       );
       if (progressWriteError) {
         console.error('[ResultsScreen] quiz_progress upsert failed:', progressWriteError);
+        Sentry.captureException(new Error(progressWriteError.message), {
+          tags: { operation: 'quizProgressWrite', code: progressWriteError.code },
+        });
       }
     })().catch((err) => {
       console.error('[ResultsScreen] save effect threw:', err);
+      Sentry.captureException(err, { tags: { operation: 'resultsScreenSaveEffect' } });
     });
     // Only persist once, right after the quiz finishes and user identity resolves.
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -11,6 +11,7 @@
     "validate": "node scripts/validate-banks.js"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.70.0",
     "@supabase/supabase-js": "^2.45.4",
     "next": "14.2.35",
     "openai": "^7.3.0",

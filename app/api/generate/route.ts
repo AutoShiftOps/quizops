@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import * as Sentry from '@sentry/nextjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/serverSupabase';
 import { getPublisher, checkTierLimit } from '@/lib/publisher';
@@ -124,6 +125,7 @@ async function checkDomainAllowed(openai: OpenAI, domain: string): Promise<Moder
     // the primary generation feature for every user. Logged so a spike in
     // failures here is visible/monitorable rather than silently degrading.
     console.error('[generate] domain moderation check failed, defaulting to allowed:', err);
+    Sentry.captureException(err, { tags: { operation: 'checkDomainAllowed' } });
     return { ok: true };
   }
 }
@@ -150,6 +152,7 @@ async function checkContentAppropriate(openai: OpenAI, articleText: string): Pro
     return { ok: true };
   } catch (err) {
     console.error('[generate] content moderation check failed, defaulting to allowed:', err);
+    Sentry.captureException(err, { tags: { operation: 'checkContentAppropriate' } });
     return { ok: true };
   }
 }

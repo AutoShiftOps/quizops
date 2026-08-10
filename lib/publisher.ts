@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import * as Sentry from '@sentry/nextjs';
 import { Publisher } from './types';
 
 export async function getPublisher(
@@ -52,6 +53,9 @@ export async function incrementQuizCount(
     .maybeSingle();
   if (readError) {
     console.error('incrementQuizCount read failed:', readError.message, readError.code);
+    Sentry.captureException(new Error(readError.message), {
+      tags: { operation: 'incrementQuizCountRead', code: readError.code },
+    });
     return false;
   }
   const current = data?.quiz_count ?? 0;
@@ -61,6 +65,9 @@ export async function incrementQuizCount(
     .eq('id', publisherId);
   if (updateError) {
     console.error('incrementQuizCount update failed:', updateError.message, updateError.code);
+    Sentry.captureException(new Error(updateError.message), {
+      tags: { operation: 'incrementQuizCountUpdate', code: updateError.code },
+    });
     return false;
   }
   return true;
@@ -77,6 +84,9 @@ export async function decrementQuizCount(
     .maybeSingle();
   if (readError) {
     console.error('decrementQuizCount read failed:', readError.message, readError.code);
+    Sentry.captureException(new Error(readError.message), {
+      tags: { operation: 'decrementQuizCountRead', code: readError.code },
+    });
     return false;
   }
   const current = data?.quiz_count ?? 0;
@@ -86,6 +96,9 @@ export async function decrementQuizCount(
     .eq('id', publisherId);
   if (updateError) {
     console.error('decrementQuizCount update failed:', updateError.message, updateError.code);
+    Sentry.captureException(new Error(updateError.message), {
+      tags: { operation: 'decrementQuizCountUpdate', code: updateError.code },
+    });
     return false;
   }
   return true;

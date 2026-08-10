@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import * as Sentry from '@sentry/nextjs';
 import { ExamAttempt } from './types';
 
 let client: SupabaseClient | null = null;
@@ -54,6 +55,9 @@ export async function saveExamAttempt(attempt: ExamAttempt): Promise<boolean> {
   // could silently fail to save with zero trace anywhere.
   if (error) {
     console.error('[saveExamAttempt] upsert failed:', error);
+    Sentry.captureException(new Error(error.message), {
+      tags: { operation: 'saveExamAttempt', code: error.code },
+    });
     return false;
   }
   console.log('[saveExamAttempt] upsert succeeded');
