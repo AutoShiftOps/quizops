@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
+import WaitlistModal from '@/components/WaitlistModal';
 
 type Billing = 'monthly' | 'annual';
 
@@ -61,9 +62,18 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function PricingPage() {
   const [billing, setBilling] = useState<Billing>('monthly');
   const isAnnual = billing === 'annual';
+  const [showWaitlist, setShowWaitlist] = useState(false);
+  const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
 
   useEffect(() => {
     track('pricing_page_viewed');
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/waitlist/count')
+      .then((res) => res.json())
+      .then((data) => setWaitlistCount(typeof data.count === 'number' ? data.count : null))
+      .catch(() => setWaitlistCount(null));
   }, []);
 
   return (
@@ -182,13 +192,18 @@ export default function PricingPage() {
             <Feature>Community quiz banks</Feature>
             <Feature>All Free features</Feature>
           </ul>
-          <Link
-            href="/waitlist"
+          <button
+            onClick={() => setShowWaitlist(true)}
             className="w-full text-center bg-accent text-white font-semibold hover:opacity-90 transition-opacity"
             style={{ borderRadius: 8, padding: 12 }}
           >
             Join Pro waitlist →
-          </Link>
+          </button>
+          {waitlistCount !== null && waitlistCount > 0 && (
+            <p className="text-center mt-2" style={{ color: '#71717A', fontSize: 12 }}>
+              {waitlistCount} {waitlistCount === 1 ? 'publisher' : 'publishers'} on the waitlist
+            </p>
+          )}
         </div>
 
         {/* Enterprise */}
@@ -268,6 +283,8 @@ export default function PricingPage() {
           </a>
         </div>
       </div>
+
+      <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </div>
   );
 }

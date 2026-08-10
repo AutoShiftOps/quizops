@@ -198,3 +198,23 @@ drop trigger if exists published_quizzes_updated_at on published_quizzes;
 create trigger published_quizzes_updated_at
   before update on published_quizzes
   for each row execute function update_updated_at();
+
+-- ── Pro waitlist (M2-02) ───────────────────────────────────────
+-- Public signup, no auth required — anyone can insert; reads are
+-- service-role only (admin), via lib/supabaseAdmin.ts.
+
+create table if not exists waitlist (
+  id           uuid default gen_random_uuid() primary key,
+  email        text not null unique,
+  name         text not null,
+  website_url  text,
+  tier         text not null default 'pro',
+  source       text default 'pricing',
+  created_at   timestamptz default now()
+);
+
+alter table waitlist enable row level security;
+
+create policy "anyone can join waitlist"
+  on waitlist for insert
+  with check (true);
