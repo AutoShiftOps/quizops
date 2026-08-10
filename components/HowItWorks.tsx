@@ -30,7 +30,7 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       className="px-6 md:px-10 scroll-mt-20"
-      style={{ paddingTop: 64, paddingBottom: 64, borderBottom: '1px solid #E4E4E7' }}
+      style={{ paddingTop: 40, paddingBottom: 40, borderBottom: '1px solid #E4E4E7' }}
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
@@ -49,12 +49,12 @@ export default function HowItWorks() {
           <p style={{ color: '#71717A', fontSize: 16 }}>No design skills, no coding, no friction.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {STEPS.map((step, i) => (
             <div
               key={step.number}
               className="relative"
-              style={{ background: '#F8FAFF', border: '1px solid #E4E4E7', borderRadius: 12, padding: 24 }}
+              style={{ background: '#F8FAFF', border: '1px solid #E4E4E7', borderRadius: 12, padding: 16 }}
             >
               <span
                 className="flex items-center justify-center rounded-md bg-accent text-white font-bold mb-4"

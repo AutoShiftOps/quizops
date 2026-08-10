@@ -245,7 +245,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
 
       <HowItWorks />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-10 py-12">
+      <div className="max-w-6xl mx-auto px-6 md:px-10" style={{ paddingTop: 40, paddingBottom: 40 }}>
         <div className="flex items-center justify-between mb-4">
           {isSignedIn ? (
             <h2

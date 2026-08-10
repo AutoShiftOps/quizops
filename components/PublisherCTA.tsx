@@ -8,8 +8,8 @@ export default function PublisherCTA() {
       className="text-center px-6 md:px-10"
       style={{
         background: 'linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 50%, #3E7BFA 100%)',
-        paddingTop: 64,
-        paddingBottom: 64,
+        paddingTop: 40,
+        paddingBottom: 40,
       }}
     >
       <h2

@@ -20,20 +20,41 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
       style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)', borderRadius: 12 }}
     >
       <div className="flex items-start justify-between mb-3">
-        {/* bank.emoji already includes the U+FE0F variation selector needed
-            for colour presentation, and this renders it as plain text (not
-            an icon font) — but some Windows/Chromium combos still pick a
-            monochrome symbol font over the colour emoji font for characters
-            like ⚙ unless one is named explicitly in the stack. */}
-        <span
-          className="text-3xl"
-          style={{
-            fontFamily:
-              '"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji",sans-serif',
-          }}
-        >
-          {bank.emoji}
-        </span>
+        {bank.slug === 'devops-cicd' ? (
+          // The gear emoji (⚙️) still rendered as a flat grey glyph on
+          // Windows Chrome even with the colour-emoji font stack named
+          // explicitly below — that font-matching behaviour isn't something
+          // we can fix from here without a real Windows Chrome to verify
+          // against, so this bank gets a deterministic text badge instead:
+          // no emoji glyph involved, so nothing for the OS/browser to
+          // second-guess.
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 10,
+              background: '#EFF6FF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 15,
+              fontWeight: 800,
+              color: '#1D4ED8',
+            }}
+          >
+            CI
+          </div>
+        ) : (
+          <span
+            className="text-3xl"
+            style={{
+              fontFamily:
+                '"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji",sans-serif',
+            }}
+          >
+            {bank.emoji}
+          </span>
+        )}
       </div>
       <h3 className="font-heading text-lg font-semibold mb-1 text-[#18181B]">{bank.name}</h3>
       <p className="text-[#71717A] text-sm mb-4">{bank.description}</p>

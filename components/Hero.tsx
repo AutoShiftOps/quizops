@@ -26,10 +26,10 @@ export default function Hero() {
     <section
       className="text-center px-6 md:px-10"
       style={{
-        background: 'linear-gradient(180deg, #fff 0%, #F8FAFF 100%)',
+        background: '#fff',
         borderBottom: '1px solid #E4E4E7',
-        paddingTop: 80,
-        paddingBottom: 64,
+        paddingTop: 56,
+        paddingBottom: 48,
       }}
     >
       <span className="inline-block text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#1D4ED8] mb-5">
@@ -62,7 +62,7 @@ export default function Hero() {
         ))}
       </p>
 
-      <div className="flex items-center justify-center gap-3 flex-wrap" style={{ marginBottom: 48 }}>
+      <div className="flex items-center justify-center gap-3 flex-wrap" style={{ marginBottom: 32 }}>
         <Link
           href="/dashboard"
           className="rounded-md bg-accent text-white hover:opacity-90 transition-opacity"
@@ -84,21 +84,28 @@ export default function Hero() {
         </Link>
       </div>
 
+      {/* Flexbox, not grid — space-around + nowrap keeps all 4 stats on one
+          row with dividers doing the spacing instead of a gap, so a 4th
+          item can't wrap onto its own line. overflow-x-auto is just a
+          safety net for very narrow screens; it never fires above ~380px. */}
       <div
-        className="mx-auto flex flex-wrap items-center justify-center"
+        className="mx-auto flex items-center overflow-x-auto"
         style={{
           background: '#F8FAFF',
           border: '1px solid #E4E4E7',
           borderRadius: 12,
           maxWidth: 680,
           padding: '20px 40px',
+          flexDirection: 'row',
+          flexWrap: 'nowrap',
+          justifyContent: 'space-around',
         }}
       >
         {STATS.map((stat, i) => (
           <div
             key={stat.label}
-            className="text-center"
-            style={i > 0 ? { borderLeft: '1px solid #E4E4E7', paddingLeft: 40, marginLeft: 40 } : undefined}
+            className="text-center shrink-0"
+            style={i > 0 ? { borderLeft: '1px solid #E4E4E7', paddingLeft: 20, marginLeft: 20 } : undefined}
           >
             <p style={{ fontSize: 26, fontWeight: 800, color: '#18181B' }}>{stat.value}</p>
             <p style={{ fontSize: 12, color: '#71717A' }}>{stat.label}</p>
