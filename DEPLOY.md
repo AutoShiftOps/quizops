@@ -143,6 +143,87 @@ Quick sanity checks before a full pass:
 
 ---
 
+## STEP 8 — CI & branch protection
+
+`.github/workflows/e2e.yml` already runs the Playwright suite (`npm test`)
+on every push to `main` and every PR targeting `main` — that part needs no
+further setup.
+
+### 8a — GitHub branch protection: **already partially live**
+
+As of 2026-08-11, a repo ruleset named **"Protect main"** exists and is
+active (GitHub → repo → **Settings → Rules → Rulesets**, not the older
+Settings → Branches page — this was created via the newer Rulesets
+system). Current live configuration, confirmed via
+`gh api repos/AutoShiftOps/quizops/rulesets/20700669`:
+
+- Blocks branch deletion and force-push (non-fast-forward) on `main`.
+- Requires the **`test`** status check (the `e2e.yml` job) to pass, with
+  the strict "branches must be up to date" policy.
+- Does **not** require pull requests — direct `git push origin main` still
+  works, same as this project's history so far.
+- A bypass actor is configured on the ruleset, so a required-status-check
+  failure doesn't block every possible push. Observed live: a commit
+  pushed here while `test` was red went through with GitHub explicitly
+  logging *"Bypassed rule violations for refs/heads/main: Required status
+  check 'test' is expected."*
+
+Net effect right now: contributors without bypass rights are blocked by a
+red `test` check; the bypass actor isn't. That's a real, working gate for
+everyone else, with an intentional escape hatch — not nothing, but also
+not the same guarantee as PR-gating below.
+
+**If you want it to actually stop bad code from reaching `main` for
+everyone, including bypass-configured accounts:** the ruleset needs a
+`pull_request` rule added (equivalent to "Require a pull request before
+merging" in the classic UI) and the bypass actor removed or scoped down.
+Required status checks alone — what's live today — only ever block a
+*merge*; there's no GitHub mechanism to block a raw `git push` on a check
+result, because the check can't run until *after* the commit already
+exists. Adding the PR requirement forces every change onto a branch first,
+where the check runs *before* merge is allowed — that's the only version
+of this that actually keeps `main` clean. It also means the direct-push
+loop this project has used throughout its history stops working the
+moment "Do not allow bypassing" is set. That trade is worth making
+deliberately, not silently — see the closing note below.
+
+### 8b — Vercel
+
+Vercel does not have a simple "wait for GitHub Actions to pass" toggle in
+the dashboard — **Settings → Git → Ignored Build Step** is for
+conditionally *skipping* a build based on a shell script's exit code (e.g.
+"only build if `app/` changed"), not for gating on an external CI job's
+result. Two ways to actually get the effect asked for:
+
+1. **Easiest, and what 8a's PR-gating already buys you for free:** if
+   `main` is protected such that bad commits can never land on it (8a with
+   "Require a pull request before merging"), then Vercel's
+   production deployment — which triggers on push to `main` — simply never
+   sees failing code in the first place. No separate Vercel configuration
+   needed.
+2. **If direct pushes to `main` stay allowed:** disable Vercel's automatic
+   production deployment on push, and instead deploy from GitHub Actions
+   itself, as a step that only runs after the `test` job succeeds (`needs:
+   test`), using `vercel deploy --prod --token=$VERCEL_TOKEN`. More setup
+   (needs a `VERCEL_TOKEN` secret + `vercel link`), but it's the only path
+   that gates deployment on tests *without* requiring PRs.
+
+Exact Vercel UI labels shift between plans/redesigns — verify directly in
+the dashboard rather than trusting this section's wording precisely.
+
+### What I did / didn't do here
+
+The "Protect main" ruleset (required `test` check + a bypass actor) was
+configured directly in the GitHub UI, not by me. I haven't added the
+`pull_request` rule that would close the bypass gap — that's still an open
+decision (see above), and a one-way door for the direct-push workflow this
+project has used throughout, so I'm not flipping it without being asked to
+in so many words. Say so and I'll add it via
+`gh api repos/AutoShiftOps/quizops/rulesets/20700669` (PATCH, adding a
+`pull_request` rule to the existing ruleset).
+
+---
+
 ## DEPLOYMENT STATUS
 
 > README.md's own "status" table (Roadmap) tracks feature phases, not
@@ -163,6 +244,8 @@ Quick sanity checks before a full pass:
 | Custom 404 page | ✅ Live | |
 | Waitlist modal | ✅ Live | M2-02 |
 | Content moderation | ✅ Live | M1-04 |
+| E2E CI (GitHub Actions) | ⚠️ Wired, tests failing | `.github/workflows/e2e.yml` — being fixed |
+| Branch protection (main) | ⚠️ Partial | Required `test` check live; PR-gating not enabled — see Step 8 |
 | Live test (42 tests) | ⏳ In progress | LIVE_TEST_PLAN.md |
 | Full regression (LT28-40) | ⏳ Required | Before public launch |
 
