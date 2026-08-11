@@ -21,51 +21,32 @@ export default function Logo({
     <svg
       width={px}
       height={px}
-      viewBox="0 0 80 80"
+      viewBox="0 0 40 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="QuizOps logo mark"
     >
-      <defs>
-        <linearGradient
-          id="qo-grad"
-          x1="0" y1="0" x2="80" y2="80"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0%" stopColor="#3E7BFA"/>
-          <stop offset="100%" stopColor="#22C55E"/>
-        </linearGradient>
-      </defs>
-      {/* Background */}
+      {/* Clean blue square background — no gradient, sophistication comes
+          from the wordmark, not the icon */}
       <rect
-        width="80" height="80" rx="18"
-        fill="#0D1829"
+        width="40" height="40"
+        rx="9"
+        fill="#3E7BFA"
       />
-      <rect
-        width="80" height="80" rx="18"
-        fill="none"
-        stroke="url(#qo-grad)"
-        strokeWidth="1.5"
-        opacity="0.5"
-      />
-      {/* Q circle with gap */}
+      {/* Bold Q letterform — geometric, clean */}
       <circle
-        cx="40" cy="38" r="16"
-        stroke="url(#qo-grad)"
-        strokeWidth="6"
+        cx="20" cy="19" r="8"
+        stroke="white"
+        strokeWidth="2.5"
         fill="none"
-        strokeLinecap="round"
-        strokeDasharray="75 25"
-        strokeDashoffset="10"
       />
-      {/* Check tail */}
-      <path
-        d="M48 48 L55 55 L68 40"
-        stroke="#22C55E"
-        strokeWidth="6"
+      {/* Tail of Q — diagonal stroke bottom right */}
+      <line
+        x1="25" y1="24"
+        x2="29" y2="28"
+        stroke="white"
+        strokeWidth="2.5"
         strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
       />
     </svg>
   );
@@ -78,12 +59,7 @@ export default function Logo({
       lineHeight: 1,
     }}>
       <span style={{ color: '#F1F5F9' }}>Quiz</span>
-      <span style={{
-        background: 'linear-gradient(90deg, #3E7BFA, #22C55E)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
-      }}>Ops</span>
+      <span style={{ color: '#3E7BFA' }}>Ops</span>
     </span>
   ) : null;
 
