@@ -170,10 +170,13 @@ export default function DashboardPage() {
           <h1 className="font-heading text-2xl font-semibold mb-1 text-[#F1F5F9]">
             Welcome, {publisher.display_name}
           </h1>
-          <p className="text-sm text-[#94A3B8] mb-3">
+          <Link
+            href={`/q/${publisher.username}`}
+            className="inline-block text-sm text-[#94A3B8] hover:text-[#F1F5F9] hover:underline transition-colors mb-3"
+          >
             {origin ? origin.replace(/^https?:\/\//, '') : 'quiz.autoshiftops.com'}/q/
             {publisher.username}
-          </p>
+          </Link>
           <TierBadge publisher={publisher} />
         </div>
         {limitReached ? (
