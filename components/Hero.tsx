@@ -1,8 +1,11 @@
 import Link from 'next/link';
 
 // Full-dark homepage hero (M2-03 redesign). Guest and signed-in visitors
-// both get the identical hero — personalisation lives in the slim
-// announcement bar BankGrid renders above this, not here.
+// get the identical hero content — personalisation lives in the slim
+// announcement bar BankGrid renders above this, not here. Top padding is
+// the one thing that varies: smaller when that welcome bar is already
+// sitting above the hero, larger when it isn't, so vertical spacing stays
+// balanced either way.
 
 const TRUST_ITEMS = [
   'AI-generated questions',
@@ -20,11 +23,16 @@ const STATS = [
   { value: 'GPT-4o', label: 'AI model' },
 ];
 
-export default function Hero() {
+export default function Hero({ isSignedIn = false }: { isSignedIn?: boolean }) {
   return (
     <section
       className="relative overflow-hidden text-center flex flex-col items-center justify-center px-6 md:px-10"
-      style={{ background: '#080C14', paddingTop: 96, paddingBottom: 40, minHeight: '85vh' }}
+      style={{
+        background: '#080C14',
+        paddingTop: isSignedIn ? 32 : 64,
+        paddingBottom: 40,
+        minHeight: '85vh',
+      }}
     >
       <div className="hero-glow" aria-hidden="true" style={{ zIndex: 0 }} />
       {/* Second, subtler glow in the opposite corner for depth — green

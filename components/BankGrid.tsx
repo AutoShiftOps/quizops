@@ -15,10 +15,11 @@ type ScoreMap = Record<string, { practice?: Score; exam?: Score }>;
 
 function getFirstName(user: User): string {
   const fullName = user.user_metadata?.full_name;
-  if (typeof fullName === 'string' && fullName.trim()) {
-    return fullName.trim().split(' ')[0];
-  }
-  return user.email?.split('@')[0] ?? 'there';
+  const firstName =
+    typeof fullName === 'string' && fullName.trim()
+      ? fullName.trim().split(' ')[0]
+      : user.email?.split('@')[0] ?? 'there';
+  return firstName.charAt(0).toUpperCase() + firstName.slice(1);
 }
 
 type TopQuiz = { title: string; slug: string; readers: number; passRate: number };
@@ -186,7 +187,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
       {isSignedIn && user && (
         <div style={{ background: '#0D1420', borderBottom: '1px solid #1E2D45', color: '#F1F5F9', fontSize: 13, padding: '8px 40px' }}>
           <div
-            className="mx-auto flex items-center justify-between gap-3 flex-wrap"
+            className="mx-auto flex items-center gap-3 flex-wrap"
             style={{ maxWidth: 1080 }}
           >
             <span>
@@ -199,18 +200,11 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
                 </>
               )}
             </span>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="hover:underline shrink-0"
-              style={{ color: '#3E7BFA' }}
-            >
-              Dashboard →
-            </button>
           </div>
         </div>
       )}
 
-      <Hero />
+      <Hero isSignedIn={isSignedIn} />
 
       <BentoGrid />
 
