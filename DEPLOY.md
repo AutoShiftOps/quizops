@@ -130,7 +130,7 @@ Step 6's custom domain is attached.
 
 ## STEP 7 — Smoke test
 
-Full test suite: [LIVE_TEST_PLAN.md](./LIVE_TEST_PLAN.md) (27 tests,
+Full test suite: [LIVE_TEST_PLAN.md](./LIVE_TEST_PLAN.md) (42 tests,
 work through LT-01 onward).
 
 Quick sanity checks before a full pass:
@@ -157,7 +157,14 @@ Quick sanity checks before a full pass:
 | Publisher MVP (#1-7) | ✅ Live | e909f65 |
 | Dashboard redesign | ✅ Live | c09dc20 |
 | Auto-title + Edit | ✅ Live | 144ba96 |
-| Live test (27 tests) | ⏳ In progress | LIVE_TEST_PLAN.md |
+| Dark theme redesign | ✅ Live | Linear/Vercel aesthetic |
+| New geometric Q logo | ✅ Live | Enterprise mark |
+| Publisher profile /q/[u] | ✅ Live | M3-10 |
+| Custom 404 page | ✅ Live | |
+| Waitlist modal | ✅ Live | M2-02 |
+| Content moderation | ✅ Live | M1-04 |
+| Live test (42 tests) | ⏳ In progress | LIVE_TEST_PLAN.md |
+| Full regression (LT28-40) | ⏳ Required | Before public launch |
 
 ---
 

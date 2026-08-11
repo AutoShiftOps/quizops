@@ -5,9 +5,34 @@
 
 ---
 
+## TEST PLAN STATUS WARNING
+
+Last full regression run: pre-dark-theme
+(approximately commit c0444c7)
+
+Since then the following major changes shipped WITHOUT test plan coverage:
+- Complete dark theme redesign
+- New logo (Q-check → geometric Q)
+- Route group consolidation (light/dark)
+- Welcome bar personalisation
+- Bento grid with streaming animation
+- Publisher profile page /q/[username]
+- Custom 404 page
+- Waitlist modal (M2-02)
+- Content moderation (M1-04)
+- GA4 event tracking (M1-06)
+- Sentry error monitoring (M1-07)
+- Sticky NavBar fix
+- Hero CTA button fix
+- Score persistence fix (410c318)
+
+**FULL REGRESSION RUN REQUIRED before opening to external publishers.**
+
+---
+
 Deployment complete as of 2026-08-05.
 Manual live testing in progress.
-Start at LT-01 and work through all 29 tests.
+Start at LT-01 and work through all 42 tests.
 
 ---
 
@@ -369,6 +394,88 @@ Open quiz.autoshiftops.com on your phone.
 
 ---
 
+## PHASE 10 — Post-redesign regression (30 min)
+
+### LT-28 — Dark theme homepage (signed out)
+Expected: Dark background, gradient hero,
+bento grid visible, social proof bar,
+no horizontal scrollbar, NavBar sticky on scroll.
+
+### LT-29 — Dark theme homepage (signed in)
+Expected: Welcome bar shows "Sudhakar",
+mini stats show real numbers,
+quiz banks in dark cards,
+publisher strip visible.
+
+### LT-30 — Practice quiz still works
+Open /quiz/devops-cicd
+Expected: Dark theme, questions load,
+timer works, score saves to Supabase after
+completion (check quiz_attempts table).
+
+### LT-31 — Exam mode still works
+Open /exam/devops-cicd
+Expected: Dark theme, start screen,
+fullscreen requested, side panel visible,
+no layout regression from route consolidation.
+
+### LT-32 — Publisher dashboard
+Open /dashboard
+Expected: Dark theme, stats show real data,
+quiz cards with attempt counts,
+Create quiz button works or shows upgrade wall.
+
+### LT-33 — Create quiz flow
+Click + Create quiz → Generate from article
+Paste autoshiftops.com article URL
+Expected: Questions stream in, title extracted,
+publish succeeds, quiz appears at
+/q/sudhakarsajja/[slug]
+
+### LT-34 — Publisher profile page
+Open /q/sudhakarsajja
+Expected: Profile page loads (NOT 404),
+published quizzes listed with cards,
+Take quiz links work.
+
+### LT-35 — Waitlist modal
+Open /pricing → click "Join Pro waitlist"
+Expected: Modal opens, form submits,
+Supabase waitlist table has row,
+admin email received at admin@autoshiftops.com,
+auto-reply received at submitted email.
+
+### LT-36 — Content moderation
+In dashboard/new, enter an adult content URL
+Expected: 422 error shown with reason,
+paste fallback appears,
+no generation proceeds.
+
+### LT-37 — Custom 404 page
+Open /quiz.autoshiftops.com/fake-page
+Expected: Custom dark 404 page shows
+(not Next.js default plain white 404).
+
+### LT-38 — GA4 events firing
+Open GA4 → Realtime → Events
+Take the DevOps practice quiz
+Expected: quiz_started and quiz_completed
+events appear in realtime view.
+
+### LT-39 — Score persists after quiz
+Complete DevOps practice quiz signed in
+Check Supabase → quiz_attempts → row exists
+Reload homepage → Practice badge shows score.
+
+### LT-40 — Mobile smoke test
+Open quiz.autoshiftops.com on phone
+Expected: Homepage renders correctly,
+NavBar collapses properly,
+quiz works on touch,
+dashboard usable on mobile.
+
+---
+
 ## PASS CRITERIA SUMMARY
 
 | Phase | Tests | Required to launch |
@@ -382,8 +489,9 @@ Open quiz.autoshiftops.com on your phone.
 | 7 — Tier limits | LT-22 to LT-23 | All pass |
 | 8 — Dashboard | LT-24 to LT-25 | All pass |
 | 9 — Regression | LT-26 to LT-27 | All pass |
+| 10 — Post-redesign regression | LT-28 to LT-40 | All pass |
 
-**Total: 29 live tests. All must pass before opening 
+**Total: 42 live tests. All must pass before opening 
 to external publishers.**
 
 ---
@@ -430,10 +538,23 @@ to external publishers.**
 | LT-25 | — | |
 | LT-26 | — | |
 | LT-27 | — | |
+| LT-28 | — | |
+| LT-29 | — | |
+| LT-30 | — | |
+| LT-31 | — | |
+| LT-32 | — | |
+| LT-33 | — | |
+| LT-34 | — | |
+| LT-35 | — | |
+| LT-36 | — | |
+| LT-37 | — | |
+| LT-38 | — | |
+| LT-39 | — | |
+| LT-40 | — | |
 
 ---
 
-## POST-LAUNCH ACTIONS (after all 29 pass)
+## POST-LAUNCH ACTIONS (after all 42 pass)
 
 1. Update DEPLOY.md deployment status table
 2. Close GitHub issues #1–#7 with test results
