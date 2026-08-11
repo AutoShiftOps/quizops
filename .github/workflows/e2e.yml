@@ -38,6 +38,7 @@ jobs:
           AI_MODEL: gpt-4o-mini
           APP_URL: http://localhost:3000
           NEXT_PUBLIC_GA_ID: G-JRMPGDV2DM
+          TEST_PUBLISHER_USERNAME: sudhakarsajja
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
