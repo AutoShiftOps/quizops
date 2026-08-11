@@ -35,7 +35,7 @@ export default function SecurityPage() {
           Security
         </h1>
         <p className="max-w-md mx-auto mb-6" style={{ color: '#94A3B8' }}>
-          How we protect your data and what we&apos;re honest about.
+          We use industry-standard infrastructure. Here is exactly what we do and do not store.
         </p>
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {TRUST_BADGES.map((label) => (
@@ -113,21 +113,11 @@ export default function SecurityPage() {
         <section className="mb-8">
           <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: 20 }}>
             <p className="font-heading font-semibold mb-2" style={{ color: '#F1F5F9' }}>
-              ⚡ AI Provider Disclosure
+              ⚡ AI Provider
             </p>
             <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>
-              Quiz questions are generated via OpenAI&apos;s API. Article text is sent to OpenAI
-              for processing and is not stored by QuizOps after generation. OpenAI&apos;s data
-              handling:{' '}
-              <a
-                href="https://openai.com/policies/privacy-policy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline"
-                style={{ color: '#3E7BFA' }}
-              >
-                openai.com/policies/privacy-policy
-              </a>
+              Quiz questions are generated via OpenAI&apos;s API. Your article text is sent to
+              OpenAI for processing only — QuizOps does not store it after generation.
             </p>
           </div>
         </section>

@@ -291,7 +291,7 @@ export default function PricingPage() {
       </div>
 
       <p className="text-center text-[13px] -mt-4 mb-8" style={{ color: '#94A3B8' }}>
-        🔒 All plans include SSL, GDPR compliance, and data stored securely in Canada/US.
+        🔒 Your data stays yours — encrypted in transit, Row-Level Security enforced, hosted on Supabase and Vercel.
       </p>
 
       {/* FAQ */}
