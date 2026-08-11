@@ -15,11 +15,19 @@ type Score = { percentage: number; passed: boolean };
 type ScoreMap = Record<string, { practice?: Score; exam?: Score }>;
 
 function getFirstName(user: User): string {
-  const fullName = user.user_metadata?.full_name;
-  const firstName =
-    typeof fullName === 'string' && fullName.trim()
-      ? fullName.trim().split(' ')[0]
-      : user.email?.split('@')[0] ?? 'there';
+  // Diagnostic — confirms in the browser console which fields Google's
+  // OAuth response actually populated, since full_name showing up empty
+  // (falling all the way through to the email-prefix fallback, e.g.
+  // "Sudhakarrao" from "sudhakarrao@...") was the reported bug.
+  console.log('user metadata:', user?.user_metadata);
+
+  const meta = user.user_metadata ?? {};
+  const fullName = typeof meta.full_name === 'string' ? meta.full_name.trim() : '';
+  // Some OAuth providers populate `name` instead of `full_name`.
+  const name = typeof meta.name === 'string' ? meta.name.trim() : '';
+  const source = fullName || name || user.email?.split('@')[0] || 'there';
+
+  const firstName = source.split(' ')[0];
   return firstName.charAt(0).toUpperCase() + firstName.slice(1);
 }
 
@@ -44,8 +52,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
   const [username, setUsername] = useState<string | null>(null);
   const [publishedCount, setPublishedCount] = useState(0);
   const [scoreMap, setScoreMap] = useState<ScoreMap>({});
-  const [quizzesTaken, setQuizzesTaken] = useState(0);
-  const [bestScore, setBestScore] = useState<number | null>(null);
+  const [totalReaders, setTotalReaders] = useState(0);
   const [topQuizThisWeek, setTopQuizThisWeek] = useState<TopQuiz | null>(null);
   const [mostRecentQuiz, setMostRecentQuiz] = useState<RecentQuiz | null>(null);
 
@@ -73,7 +80,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
             .gte('attempted_at', sevenDaysAgo),
           supabase
             .from('published_quizzes')
-            .select('id, slug, title, created_at')
+            .select('id, slug, title, created_at, attempt_count')
             .eq('publisher_id', u.id)
             .eq('status', 'published')
             .order('created_at', { ascending: false }),
@@ -103,8 +110,6 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
 
       if (!active) return;
       setScoreMap(grouped);
-      setQuizzesTaken(attempts.length);
-      setBestScore(attempts.length > 0 ? Math.max(...attempts.map((a) => a.percentage)) : null);
 
       const publisher = publisherResult.data;
       setHasPublisherProfile(publisher !== null);
@@ -112,6 +117,10 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
       setPublishedCount(publisher?.quiz_count ?? 0);
 
       const quizzes = quizzesResult.data ?? [];
+      // Welcome bar's "readers" figure — total attempts across every quiz
+      // this publisher has published, not the signed-in user's own reading
+      // history (that belongs on a future "My learning" section, not here).
+      setTotalReaders(quizzes.reduce((sum, q) => sum + (q.attempt_count ?? 0), 0));
       const perQuiz: Record<string, { count: number; passedCount: number }> = {};
       for (const row of weeklyReadersResult.data ?? []) {
         if (!perQuiz[row.quiz_id]) perQuiz[row.quiz_id] = { count: 0, passedCount: 0 };
@@ -137,8 +146,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
 
     function resetToGuest() {
       setScoreMap({});
-      setQuizzesTaken(0);
-      setBestScore(null);
+      setTotalReaders(0);
       setHasPublisherProfile(false);
       setUsername(null);
       setPublishedCount(0);
@@ -203,12 +211,26 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
           >
             <span>
               👋 Welcome back, {getFirstName(user)}
-              {!loadingUserData && (
-                <>
-                  {' '}
-                  · {quizzesTaken} {quizzesTaken === 1 ? 'quiz' : 'quizzes'} taken ·{' '}
-                  {bestScore === null ? '—' : `${bestScore}%`} best · {publishedCount} published
-                </>
+              {/* Publisher-first stats — a signed-in publisher cares about
+                  their readers, not their own reader-side quiz scores.
+                  Reader stats (quizzes taken, best score) belong on a "My
+                  learning" section, not here. */}
+              {!loadingUserData && hasPublisherProfile && (
+                publishedCount > 0 ? (
+                  <>
+                    {' '}
+                    · {publishedCount} {publishedCount === 1 ? 'quiz' : 'quizzes'} ·{' '}
+                    {totalReaders} {totalReaders === 1 ? 'reader' : 'readers'}
+                  </>
+                ) : (
+                  <>
+                    {' '}
+                    ·{' '}
+                    <Link href="/dashboard/new" className="hover:underline" style={{ color: '#3E7BFA' }}>
+                      Start your first quiz →
+                    </Link>
+                  </>
+                )
               )}
             </span>
           </div>
