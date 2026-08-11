@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { QuizBank } from '@/lib/types';
@@ -25,7 +26,17 @@ function getFirstName(user: User): string {
 type TopQuiz = { title: string; slug: string; readers: number; passRate: number };
 type RecentQuiz = { title: string; slug: string };
 
-export default function BankGrid({ banks }: { banks: QuizBank[] }) {
+type Props = {
+  // Already sliced to the current page server-side (see app/page.tsx) —
+  // this component never receives (and never has to hydrate/ship) more
+  // than one page's worth of banks, regardless of how many exist in total.
+  banks: QuizBank[];
+  totalBankCount: number;
+  currentPage: number;
+  totalPages: number;
+};
+
+export default function BankGrid({ banks, totalBankCount, currentPage, totalPages }: Props) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
@@ -244,10 +255,10 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
         {(() => {
           // A lone card left-aligned in a wide grid looks abandoned, so the
           // "contribute" invite plus a "more banks coming" placeholder fill
-          // the row out to 3 whenever there's only one real bank. Once
-          // there are 2+ banks the grid is already visually populated and
-          // neither is needed.
-          const showInvite = banks.length === 1;
+          // the row out to 3 whenever there's only one real bank across the
+          // whole site. Once there are 2+ banks the grid is already
+          // visually populated and neither is needed.
+          const showInvite = totalBankCount === 1;
           const totalItems = banks.length + (showInvite ? 2 : 0);
           const gridClass =
             totalItems === 1
@@ -257,6 +268,7 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
               : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-[960px] mx-auto gap-6';
 
           return (
+            <>
             <section className={gridClass}>
               {banks.map((bank) => {
                 const scores = scoreMap[bank.slug];
@@ -332,6 +344,48 @@ export default function BankGrid({ banks }: { banks: QuizBank[] }) {
                 </div>
               )}
             </section>
+
+            {totalPages > 1 && (
+              // Plain <Link>s to ?page=N rather than client state — each
+              // page is its own URL, so it's bookmarkable/shareable and the
+              // server only ever sends that page's banks (see app/page.tsx).
+              <div className="flex items-center justify-center gap-4 mt-8">
+                {currentPage === 1 ? (
+                  <span
+                    className="text-sm px-3 py-1.5 rounded-md border border-dark-border text-content-secondary opacity-40"
+                    aria-disabled="true"
+                  >
+                    ← Previous
+                  </span>
+                ) : (
+                  <Link
+                    href={currentPage - 1 === 1 ? '/' : `/?page=${currentPage - 1}`}
+                    className="text-sm px-3 py-1.5 rounded-md border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
+                  >
+                    ← Previous
+                  </Link>
+                )}
+                <span style={{ fontSize: 13, color: '#94A3B8' }}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                {currentPage === totalPages ? (
+                  <span
+                    className="text-sm px-3 py-1.5 rounded-md border border-dark-border text-content-secondary opacity-40"
+                    aria-disabled="true"
+                  >
+                    Next →
+                  </span>
+                ) : (
+                  <Link
+                    href={`/?page=${currentPage + 1}`}
+                    className="text-sm px-3 py-1.5 rounded-md border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
+                  >
+                    Next →
+                  </Link>
+                )}
+              </div>
+            )}
+            </>
           );
         })()}
 
