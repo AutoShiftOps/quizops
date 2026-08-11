@@ -14,6 +14,19 @@ export async function getPublisherByUsername(
   return data as Publisher | null;
 }
 
+export async function getPublishedQuizzesByPublisher(
+  supabase: SupabaseClient,
+  publisherId: string
+): Promise<PublishedQuiz[]> {
+  const { data } = await supabase
+    .from('published_quizzes')
+    .select('*')
+    .eq('publisher_id', publisherId)
+    .eq('status', 'published')
+    .order('created_at', { ascending: false });
+  return (data ?? []) as PublishedQuiz[];
+}
+
 export async function getPublishedQuiz(
   supabase: SupabaseClient,
   publisherId: string,
