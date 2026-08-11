@@ -36,17 +36,10 @@ test.describe('Practice quiz', () => {
 
   test('LT-37: unknown slug returns 404',
   async ({ page }) => {
-    await page.goto('/quiz/fake-nonexistent');
-    // Custom 404 or Next.js 404
-    const title = await page.title();
-    const has404 =
-      title.includes('404') ||
-      await page.getByText('404')
-        .isVisible().catch(() => false) ||
-      await page.getByText('not found',
-        { exact: false }).isVisible()
-        .catch(() => false);
-    expect(has404).toBe(true);
+    const response = await page.goto(
+      '/quiz/fake-nonexistent'
+    );
+    expect(response?.status()).toBe(404);
   });
 
 });
