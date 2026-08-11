@@ -496,71 +496,93 @@ export default function NewQuizPage() {
     const belowMinimum = questions.length < 3;
 
     return (
-      <div className="mt-8 max-w-2xl mx-auto">
-        <h1 className="font-heading text-xl font-semibold mb-6 text-[#F1F5F9]">
-          {mode === 'manual' ? 'Write your quiz' : 'Review your quiz'}
-        </h1>
+      <div className="mt-8 max-w-2xl mx-auto" style={{ paddingBottom: 80 }}>
+        {/* Scrollable content — paddingBottom here (not just on the sticky
+            bar below) is what stops the bar from covering the last
+            question card once it's pinned at the bottom of the viewport. */}
+        <div style={{ paddingBottom: 60 }}>
+          <h1 className="font-heading text-xl font-semibold mb-6 text-[#F1F5F9]">
+            {mode === 'manual' ? 'Write your quiz' : 'Review your quiz'}
+          </h1>
 
-        <div className="mb-6">
-          <QuizMetadataForm
-            title={title}
-            onTitleChange={setTitle}
-            titleTouched={titleTouched}
-            onTitleBlur={() => setTitleTouched(true)}
-            description={description}
-            onDescriptionChange={setDescription}
-            emoji={emoji}
-            onEmojiChange={setEmoji}
-            sourceUrl={sourceUrl}
-            onSourceUrlChange={setSourceUrl}
-            topic={topic}
-            onTopicChange={setTopic}
-            durationMin={durationMin}
-            onDurationChange={setDurationMin}
-            passMark={passMark}
-            onPassMarkChange={setPassMark}
-          />
-        </div>
-
-        <p className="text-center text-sm text-[#94A3B8] mb-4">
-          questions ({questions.length} of minimum 3)
-        </p>
-
-        {belowMinimum && (
-          <div className="mb-6 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
-            Add at least 3 questions to publish. Each question needs 4 options and one
-            correct answer marked.
-          </div>
-        )}
-
-        <div className="space-y-4 mb-6">
-          {questions.map((q, i) => (
-            <QuestionEditor
-              key={q.id ?? i}
-              question={q}
-              index={i}
-              onChange={(updated) => handleQuestionChange(i, updated)}
-              onDelete={() => handleQuestionDelete(i)}
-              canDelete={questions.length > 1}
-              onMoveUp={() => handleMoveUp(i)}
-              onMoveDown={() => handleMoveDown(i)}
-              isFirst={i === 0}
-              isLast={i === questions.length - 1}
-              startInEditMode={q.text === 'New question' && q.explanation === ''}
+          <div className="mb-6">
+            <QuizMetadataForm
+              title={title}
+              onTitleChange={setTitle}
+              titleTouched={titleTouched}
+              onTitleBlur={() => setTitleTouched(true)}
+              description={description}
+              onDescriptionChange={setDescription}
+              emoji={emoji}
+              onEmojiChange={setEmoji}
+              sourceUrl={sourceUrl}
+              onSourceUrlChange={setSourceUrl}
+              topic={topic}
+              onTopicChange={setTopic}
+              durationMin={durationMin}
+              onDurationChange={setDurationMin}
+              passMark={passMark}
+              onPassMarkChange={setPassMark}
             />
-          ))}
+          </div>
+
+          <p className="text-center text-sm text-[#94A3B8] mb-4">
+            questions ({questions.length} of minimum 3)
+          </p>
+
+          {belowMinimum && (
+            <div className="mb-6 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-warning">
+              Add at least 3 questions to publish. Each question needs 4 options and one
+              correct answer marked.
+            </div>
+          )}
+
+          <div className="space-y-4 mb-6">
+            {questions.map((q, i) => (
+              <QuestionEditor
+                key={q.id ?? i}
+                question={q}
+                index={i}
+                onChange={(updated) => handleQuestionChange(i, updated)}
+                onDelete={() => handleQuestionDelete(i)}
+                canDelete={questions.length > 1}
+                onMoveUp={() => handleMoveUp(i)}
+                onMoveDown={() => handleMoveDown(i)}
+                isFirst={i === 0}
+                isLast={i === questions.length - 1}
+                startInEditMode={q.text === 'New question' && q.explanation === ''}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleAddQuestion}
+            className="w-full mb-8 px-4 py-2 rounded-md border border-dashed border-[#253447] hover:border-accent transition-colors text-sm text-[#94A3B8]"
+          >
+            + Add question
+          </button>
+
+          {publishError && <p className="text-sm text-danger mb-4">{publishError}</p>}
         </div>
 
-        <button
-          onClick={handleAddQuestion}
-          className="w-full mb-8 px-4 py-2 rounded-md border border-dashed border-[#253447] hover:border-accent transition-colors text-sm text-[#94A3B8]"
+        {/* Sticky action bar — floats above the footer regardless of
+            content length, so Save draft / Publish quiz are always
+            reachable without scrolling to hunt for them. */}
+        <div
+          style={{
+            position: 'sticky',
+            bottom: 0,
+            background: '#080C14',
+            borderTop: '1px solid #1E2D45',
+            padding: '16px 24px',
+            zIndex: 10,
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
         >
-          + Add question
-        </button>
-
-        {publishError && <p className="text-sm text-danger mb-4">{publishError}</p>}
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#1E2D45] pt-6">
           <div className="flex gap-2">
             {mode === 'manual' ? (
               <button
