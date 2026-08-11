@@ -40,6 +40,25 @@ h6 {
   box-shadow: 0 0 24px rgba(62, 123, 250, 0.35), 0 4px 16px rgba(62, 123, 250, 0.2);
 }
 
+/* Ghost/outline button (e.g. "Practice again" on QuizCard) — a real CSS
+   class with an explicit border and :hover state, not Tailwind utilities,
+   so the border can never be silently lost to purging. */
+.ghost-btn {
+  border: 1px solid #253447;
+  color: #94a3b8;
+  background: transparent;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ghost-btn:hover {
+  border-color: #3e7bfa;
+  color: #f1f5f9;
+}
+
 /* Card */
 .dark-card {
   background: #0f1520;

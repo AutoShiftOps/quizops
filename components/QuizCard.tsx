@@ -21,9 +21,24 @@ const TOPIC_COLORS: Record<string, { bg: string; color: string }> = {
   default: { bg: '#161D2E', color: '#94A3B8' },
 };
 
+// Explicit mapping rather than a blind topic.slice(0, 2) — "DevOps".slice(0,
+// 2) is technically "De" but reads as "DE", not the "DO" people actually
+// expect. Falls back to the slice for any topic not listed here.
+const TOPIC_INITIALS: Record<string, string> = {
+  DevOps: 'DO',
+  Cloud: 'CL',
+  Security: 'SC',
+  Frontend: 'FE',
+  Backend: 'BE',
+  Python: 'PY',
+  AWS: 'AWS',
+  Kubernetes: 'K8s',
+  Terraform: 'TF',
+};
+
 function BankIcon({ topic }: { topic: string }) {
   const scheme = TOPIC_COLORS[topic] || TOPIC_COLORS.default;
-  const initials = topic.slice(0, 2).toUpperCase();
+  const initials = TOPIC_INITIALS[topic] || topic.slice(0, 2).toUpperCase();
 
   return (
     <div
@@ -101,7 +116,7 @@ export default function QuizCard({ bank, practiceScore, examScore, hasAttempted 
       <div className="flex items-center gap-3">
         <Link
           href={`/quiz/${bank.slug}`}
-          className="flex-1 text-center text-sm px-4 py-2 rounded-md border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
+          className="ghost-btn flex-1 text-center transition-colors"
         >
           {hasAttempted ? 'Practice again' : 'Practice'}
         </Link>
