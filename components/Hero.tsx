@@ -91,19 +91,16 @@ export default function Hero({ isSignedIn = false }: { isSignedIn?: boolean }) {
         readers understood what you wrote.
       </p>
 
-      <p
-        className="relative z-10 flex items-center justify-center flex-wrap gap-x-2 gap-y-1"
-        style={{ color: '#475569', fontSize: 13, marginBottom: 36 }}
+      <div
+        className="relative z-10 flex flex-wrap justify-center"
+        style={{ gap: '8px 24px', marginBottom: 36 }}
       >
-        {TRUST_ITEMS.map((item, i) => (
-          <span key={item} className="flex items-center gap-2">
-            {i > 0 && <span aria-hidden="true">·</span>}
-            <span>
-              <span style={{ color: '#22C55E' }}>✓</span> {item}
-            </span>
+        {TRUST_ITEMS.map((item) => (
+          <span key={item} style={{ color: '#475569', fontSize: 13 }}>
+            <span style={{ color: '#22C55E' }}>✓</span> {item}
           </span>
         ))}
-      </p>
+      </div>
 
       <div className="relative z-10 flex items-center justify-center gap-3 flex-wrap">
         <Link
