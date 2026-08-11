@@ -1,0 +1,258 @@
+[
+  {
+    "id": "q1",
+    "text": "What primarily distinguishes an AI agent from a simple chatbot?",
+    "code": null,
+    "options": [
+      "An agent can only respond in a single turn, while a chatbot supports multi-turn conversation",
+      "An agent autonomously plans and takes actions (e.g. calling tools, executing multi-step tasks) toward a goal, while a chatbot mainly produces conversational text responses",
+      "There is no meaningful difference \u2014 the terms are interchangeable in every context",
+      "A chatbot always has access to external tools, while an agent never does"
+    ],
+    "answer": 1,
+    "explanation": "An agent uses the LLM as a reasoning engine to autonomously decide on and execute actions (tool calls, sub-tasks) in pursuit of a goal, often across multiple steps, whereas a plain chatbot is primarily generating conversational replies without independent action-taking.",
+    "tags": [
+      "agents",
+      "fundamentals"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "In the ReAct (Reason + Act) pattern, the agent's loop typically alternates between:",
+    "code": null,
+    "options": [
+      "Reading documentation and writing unit tests",
+      "Fine-tuning the model weights after every single action",
+      "Randomly selecting from a fixed list of pre-written responses",
+      "Generating a reasoning trace (\"thought\"), taking an action (e.g. a tool call), and observing the result, then repeating"
+    ],
+    "answer": 3,
+    "explanation": "ReAct interleaves explicit reasoning steps (\"thoughts\") with actions (tool calls) and observations of the results, letting the model adapt its plan based on what it learns from each action before deciding the next step.",
+    "tags": [
+      "react",
+      "agents"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "Tool use (function calling) in an agent framework allows the LLM to:",
+    "code": null,
+    "options": [
+      "Directly modify its own training weights in real time",
+      "Request that a defined external function (e.g. a search API, calculator, or database query) be executed, then incorporate the result into its next reasoning step",
+      "Bypass all safety guidelines automatically",
+      "Guarantee 100% factual accuracy on every response"
+    ],
+    "answer": 1,
+    "explanation": "Tool use lets the model request execution of a predefined function via a structured call; the calling framework runs the actual function and feeds the result back so the agent can use it in subsequent reasoning.",
+    "tags": [
+      "tool-use",
+      "function-calling"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "Short-term (working) memory in an agent typically refers to:",
+    "code": null,
+    "options": [
+      "Information persisted permanently across all future sessions with any user",
+      "A separate fine-tuned model trained just for that session",
+      "The model's frozen training data",
+      "The context maintained within the current task or conversation, such as recent messages and intermediate results, usually held within the context window"
+    ],
+    "answer": 3,
+    "explanation": "Short-term memory is the working context an agent holds during an active task or session \u2014 recent turns, intermediate tool outputs, and current plan state \u2014 generally scoped to the current context window rather than persisted indefinitely.",
+    "tags": [
+      "memory",
+      "agents"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "Long-term memory in an agent architecture is typically implemented using:",
+    "code": null,
+    "options": [
+      "Only the model's context window, with nothing stored externally",
+      "An external persistent store (e.g. a vector database or structured database) that the agent can write to and query across sessions",
+      "A hardcoded list of facts embedded in the source code",
+      "Increasing the temperature parameter for later sessions"
+    ],
+    "answer": 1,
+    "explanation": "Long-term memory usually lives outside the model itself \u2014 in a vector store, database, or file system the agent can read from and write to \u2014 so relevant information persists and can be retrieved across sessions rather than being lost when the context window resets.",
+    "tags": [
+      "memory",
+      "long-term-memory"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "In a multi-agent orchestration system, why might a task be split across multiple specialized agents rather than handled by one general agent?",
+    "code": null,
+    "options": [
+      "Multiple agents always run strictly slower than one agent",
+      "It is required by every LLM provider's terms of service",
+      "Specialized agents (e.g. a researcher, a coder, a reviewer) can each focus on a narrower role with tailored prompts/tools, often improving reliability and making the system easier to reason about and debug",
+      "It removes the need for any tool use at all"
+    ],
+    "answer": 2,
+    "explanation": "Decomposing work across specialized agents with focused roles, prompts, and tool access tends to produce more reliable, easier-to-debug systems than one monolithic agent trying to handle every responsibility with a single generic prompt.",
+    "tags": [
+      "multi-agent",
+      "orchestration"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "What is the core conceptual difference between LangChain and LangGraph?",
+    "code": null,
+    "options": [
+      "They are unrelated products from different companies with no shared purpose",
+      "LangGraph is used only for embeddings, never for agents",
+      "LangChain provides composable building blocks and chains for LLM apps, while LangGraph adds an explicit graph/state-machine model for defining more controllable, cyclical agent workflows",
+      "LangChain requires no Python code, while LangGraph is Python-only"
+    ],
+    "answer": 2,
+    "explanation": "LangChain offers general-purpose components (chains, prompts, tool wrappers) for building LLM applications, while LangGraph builds on top of it with an explicit graph-based model of nodes and edges, better suited to defining stateful, cyclical agent control flow.",
+    "tags": [
+      "langchain",
+      "langgraph",
+      "frameworks"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "In CrewAI, what do \"roles\" and \"tasks\" represent?",
+    "code": null,
+    "options": [
+      "Roles define an agent's persona/responsibility within the crew, and tasks are the discrete units of work assigned to agents to complete the overall goal",
+      "Roles and tasks are two names for the exact same concept in CrewAI",
+      "Roles control the API rate limit, and tasks control the temperature setting",
+      "Tasks are only used for logging and have no effect on execution"
+    ],
+    "answer": 0,
+    "explanation": "In CrewAI, a role defines what an agent is (e.g. \"researcher\", \"writer\") and its goal/backstory, while tasks are the specific, assignable units of work that agents execute \u2014 together forming a crew collaborating toward an outcome.",
+    "tags": [
+      "crewai",
+      "multi-agent"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "Which metric is most relevant when evaluating an agent's reliability for a production task?",
+    "code": null,
+    "options": [
+      "The visual polish of the agent's chat UI",
+      "The success rate at correctly completing the intended task end-to-end across a representative set of inputs, including recovery from tool failures",
+      "The total number of available tools in the framework's library",
+      "How many programming languages the framework's SDK supports"
+    ],
+    "answer": 1,
+    "explanation": "Agent reliability for production is best measured by task-completion success rate over representative inputs, including how gracefully the agent handles unexpected tool errors or ambiguous situations \u2014 not by UI polish or the size of a tool library.",
+    "tags": [
+      "evaluation",
+      "reliability"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "What determines when an agentic loop should terminate?",
+    "code": null,
+    "options": [
+      "A defined stopping condition \u2014 such as the agent determining the goal is achieved, hitting a maximum iteration/step limit, or an explicit \"final answer\" action \u2014 should be built into the loop to prevent runaway execution",
+      "Agentic loops never terminate and must be manually killed by a human every time",
+      "Termination is decided entirely at random",
+      "The loop stops only when the API key expires"
+    ],
+    "answer": 0,
+    "explanation": "Well-designed agent loops include explicit termination conditions \u2014 goal completion signaled by the agent, a maximum step count, or a timeout \u2014 to avoid infinite loops, runaway costs, or unbounded tool-calling.",
+    "tags": [
+      "agentic-loops",
+      "termination"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "Human-in-the-loop (HITL) design for agents typically means:",
+    "code": null,
+    "options": [
+      "The agent pauses for explicit human review/approval before taking high-stakes or irreversible actions (e.g. sending money, deleting data)",
+      "A human writes every single response instead of the model",
+      "Humans are only involved during initial model training and never afterward",
+      "The agent ignores all human input once deployed"
+    ],
+    "answer": 0,
+    "explanation": "Human-in-the-loop patterns insert a checkpoint where a human reviews or approves an agent's proposed action before it executes \u2014 especially valuable for irreversible, costly, or high-risk operations \u2014 rather than letting the agent act fully autonomously.",
+    "tags": [
+      "human-in-the-loop",
+      "safety"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "Why is it risky to give an autonomous agent unrestricted access to destructive tools (e.g. `rm -rf`, arbitrary shell execution) without safeguards?",
+    "code": null,
+    "options": [
+      "It isn't risky at all, since LLMs never make mistakes",
+      "It would violate the model's context window limit",
+      "Destructive tools always run slower than safe tools",
+      "The agent could misinterpret a goal or hallucinate an incorrect plan and execute an irreversible, harmful action with no opportunity for review"
+    ],
+    "answer": 3,
+    "explanation": "Because agents can misinterpret instructions or reason incorrectly, giving them unchecked access to irreversible or destructive actions risks real harm \u2014 this is why scoping tool permissions, sandboxing, and human approval gates are standard mitigations.",
+    "tags": [
+      "safety",
+      "tool-use"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "In an agent's planning step, decomposing a high-level goal into an ordered list of sub-tasks before execution is generally beneficial because it:",
+    "code": null,
+    "options": [
+      "Guarantees zero errors during execution",
+      "Removes the need for any tool calls",
+      "Makes the agent's intended approach inspectable and gives natural checkpoints for validation, retries, or human review at each sub-task",
+      "Is required by every agent framework's license agreement"
+    ],
+    "answer": 2,
+    "explanation": "Breaking a goal into explicit sub-tasks makes the agent's plan legible \u2014 it can be reviewed, validated step by step, retried on failure, or interrupted \u2014 improving debuggability and control compared to attempting the whole goal in one opaque step.",
+    "tags": [
+      "planning",
+      "agents"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "What is a common failure mode of agents that rely heavily on chained tool calls without validation?",
+    "code": null,
+    "options": [
+      "They run too quickly and complete tasks before the user can review anything",
+      "They automatically self-correct every error with no configuration needed",
+      "An error or hallucinated result early in the chain propagates unnoticed into later steps, compounding into a wrong final outcome",
+      "They cannot call more than one tool ever, by design"
+    ],
+    "answer": 2,
+    "explanation": "Without validation between steps, an early mistake (a bad tool result, a hallucinated fact) can silently feed into subsequent steps, compounding into an incorrect final result \u2014 which is why intermediate checks or verification steps are important in longer chains.",
+    "tags": [
+      "failure-modes",
+      "agents"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Why might an orchestration framework use a supervisor/manager agent to coordinate several worker agents rather than letting workers communicate freely with each other?",
+    "code": null,
+    "options": [
+      "A supervisor can centralize task assignment, aggregate results, and enforce overall goal alignment, reducing chaotic or redundant communication between many peer agents",
+      "Free-form communication between agents is technically impossible in any framework",
+      "Supervisors eliminate the need for any tools",
+      "It guarantees the system will never make a mistake"
+    ],
+    "answer": 0,
+    "explanation": "A supervisor/manager pattern centralizes coordination \u2014 assigning sub-tasks, collecting results, and keeping the overall goal in view \u2014 which tends to be more predictable and easier to control than an unstructured mesh of peer agents communicating freely.",
+    "tags": [
+      "orchestration",
+      "multi-agent"
+    ]
+  }
+]

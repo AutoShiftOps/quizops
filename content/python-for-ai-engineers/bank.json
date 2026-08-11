@@ -1,0 +1,11 @@
+{
+  "slug": "python-for-ai-engineers",
+  "name": "Python for AI Engineers",
+  "description": "Python patterns that actually matter when building AI applications. Async, type hints, dataclasses, API clients, error handling, and testing.",
+  "topic": "Python",
+  "emoji": "🐍",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

@@ -1,0 +1,255 @@
+[
+  {
+    "id": "q1",
+    "text": "What is the primary purpose of `async`/`await` in Python?",
+    "code": null,
+    "options": [
+      "To let a program efficiently wait on I/O-bound operations (like network requests) without blocking the entire thread, by cooperatively yielding control during awaits",
+      "To run CPU-bound code faster by using multiple CPU cores automatically",
+      "To permanently disable the Global Interpreter Lock (GIL)",
+      "To convert synchronous functions into compiled machine code"
+    ],
+    "answer": 0,
+    "explanation": "`async`/`await` enables cooperative concurrency for I/O-bound work \u2014 an `await` yields control back to the event loop while waiting (e.g. on a network call), letting other coroutines run instead of blocking the whole thread. It does not parallelize CPU-bound work across cores.",
+    "tags": [
+      "async",
+      "asyncio"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "Why can't you simply call an `async def` function like a normal function and expect its body to run immediately?",
+    "code": null,
+    "options": [
+      "Calling an async function raises a SyntaxError in all cases",
+      "Async functions can only be called from inside a class",
+      "Calling it returns a coroutine object; the function body only actually executes once that coroutine is awaited or scheduled on an event loop",
+      "Async functions execute their body immediately and identically to sync functions, with no difference at all"
+    ],
+    "answer": 2,
+    "explanation": "Calling an `async def` function doesn't run its body right away \u2014 it returns a coroutine object. The body only executes when that coroutine is awaited (e.g. via `await` or `asyncio.run()`), which schedules it on the event loop.",
+    "tags": [
+      "async",
+      "coroutines"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "What advantage does a Pydantic model offer over a plain `dataclass` when validating data coming from an external API (like an LLM's JSON output)?",
+    "code": null,
+    "options": [
+      "Pydantic models are always faster to instantiate than dataclasses in every scenario",
+      "Pydantic performs runtime type validation and coercion (raising clear errors on bad data), while a plain dataclass does not validate types at runtime by default",
+      "Dataclasses cannot have more than 3 fields",
+      "Pydantic models cannot be nested inside one another"
+    ],
+    "answer": 1,
+    "explanation": "Pydantic actively validates and coerces field values at runtime against declared types, raising descriptive errors on invalid input \u2014 useful for untrusted external data like API/LLM output. A plain `dataclass` only provides type *hints*; nothing enforces them at runtime.",
+    "tags": [
+      "pydantic",
+      "dataclasses"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "What is the key difference between a `TypedDict` and a Pydantic `BaseModel`?",
+    "code": null,
+    "options": [
+      "`TypedDict` is purely a static-typing construct (checked by tools like mypy, with zero runtime validation) describing a plain dict's shape, while Pydantic's `BaseModel` performs actual runtime validation and produces real class instances",
+      "They are identical in every respect",
+      "TypedDict instances can never be converted to JSON",
+      "Pydantic BaseModel is part of the Python standard library, while TypedDict requires a third-party package"
+    ],
+    "answer": 0,
+    "explanation": "`TypedDict` (from `typing`) only affects static type checking \u2014 at runtime it's just a regular dict with no validation. Pydantic's `BaseModel` actually validates and coerces data at runtime and creates real model instances with attribute access, not just typed dicts.",
+    "tags": [
+      "typeddict",
+      "pydantic",
+      "type-hints"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "What does a Python `with` statement (context manager) primarily guarantee?",
+    "code": null,
+    "options": [
+      "That the code inside will run faster than equivalent code without `with`",
+      "That all variables inside the block are automatically deleted from memory immediately",
+      "That the block's code will run in a separate thread",
+      "That a defined setup action runs on entry and a defined cleanup/teardown action runs on exit \u2014 even if an exception occurs inside the block"
+    ],
+    "answer": 3,
+    "explanation": "A context manager's `__enter__`/`__exit__` (or `async` equivalents) guarantee setup and cleanup around a block of code, with cleanup running even if an exception is raised inside \u2014 commonly used for resources like files, network connections, or API clients that must be closed properly.",
+    "tags": [
+      "context-managers"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "What makes a function containing `yield` a generator function, and what's the benefit of using one to process a large dataset?",
+    "code": null,
+    "options": [
+      "`yield` turns the function into a generator that produces values lazily, one at a time, avoiding the need to hold the entire dataset in memory at once",
+      "`yield` makes the function run in parallel across CPU cores",
+      "Generators are only usable inside async functions",
+      "Using `yield` doubles the function's execution speed automatically"
+    ],
+    "answer": 0,
+    "explanation": "A function with `yield` becomes a generator: calling it returns an iterator that produces values lazily on each `next()` call, rather than computing and storing everything upfront \u2014 ideal for processing large or streaming datasets without high memory overhead.",
+    "tags": [
+      "generators",
+      "yield"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "Which of these is generally the most \"Pythonic\" and readable way to build a list of transformed values from an existing iterable?",
+    "code": null,
+    "options": [
+      "Manually appending in a for-loop is always strictly forbidden by PEP 8",
+      "A list comprehension, e.g. `[transform(x) for x in items if condition(x)]`, when the logic is simple enough to stay readable",
+      "Using `eval()` to dynamically construct the list from a string",
+      "Recursively calling the function on itself with no base case"
+    ],
+    "answer": 1,
+    "explanation": "List comprehensions are the idiomatic, generally more readable and often faster way to build a transformed/filtered list from an iterable in Python, as long as the logic inside stays simple enough not to hurt readability.",
+    "tags": [
+      "list-comprehensions"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "Why is `python-dotenv` (loading a `.env` file into environment variables) commonly used in local AI application development?",
+    "code": null,
+    "options": [
+      "It permanently encrypts API keys so they can be safely committed to git",
+      "It lets developers keep secrets like API keys out of source code by loading them from a local, gitignored `.env` file into `os.environ` at runtime",
+      "It replaces the need for any API client library",
+      "It is required by every cloud provider's SDK to function at all"
+    ],
+    "answer": 1,
+    "explanation": "`python-dotenv` reads key-value pairs from a local `.env` file (which should be gitignored) and loads them into the process's environment variables, letting code read secrets via `os.environ` without hardcoding them or committing them to source control.",
+    "tags": [
+      "environment-variables",
+      "dotenv"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "What is a key practical advantage of `httpx` (with its async client) over the synchronous `requests` library when building an AI application that calls multiple external APIs?",
+    "code": null,
+    "options": [
+      "`httpx` and `requests` are functionally identical with no differences",
+      "`requests` cannot make HTTP POST requests at all",
+      "`httpx` supports async/await natively, allowing many API calls (e.g. to an LLM provider and other services) to be made concurrently without blocking, while `requests` is purely synchronous",
+      "`httpx` does not support HTTPS, only HTTP"
+    ],
+    "answer": 2,
+    "explanation": "`httpx` provides both sync and async clients, and its async client lets an application issue multiple HTTP calls concurrently using `async`/`await` \u2014 valuable when fanning out to several APIs (LLM providers, databases, tools) without blocking. `requests` only offers a synchronous API.",
+    "tags": [
+      "httpx",
+      "requests",
+      "http-clients"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "When calling an external LLM API that can intermittently fail (timeouts, 5xx errors), what is the recommended error-handling pattern?",
+    "code": null,
+    "options": [
+      "Catch the specific expected exceptions (timeouts, rate limits, transient server errors) and retry with backoff where appropriate, while letting genuinely unexpected errors surface with useful context",
+      "Let any exception propagate uncaught and crash the whole application",
+      "Wrap the entire application in a single bare `except: pass` to silently ignore all errors",
+      "Never handle errors from third-party APIs, since they are guaranteed to always succeed"
+    ],
+    "answer": 0,
+    "explanation": "Robust API-calling code catches the specific transient failure modes it expects (timeouts, rate limits, 5xx) and retries them appropriately, while avoiding broad bare `except` clauses that silently swallow bugs \u2014 genuinely unexpected errors should still surface with enough context to debug.",
+    "tags": [
+      "error-handling",
+      "api-clients"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "Why are bare `except:` (or overly broad `except Exception:`) clauses generally discouraged in production code?",
+    "code": null,
+    "options": [
+      "They make code run measurably slower in every case",
+      "They are only a problem when used inside a class definition",
+      "Python does not actually allow bare except clauses; it's a syntax error",
+      "They can silently swallow programming errors (like a typo causing an AttributeError) alongside the specific failure you intended to handle, making bugs much harder to detect and debug"
+    ],
+    "answer": 3,
+    "explanation": "A bare or overly broad except clause catches everything, including unrelated bugs (typos, wrong attribute names, logic errors) that should have crashed loudly and been fixed \u2014 hiding them instead makes the codebase harder to trust and debug over time.",
+    "tags": [
+      "error-handling",
+      "best-practices"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "What makes AI application code more \"testable\" when it depends on an external LLM API?",
+    "code": null,
+    "options": [
+      "Calling the real, live LLM API directly inside every unit test with no abstraction",
+      "Avoiding tests entirely for any code that calls an LLM",
+      "Abstracting the API call behind an interface/function that can be mocked or stubbed in tests, so test behavior doesn't depend on real network calls, live model output, or API cost",
+      "Hardcoding expected LLM responses directly into the production code path"
+    ],
+    "answer": 2,
+    "explanation": "Wrapping the external API call behind a clear interface (a function/class you can mock or stub) lets unit tests exercise your application logic deterministically and cheaply, without depending on real network calls, nondeterministic model output, or incurring API costs on every test run.",
+    "tags": [
+      "testing",
+      "mocking"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "What is the benefit of using `dataclasses.dataclass` for a simple internal data structure compared to a plain class with a hand-written `__init__`?",
+    "code": null,
+    "options": [
+      "Dataclasses cannot have any methods beyond the auto-generated ones",
+      "Dataclasses are always faster at runtime than any hand-written class",
+      "Dataclasses automatically generate boilerplate like `__init__`, `__repr__`, and `__eq__` from the field declarations, reducing repetitive code for simple data-holding classes",
+      "Dataclasses automatically validate types at runtime like Pydantic does"
+    ],
+    "answer": 2,
+    "explanation": "The `@dataclass` decorator auto-generates common boilerplate methods (`__init__`, `__repr__`, `__eq__`, etc.) from the declared fields, cutting down repetitive code for straightforward data-holding classes \u2014 but unlike Pydantic, it does not perform runtime type validation by default.",
+    "tags": [
+      "dataclasses"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "In an async application, what happens if you call a blocking, synchronous function (e.g. a slow synchronous file read) directly inside an `async def` coroutine without offloading it?",
+    "code": null,
+    "options": [
+      "It runs seamlessly in parallel with no effect on other coroutines",
+      "It blocks the entire event loop for its duration, preventing any other coroutine from making progress until it finishes \u2014 defeating the purpose of using async in the first place",
+      "Python automatically converts it into an async function at runtime",
+      "It raises an immediate SyntaxError"
+    ],
+    "answer": 1,
+    "explanation": "A blocking synchronous call inside a coroutine runs on the single event loop thread and doesn't yield control, so it stalls every other coroutine until it completes \u2014 which is why CPU-bound or blocking I/O work is typically offloaded (e.g. via a thread pool executor) instead.",
+    "tags": [
+      "async",
+      "event-loop"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Why are type hints (e.g. `def summarize(text: str) -> str:`) valuable in an AI application codebase even though Python doesn't enforce them at runtime?",
+    "code": null,
+    "options": [
+      "They have zero practical value since Python ignores them completely",
+      "They are required for a function to be callable at all",
+      "They automatically add runtime validation identical to Pydantic",
+      "They let static type checkers (like mypy) and IDEs catch type-related mistakes before runtime, and they document expected input/output shapes for other developers reading the code"
+    ],
+    "answer": 3,
+    "explanation": "Although Python doesn't enforce type hints at runtime on its own, they enable static analysis tools (mypy, IDE type checkers) to catch mistakes before the code ever runs, and they serve as clear, checkable documentation of a function's expected inputs and outputs for other developers.",
+    "tags": [
+      "type-hints"
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "slug": "ai-agents-and-orchestration",
+  "name": "AI Agents & Orchestration",
+  "description": "Build autonomous AI agents. Covers ReAct patterns, tool use, memory, multi-agent systems, and frameworks like LangChain and CrewAI.",
+  "topic": "AI",
+  "emoji": "🕵️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

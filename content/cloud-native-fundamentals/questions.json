@@ -1,0 +1,258 @@
+[
+  {
+    "id": "q1",
+    "text": "According to the 12-factor app methodology, how should configuration (e.g. database URLs, API keys) be stored?",
+    "code": null,
+    "options": [
+      "Hardcoded directly into the application's source code for simplicity",
+      "Configuration should be identical and unchangeable across every environment",
+      "In a config file that is always committed to the same repository as the code",
+      "In environment variables, strictly separated from the code, so the same build can be deployed across different environments (dev/staging/prod) with different config"
+    ],
+    "answer": 3,
+    "explanation": "The 12-factor app methodology's \"Config\" factor mandates storing configuration in environment variables, strictly separate from code, so the exact same build artifact can run in different environments by varying only its environment configuration.",
+    "tags": [
+      "12-factor-app",
+      "configuration"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "What is the fundamental difference between a container and a virtual machine (VM)?",
+    "code": null,
+    "options": [
+      "A container shares the host machine's OS kernel and isolates processes at the OS level, while a VM virtualizes hardware and runs a full separate guest OS \u2014 making containers generally lighter-weight and faster to start",
+      "There is no real difference; the terms are interchangeable",
+      "VMs always start faster than containers in every case",
+      "Containers require dedicated physical hardware per instance, while VMs do not"
+    ],
+    "answer": 0,
+    "explanation": "Containers share the host's kernel and isolate at the process/namespace level, resulting in much lower overhead and faster startup than VMs, which each run a complete separate guest operating system on top of virtualized hardware.",
+    "tags": [
+      "containers",
+      "virtual-machines"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "What is a key trade-off of a microservices architecture compared to a monolith?",
+    "code": null,
+    "options": [
+      "Microservices have no trade-offs and are strictly better in every situation",
+      "Monoliths always require more servers than an equivalent microservices architecture",
+      "A monolith cannot be scaled at all, while microservices scale infinitely with zero effort",
+      "Microservices allow independent deployment, scaling, and technology choices per service, but introduce additional operational complexity \u2014 network calls between services, distributed debugging, and more infrastructure to manage"
+    ],
+    "answer": 3,
+    "explanation": "Microservices offer independent deployability, scaling, and technology flexibility per service, but that comes at the cost of increased operational complexity: network latency and failure modes between services, distributed tracing/debugging, and more infrastructure to provision and monitor than a single monolithic deployable.",
+    "tags": [
+      "microservices",
+      "monolith",
+      "tradeoffs"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "What core problem does a service mesh (e.g. Istio, Linkerd) address in a microservices architecture?",
+    "code": null,
+    "options": [
+      "It replaces the need for containers entirely",
+      "It is used exclusively for storing application secrets",
+      "It provides a dedicated infrastructure layer for service-to-service communication concerns \u2014 like traffic routing, retries, mTLS encryption, and observability \u2014 typically via sidecar proxies, without changing application code",
+      "It automatically writes your application's business logic"
+    ],
+    "answer": 2,
+    "explanation": "A service mesh handles cross-cutting service-to-service communication concerns (routing, retries, load balancing, mutual TLS, observability) via a dedicated infrastructure layer \u2014 often sidecar proxies \u2014 so individual services don't need to reimplement this logic themselves.",
+    "tags": [
+      "service-mesh"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "In observability, what are the three commonly cited \"pillars\" alongside metrics?",
+    "code": null,
+    "options": [
+      "Backups, snapshots, and archives",
+      "Logs and traces, together with metrics, giving complementary views: discrete events (logs), request flow across services (traces), and aggregated numerical trends (metrics)",
+      "Firewalls, load balancers, and DNS records",
+      "Unit tests, integration tests, and end-to-end tests"
+    ],
+    "answer": 1,
+    "explanation": "The commonly cited observability pillars are metrics (aggregated numerical measurements over time), logs (discrete, timestamped event records), and traces (the path of a single request as it flows across distributed services) \u2014 together giving a fuller picture than any one alone.",
+    "tags": [
+      "observability",
+      "logs",
+      "traces",
+      "metrics"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "What is the difference between a liveness-style health check and graceful shutdown handling in a cloud-native service?",
+    "code": null,
+    "options": [
+      "They are the same mechanism, just triggered at different times with no functional distinction",
+      "A health check reports whether a running instance is currently healthy, while graceful shutdown handling ensures the app finishes in-flight requests and cleans up resources properly when told to stop, instead of dropping requests abruptly",
+      "Graceful shutdown is only relevant for databases, never for application services",
+      "Health checks are only run once, at application startup, and never again"
+    ],
+    "answer": 1,
+    "explanation": "Health checks continuously report whether a running instance is fit to serve traffic. Graceful shutdown is a separate concern: when an instance is told to stop (e.g. during a deploy or scale-down), it should stop accepting new requests, finish in-flight ones, and clean up connections rather than terminating abruptly.",
+    "tags": [
+      "health-checks",
+      "graceful-shutdown"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "What is the core difference between a blue-green deployment and a canary deployment?",
+    "code": null,
+    "options": [
+      "They are identical strategies with different marketing names",
+      "Canary deployments always require twice the infrastructure of blue-green",
+      "Blue-green switches all traffic at once from the old (blue) environment to a fully deployed new (green) one, while canary gradually shifts a small, increasing percentage of traffic to the new version to catch issues early",
+      "Blue-green deployments cannot be rolled back once switched"
+    ],
+    "answer": 2,
+    "explanation": "Blue-green deployment runs two full environments and cuts traffic over all at once from old to new, enabling a fast rollback by switching back. Canary deployment instead gradually routes an increasing slice of traffic to the new version, limiting blast radius if something's wrong before a full rollout.",
+    "tags": [
+      "blue-green-deployment",
+      "canary-deployment"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "What is meant by \"immutable infrastructure\"?",
+    "code": null,
+    "options": [
+      "Infrastructure that is manually configured via SSH after every deployment",
+      "Infrastructure that can never be deleted under any circumstances",
+      "Infrastructure that, once provisioned, is never patched or updated in place \u2014 instead, changes are made by building and deploying a new instance/image and replacing the old one entirely",
+      "A type of storage that data cannot ever be written to"
+    ],
+    "answer": 2,
+    "explanation": "Immutable infrastructure means running instances (servers, containers) are never modified in place after creation. Instead, any change results in building a new image/instance and replacing the old one \u2014 avoiding configuration drift and making deployments more predictable and reproducible.",
+    "tags": [
+      "immutable-infrastructure"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "Which storage approach is generally appropriate for a stateless, horizontally-scaled cloud-native application's persistent data?",
+    "code": null,
+    "options": [
+      "Storing all persistent data on the local disk of each application instance",
+      "Each instance should keep its own private, unsynchronized copy of all data",
+      "Persistent data should never be stored anywhere in a cloud-native system",
+      "Externalizing persistent state to a dedicated data service (managed database, object storage, cache) that all instances share, keeping the application instances themselves stateless and interchangeable"
+    ],
+    "answer": 3,
+    "explanation": "Cloud-native apps typically keep application instances themselves stateless and interchangeable, externalizing actual persistent state to shared backing services (managed databases, object storage, caches) so any instance can be scaled, replaced, or restarted without losing data.",
+    "tags": [
+      "cloud-native-storage",
+      "statelessness"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "What is the key distinction between serverless (e.g. FaaS like AWS Lambda) and traditional containerized deployments?",
+    "code": null,
+    "options": [
+      "Serverless functions abstract away server/instance management entirely \u2014 the platform handles provisioning and scaling per invocation, often scaling to zero \u2014 while containerized deployments require you to manage running instances/replicas continuously",
+      "Serverless means there are no servers involved anywhere in the entire system",
+      "Containers can only run one request at a time, while serverless can run unlimited concurrent requests with no configuration",
+      "Serverless functions cannot access any databases or external APIs"
+    ],
+    "answer": 0,
+    "explanation": "\"Serverless\" doesn't mean no servers exist \u2014 it means the platform fully manages provisioning, scaling (including to zero when idle), and infrastructure per invocation, whereas containerized deployments require you to keep instances/replicas running and manage their scaling yourself (or via an orchestrator).",
+    "tags": [
+      "serverless",
+      "containers"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "Why do 12-factor apps recommend treating logs as event streams written to stdout/stderr, rather than the application managing its own log files?",
+    "code": null,
+    "options": [
+      "It decouples the application from log storage/routing concerns, letting the execution environment (e.g. a container platform's logging driver) capture, aggregate, and route logs centrally without the app needing to know where logs end up",
+      "Writing to stdout/stderr is slower and should be avoided",
+      "It is required because file systems cannot be used in the cloud at all",
+      "Logs written to stdout are automatically encrypted, unlike file-based logs"
+    ],
+    "answer": 0,
+    "explanation": "By writing logs as an unstructured stream to stdout/stderr, the application stays agnostic to how logs are stored or routed \u2014 the execution environment (container runtime, log aggregator) takes responsibility for capturing and centralizing them, which is simpler and more portable across environments.",
+    "tags": [
+      "12-factor-app",
+      "logging"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "What does horizontal scaling mean, as opposed to vertical scaling?",
+    "code": null,
+    "options": [
+      "Horizontal scaling means adding more instances/replicas of an application to handle load, while vertical scaling means increasing the resources (CPU/memory) of a single existing instance",
+      "They are the same concept described two different ways",
+      "Vertical scaling means adding more instances, while horizontal scaling means upgrading a single instance's hardware",
+      "Horizontal scaling only applies to databases, never to application services"
+    ],
+    "answer": 0,
+    "explanation": "Horizontal scaling adds more instances/replicas running in parallel to share load, while vertical scaling increases the resources (CPU, memory) of a single existing instance. Cloud-native architectures generally favor horizontal scaling since it doesn't hit a single-machine resource ceiling.",
+    "tags": [
+      "horizontal-scaling",
+      "vertical-scaling"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "What does \"dev/prod parity,\" one of the 12 factors, advocate for?",
+    "code": null,
+    "options": [
+      "Developers should have full production access with no restrictions",
+      "Development and production environments should be as similar as possible (same backing services, dependency versions, deployment process) to avoid \"works on my machine\" bugs that only appear in production",
+      "Development and production should intentionally use completely different technology stacks",
+      "Production deployments should happen only once a year to minimize risk"
+    ],
+    "answer": 1,
+    "explanation": "Dev/prod parity advocates keeping development, staging, and production environments as similar as possible \u2014 same backing service versions, similar deployment processes \u2014 to catch environment-specific bugs early rather than discovering them only after deploying to production.",
+    "tags": [
+      "12-factor-app",
+      "dev-prod-parity"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "What is a distributed trace, in the context of observability for microservices?",
+    "code": null,
+    "options": [
+      "A single log line stored on one server",
+      "A backup snapshot of an entire database cluster",
+      "A record that follows a single request as it propagates across multiple services, capturing timing and causality for each hop \u2014 useful for diagnosing latency and failures in distributed systems",
+      "A static diagram of the system's architecture drawn by a developer"
+    ],
+    "answer": 2,
+    "explanation": "A distributed trace stitches together the individual spans (units of work) a single request generates as it passes through multiple services, showing timing, order, and causality across the whole call chain \u2014 critical for diagnosing where latency or errors originate in a microservices system.",
+    "tags": [
+      "distributed-tracing",
+      "observability"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Why is graceful handling of a dependency's failure (e.g. via circuit breakers or fallback behavior) important in a cloud-native, distributed system?",
+    "code": null,
+    "options": [
+      "It isn't important, since cloud-native dependencies never fail",
+      "Without it, a failing downstream dependency can cause cascading failures \u2014 retries piling up, threads/connections exhausted, latency spiking \u2014 dragging down otherwise healthy services that depend on it",
+      "Graceful failure handling is only relevant for the very first service in a request chain",
+      "Circuit breakers are used exclusively to save money on cloud bills, not for reliability"
+    ],
+    "answer": 1,
+    "explanation": "In a distributed system, an unprotected failing dependency can cause cascading failures \u2014 piling-up retries, exhausted connection pools, and rising latency \u2014 that spread to dependent services. Patterns like circuit breakers and fallbacks contain that blast radius instead of letting one failure take down the whole system.",
+    "tags": [
+      "resilience",
+      "circuit-breaker"
+    ]
+  }
+]

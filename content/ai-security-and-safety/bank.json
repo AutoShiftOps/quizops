@@ -1,0 +1,11 @@
+{
+  "slug": "ai-security-and-safety",
+  "name": "AI Security & Safety",
+  "description": "Secure AI applications against real threats. Prompt injection, jailbreaks, data poisoning, model security, and responsible AI deployment.",
+  "topic": "Security",
+  "emoji": "🛡️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

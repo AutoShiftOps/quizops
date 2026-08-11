@@ -1,0 +1,11 @@
+{
+  "slug": "cloud-native-fundamentals",
+  "name": "Cloud Native Fundamentals",
+  "description": "Build applications the cloud-native way. Containers, microservices, 12-factor app, observability, and modern deployment patterns.",
+  "topic": "Cloud",
+  "emoji": "☁️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

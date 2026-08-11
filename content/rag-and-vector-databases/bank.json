@@ -1,0 +1,11 @@
+{
+  "slug": "rag-and-vector-databases",
+  "name": "RAG & Vector Databases",
+  "description": "Retrieval-Augmented Generation from scratch. Embeddings, chunking strategies, vector stores, similarity search, and production RAG patterns.",
+  "topic": "AI",
+  "emoji": "🗄️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

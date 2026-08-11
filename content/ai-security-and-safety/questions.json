@@ -1,0 +1,253 @@
+[
+  {
+    "id": "q1",
+    "text": "What is a direct prompt injection attack?",
+    "code": null,
+    "options": [
+      "A method for improving the model's factual accuracy",
+      "A network-level attack that intercepts API traffic between the client and the LLM provider",
+      "An attacker directly supplies malicious instructions in their own input to the model, attempting to override the application's system prompt or intended behavior",
+      "A technique for compressing prompts to save on token costs"
+    ],
+    "answer": 2,
+    "explanation": "Direct prompt injection is when an attacker's own input to the model contains instructions crafted to override or subvert the application's intended system prompt and behavior \u2014 as opposed to indirect injection, where the malicious instructions arrive via third-party content the model processes.",
+    "tags": [
+      "prompt-injection"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "What distinguishes an indirect prompt injection attack from a direct one?",
+    "code": null,
+    "options": [
+      "There is no meaningful distinction between the two",
+      "Indirect attacks can only target image inputs, never text",
+      "In an indirect attack, the malicious instructions are hidden in third-party content the model processes (e.g. a webpage, email, or document fetched by the application) rather than typed directly by the attacker as the user",
+      "Indirect attacks require physical access to the server running the model"
+    ],
+    "answer": 2,
+    "explanation": "Indirect prompt injection hides malicious instructions inside content the application retrieves and feeds to the model \u2014 a web page, document, or email, for example \u2014 so the attack doesn't come from the user's own direct input but from data the model is told to process.",
+    "tags": [
+      "prompt-injection",
+      "indirect-injection"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "What is \"jailbreaking\" in the context of LLMs?",
+    "code": null,
+    "options": [
+      "A legitimate feature for unlocking additional model capabilities via a paid subscription",
+      "Crafting prompts specifically designed to bypass a model's safety guidelines/alignment training, getting it to produce content or behavior it was trained to refuse",
+      "The process of fine-tuning a model on new data",
+      "A technique for reducing an LLM's token usage"
+    ],
+    "answer": 1,
+    "explanation": "Jailbreaking refers to adversarial prompting techniques (like role-play framing, hypothetical scenarios, or encoding tricks) aimed at circumventing a model's safety training so it produces outputs it would normally refuse to generate.",
+    "tags": [
+      "jailbreaking"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "Why is a system prompt alone generally NOT considered a fully reliable security boundary against a determined, adversarial user?",
+    "code": null,
+    "options": [
+      "System prompts are cryptographically encrypted and therefore already perfectly secure",
+      "System prompts have no effect on model behavior at all",
+      "System prompts are always publicly visible to every user by default",
+      "Since the system prompt and user input are both processed as natural language by the same model, a sufficiently crafted adversarial input can sometimes get the model to disregard or override its instructions \u2014 so security-critical enforcement should not rely on the prompt alone"
+    ],
+    "answer": 3,
+    "explanation": "Because both the system prompt and user input are natural-language text processed together by the model, there's no hard technical barrier preventing crafted input from influencing or overriding instructions \u2014 so genuinely security-critical constraints (like authorization) need enforcement outside the model, not just via prompt wording.",
+    "tags": [
+      "prompt-injection",
+      "security-boundaries"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "What is data poisoning, in the context of training machine learning models?",
+    "code": null,
+    "options": [
+      "A technique for cleaning noisy data before training",
+      "A normal part of standard data augmentation with no security implications",
+      "A method for compressing training datasets to save storage",
+      "Deliberately injecting malicious or misleading examples into a model's training (or fine-tuning) data to manipulate its future behavior"
+    ],
+    "answer": 3,
+    "explanation": "Data poisoning is an attack where malicious or misleading examples are deliberately introduced into training or fine-tuning data, aiming to bias the resulting model's behavior \u2014 for example, causing it to mishandle certain inputs or embed hidden backdoors.",
+    "tags": [
+      "data-poisoning"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "What does PII leakage through an LLM typically refer to?",
+    "code": null,
+    "options": [
+      "A model inadvertently revealing personally identifiable information \u2014 either memorized from training data or present in the current context/conversation \u2014 in its output to an unauthorized party",
+      "The model running out of available memory during inference",
+      "A network protocol used to encrypt API traffic",
+      "The process of a model correctly redacting sensitive data on request"
+    ],
+    "answer": 0,
+    "explanation": "PII leakage occurs when a model exposes personally identifiable information in its responses \u2014 whether memorized from training data or present in the current session's context \u2014 to a user who shouldn't have access to it, a real privacy risk for LLM-backed applications.",
+    "tags": [
+      "pii-leakage",
+      "privacy"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "Why is output validation/sanitization important when an LLM's response is inserted directly into a web page or executed as code?",
+    "code": null,
+    "options": [
+      "It isn't important, since LLM output is always inherently safe to render or execute as-is",
+      "Output validation only matters for input, never for output",
+      "Unvalidated model output could contain injected script (leading to XSS) or unsafe commands, so it should be treated as untrusted input and sanitized/escaped before rendering or execution, just like any other untrusted data",
+      "Sanitizing LLM output always breaks its formatting and should be avoided"
+    ],
+    "answer": 2,
+    "explanation": "Because an LLM can be manipulated (via prompt injection or simply produce unexpected content) into generating malicious markup or commands, its output should be treated as untrusted \u2014 sanitized/escaped before being rendered in a browser or executed \u2014 just like any other externally sourced data.",
+    "tags": [
+      "output-validation",
+      "xss"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "Why is rate limiting an important control for a public-facing AI API endpoint?",
+    "code": null,
+    "options": [
+      "It limits abuse such as scraping, denial-of-wallet attacks (running up API costs), and brute-force prompt injection attempts by capping how many requests a client can make in a given time window",
+      "It has no security benefit and exists purely to annoy legitimate users",
+      "Rate limiting is only relevant for database queries, never for AI APIs",
+      "It automatically fixes all prompt injection vulnerabilities"
+    ],
+    "answer": 0,
+    "explanation": "Rate limiting caps how many requests a given client can make in a time window, mitigating abuse patterns like scraping, automated jailbreak attempts, and \"denial-of-wallet\" attacks where an attacker runs up the API bill by hammering an expensive LLM endpoint.",
+    "tags": [
+      "rate-limiting",
+      "api-security"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "What is the purpose of a model card?",
+    "code": null,
+    "options": [
+      "A structured document describing a model's intended use, training data characteristics, known limitations, and evaluation results, promoting transparency for downstream users",
+      "A physical ID card required to access GPU data centers",
+      "A billing statement summarizing API usage costs",
+      "A file format used exclusively for storing model weights"
+    ],
+    "answer": 0,
+    "explanation": "A model card is a standardized, transparent summary of a model \u2014 its intended use cases, training data at a high level, evaluated performance/limitations, and known risks \u2014 helping downstream developers and users understand what a model is (and isn't) suited for.",
+    "tags": [
+      "model-cards",
+      "transparency"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "What does the OWASP Top 10 for LLM Applications aim to catalog?",
+    "code": null,
+    "options": [
+      "The ten fastest LLM inference frameworks available",
+      "The ten most expensive LLM APIs on the market by token price",
+      "The most critical, commonly seen security vulnerabilities specific to LLM-powered applications (such as prompt injection, insecure output handling, and training data poisoning), to guide developers on what to defend against",
+      "A ranked list of the most accurate LLMs on standard benchmarks"
+    ],
+    "answer": 2,
+    "explanation": "The OWASP Top 10 for LLM Applications documents the most critical, widely observed security risks specific to LLM-integrated applications \u2014 like prompt injection, insecure output handling, and training data poisoning \u2014 giving developers a structured checklist of what to defend against.",
+    "tags": [
+      "owasp",
+      "llm-security"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "Which of these best reflects a core responsible AI principle around transparency?",
+    "code": null,
+    "options": [
+      "Deliberately hiding from users that they are interacting with an AI system whenever possible",
+      "Being clear with users about when they're interacting with an AI system, what its known limitations are, and how their data is used",
+      "Refusing to document any of a model's limitations to avoid legal liability",
+      "Transparency principles only apply to open-source models, never to commercial ones"
+    ],
+    "answer": 1,
+    "explanation": "A core responsible AI principle is being clear and honest with users about when they're interacting with an AI, its known limitations, and how their data is handled \u2014 enabling informed trust rather than obscuring the system's nature or shortcomings.",
+    "tags": [
+      "responsible-ai",
+      "transparency"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "Why should sensitive user data (like article text submitted for AI processing) generally NOT be retained indefinitely by an application after it's no longer needed?",
+    "code": null,
+    "options": [
+      "Retention duration has no bearing on privacy or security risk",
+      "Deleting data always makes an application run slower",
+      "Indefinite retention is required by every AI provider's terms of service",
+      "Minimizing data retention reduces the impact of a potential future data breach and aligns with data minimization principles common in privacy regulations and security best practice"
+    ],
+    "answer": 3,
+    "explanation": "Data minimization \u2014 retaining sensitive data only as long as necessary \u2014 limits the potential damage of a future breach and reflects both security best practice and common privacy regulatory expectations, rather than accumulating an ever-growing pool of sensitive data to protect.",
+    "tags": [
+      "data-minimization",
+      "privacy"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "What is the first recommended step in a well-defined AI incident response process after detecting a serious issue (e.g. the model leaking sensitive data)?",
+    "code": null,
+    "options": [
+      "Immediately delete all logs related to the incident to reduce liability",
+      "Contain the issue (e.g. disable the affected feature/endpoint) and begin gathering facts about scope and impact, before deciding on further remediation and disclosure steps",
+      "Wait several months to see if anyone notices before taking any action",
+      "Publicly announce the incident on social media before any internal investigation"
+    ],
+    "answer": 1,
+    "explanation": "A sound incident response process starts with containment \u2014 stopping ongoing harm, such as disabling an affected feature \u2014 and fact-gathering about scope and impact, which then informs appropriate remediation and any required disclosure, rather than skipping straight to public statements or, worse, destroying evidence.",
+    "tags": [
+      "incident-response"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "Which mitigation most directly reduces the risk of a jailbreak-style prompt tricking a model into revealing a hardcoded secret embedded in the system prompt?",
+    "code": null,
+    "options": [
+      "Never placing genuinely sensitive secrets (API keys, credentials) inside the system prompt or any text visible to the model in the first place \u2014 treat the prompt as something a determined user might eventually see",
+      "Increasing the model's temperature setting",
+      "Making the system prompt longer so it's harder to read",
+      "Disabling logging entirely so the leak can't be traced"
+    ],
+    "answer": 0,
+    "explanation": "The most reliable mitigation isn't a prompting trick \u2014 it's simply never putting genuinely sensitive secrets where the model (and therefore, potentially, a sufficiently adversarial user) can access them. Secrets belong in secure backend configuration, not in text the model processes.",
+    "tags": [
+      "prompt-injection",
+      "secrets-management"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Why is human review important for high-stakes decisions an AI system assists with (e.g. content moderation bans, financial approvals)?",
+    "code": null,
+    "options": [
+      "It isn't important \u2014 AI systems are always more accurate than humans on every task",
+      "AI models can make confident-sounding but incorrect judgments, and human review provides a check against wrongful high-impact decisions, along with an appeals/accountability path",
+      "Human review is only a legal formality with no actual risk-reduction benefit",
+      "Human review should replace AI entirely, removing any role for automation"
+    ],
+    "answer": 1,
+    "explanation": "AI systems can produce confident but incorrect judgments, and for high-stakes decisions \u2014 bans, financial approvals, and similar \u2014 human review provides a meaningful check against wrongful outcomes and an accountable path for appeal, rather than fully automating decisions with real consequences for people.",
+    "tags": [
+      "responsible-ai",
+      "human-in-the-loop"
+    ]
+  }
+]

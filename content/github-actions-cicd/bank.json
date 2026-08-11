@@ -1,0 +1,11 @@
+{
+  "slug": "github-actions-cicd",
+  "name": "GitHub Actions & CI/CD",
+  "description": "Automate everything with GitHub Actions. Workflows, jobs, steps, secrets, environments, matrix builds, and real-world CI/CD pipelines.",
+  "topic": "DevOps",
+  "emoji": "⚡",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

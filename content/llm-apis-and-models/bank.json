@@ -1,0 +1,11 @@
+{
+  "slug": "llm-apis-and-models",
+  "name": "LLM APIs & Models",
+  "description": "Navigate the LLM landscape — OpenAI, Anthropic, Google, and open source models. API usage, token costs, model selection, and rate limits.",
+  "topic": "AI",
+  "emoji": "🤖",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

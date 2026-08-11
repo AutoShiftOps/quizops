@@ -1,0 +1,255 @@
+[
+  {
+    "id": "q1",
+    "text": "What is the smallest deployable unit in Kubernetes?",
+    "code": null,
+    "options": [
+      "A Deployment",
+      "A Pod",
+      "A Node",
+      "A Container image"
+    ],
+    "answer": 1,
+    "explanation": "A Pod is the smallest deployable unit in Kubernetes \u2014 it wraps one or more tightly coupled containers that share network and storage, scheduled together onto the same node.",
+    "tags": [
+      "pods",
+      "fundamentals"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "What is the key difference between a Deployment and a StatefulSet?",
+    "code": null,
+    "options": [
+      "There is no difference; they are interchangeable in every use case",
+      "A Deployment manages stateless, interchangeable Pod replicas, while a StatefulSet provides stable, unique network identities and persistent storage per Pod \u2014 suited for stateful applications like databases",
+      "StatefulSets cannot be scaled, while Deployments can",
+      "Deployments always use more resources than StatefulSets"
+    ],
+    "answer": 1,
+    "explanation": "Deployments manage a set of identical, interchangeable Pods ideal for stateless workloads. StatefulSets give each Pod a stable, unique identity (hostname, storage) that persists across rescheduling \u2014 necessary for stateful workloads like databases or clustered systems.",
+    "tags": [
+      "deployments",
+      "statefulsets"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "What does a ClusterIP Service provide?",
+    "code": null,
+    "options": [
+      "Direct public internet access to the Pods with no additional configuration",
+      "A stable internal IP and DNS name for accessing a set of Pods from within the cluster, without exposing them externally",
+      "A fixed external port on every node in the cluster",
+      "Automatic TLS certificates for the Pods"
+    ],
+    "answer": 1,
+    "explanation": "ClusterIP is the default Service type \u2014 it exposes the Service on a stable internal-only IP/DNS name reachable from within the cluster, providing consistent access to a dynamic set of backing Pods without external exposure.",
+    "tags": [
+      "services",
+      "clusterip"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "What does a NodePort Service do differently from ClusterIP?",
+    "code": null,
+    "options": [
+      "It automatically provisions a cloud load balancer with a single external IP",
+      "It removes internal cluster access entirely",
+      "It opens a static port on every node's IP, making the Service reachable from outside the cluster via <NodeIP>:<NodePort>, in addition to the internal ClusterIP access",
+      "It only works for Pods running on the control plane node"
+    ],
+    "answer": 2,
+    "explanation": "NodePort opens the same static port on every node in the cluster, routing traffic on that port to the Service \u2014 making it reachable externally via any node's IP and that port, on top of the ClusterIP it still gets internally.",
+    "tags": [
+      "services",
+      "nodeport"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "What is the purpose of an Ingress resource combined with an Ingress controller?",
+    "code": null,
+    "options": [
+      "To provide HTTP/HTTPS routing rules (host- and path-based) that direct external traffic to different internal Services, often with TLS termination \u2014 the controller is the component that actually implements the routing",
+      "To replace the need for any Services in the cluster",
+      "To store persistent volume claims",
+      "To schedule Pods onto specific nodes"
+    ],
+    "answer": 0,
+    "explanation": "An Ingress resource declares HTTP routing rules (by hostname/path) to internal Services, and an Ingress controller (like NGINX or Traefik) actually implements that routing, typically also handling TLS termination \u2014 giving a single external entry point for many Services.",
+    "tags": [
+      "ingress"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "What is the fundamental difference between a ConfigMap and a Secret in Kubernetes?",
+    "code": null,
+    "options": [
+      "ConfigMaps store non-sensitive configuration data, while Secrets are intended for sensitive data (e.g. passwords, tokens) and are base64-encoded (not encrypted by default) with tighter access controls",
+      "ConfigMaps and Secrets are functionally identical, just named differently",
+      "Secrets can only be used by the control plane, never by application Pods",
+      "ConfigMaps can only store a single key-value pair per resource"
+    ],
+    "answer": 0,
+    "explanation": "ConfigMaps hold non-sensitive configuration values, while Secrets are meant for sensitive data and are base64-encoded (which is encoding, not encryption, by default) with RBAC and access patterns intended to restrict who/what can read them \u2014 encryption at rest requires additional configuration.",
+    "tags": [
+      "configmaps",
+      "secrets"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "What do CPU/memory `requests` and `limits` on a Pod's containers control?",
+    "code": null,
+    "options": [
+      "Limits are always ignored by the Kubernetes scheduler",
+      "Requests and limits are purely cosmetic and have no effect on scheduling or runtime behavior",
+      "Requests are the guaranteed minimum resources the scheduler reserves for the container; limits are the maximum the container is allowed to use before being throttled (CPU) or OOM-killed (memory)",
+      "Requests set the maximum, and limits set the minimum"
+    ],
+    "answer": 2,
+    "explanation": "Requests inform the scheduler how much CPU/memory to reserve when placing the Pod on a node, while limits cap actual usage at runtime \u2014 a container exceeding its CPU limit gets throttled, and exceeding its memory limit typically gets OOM-killed.",
+    "tags": [
+      "resource-requests",
+      "resource-limits"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "What is the difference between a liveness probe and a readiness probe?",
+    "code": null,
+    "options": [
+      "They are the same thing, just configured with different names",
+      "Liveness probes are only used during the initial deployment and never afterward",
+      "Readiness probes restart the container, while liveness probes only log warnings",
+      "A liveness probe determines whether a container should be restarted because it's stuck/unhealthy, while a readiness probe determines whether the container is ready to receive traffic (removing it from Service endpoints if not)"
+    ],
+    "answer": 3,
+    "explanation": "A liveness probe checks if the container is alive/healthy \u2014 failing it causes Kubernetes to restart the container. A readiness probe checks if the container is ready to serve traffic \u2014 failing it removes the Pod from Service endpoints without restarting it.",
+    "tags": [
+      "liveness-probe",
+      "readiness-probe"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "During a rolling update of a Deployment, what happens by default?",
+    "code": null,
+    "options": [
+      "All old Pods are terminated instantly before any new Pods are created, causing downtime",
+      "Rolling updates only work for StatefulSets, never for Deployments",
+      "The Deployment is paused indefinitely until a human manually deletes each old Pod",
+      "New Pods with the updated spec are gradually created while old Pods are gradually terminated, maintaining availability throughout (governed by maxSurge/maxUnavailable)"
+    ],
+    "answer": 3,
+    "explanation": "The default RollingUpdate strategy incrementally replaces old Pods with new ones \u2014 controlled by `maxSurge` (how many extra Pods can be created) and `maxUnavailable` (how many can be down) \u2014 to update the Deployment while keeping the application available.",
+    "tags": [
+      "rolling-updates"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "How do you roll back a Deployment to its previous working revision after a bad rollout?",
+    "code": null,
+    "options": [
+      "Deployments cannot be rolled back once updated",
+      "Rollbacks require rebuilding the container image from scratch",
+      "You must manually delete and recreate the entire cluster",
+      "`kubectl rollout undo deployment/<name>` reverts the Deployment to a previous revision recorded in its rollout history"
+    ],
+    "answer": 3,
+    "explanation": "`kubectl rollout undo` reverts a Deployment to a prior revision from its recorded rollout history, letting you quickly recover from a bad rollout without manually reconstructing the previous Pod spec.",
+    "tags": [
+      "rollbacks",
+      "kubectl"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "What does a HorizontalPodAutoscaler (HPA) do?",
+    "code": null,
+    "options": [
+      "Automatically adjusts a node's physical CPU/memory capacity",
+      "Automatically increases or decreases the number of Pod replicas in a Deployment/StatefulSet based on observed metrics like CPU or memory utilization (or custom metrics)",
+      "Automatically resizes container images to reduce storage usage",
+      "Automatically restarts all Pods every 24 hours regardless of health"
+    ],
+    "answer": 1,
+    "explanation": "The HorizontalPodAutoscaler scales the number of Pod replicas up or down automatically based on observed resource utilization (commonly CPU/memory) or custom/external metrics, matching capacity to actual load.",
+    "tags": [
+      "hpa",
+      "autoscaling"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "What is the relationship between a PersistentVolume (PV) and a PersistentVolumeClaim (PVC)?",
+    "code": null,
+    "options": [
+      "A PVC is a request for storage matching certain criteria; a PV is the actual provisioned storage resource in the cluster that gets bound to a matching PVC",
+      "PVs and PVCs are unrelated resources that never interact",
+      "A PV is created by an application Pod directly, bypassing the cluster's storage system",
+      "PVCs are only used for ConfigMaps, never for actual storage"
+    ],
+    "answer": 0,
+    "explanation": "A PersistentVolumeClaim is a user's request for storage with certain requirements (size, access mode); a PersistentVolume is the actual piece of storage in the cluster (static or dynamically provisioned) that gets bound to a matching claim, decoupling Pods from storage implementation details.",
+    "tags": [
+      "persistent-volumes",
+      "persistent-volume-claims"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "A Pod is stuck in `CrashLoopBackOff`. What is the most useful first debugging command?",
+    "code": null,
+    "options": [
+      "`kubectl delete namespace` to start completely fresh",
+      "`kubectl get nodes` \u2014 this has no relation to a specific Pod's crash",
+      "`kubectl logs <pod-name>` (and `kubectl describe pod <pod-name>`) to inspect the container's output and recent events for the actual failure reason",
+      "Immediately reinstall the entire Kubernetes cluster"
+    ],
+    "answer": 2,
+    "explanation": "`CrashLoopBackOff` means the container keeps crashing and restarting; `kubectl logs` shows the container's output (often revealing the actual application error), and `kubectl describe pod` shows recent events, exit codes, and probe failures \u2014 the standard first steps to diagnose it.",
+    "tags": [
+      "troubleshooting",
+      "kubectl"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "A Pod is stuck in `Pending` state and never gets scheduled. Which is a plausible root cause worth checking first?",
+    "code": null,
+    "options": [
+      "The cluster's DNS server name",
+      "The container image is too well-optimized",
+      "Insufficient cluster resources (CPU/memory) to satisfy the Pod's requests, or unsatisfied scheduling constraints like node selectors, taints/tolerations, or affinity rules",
+      "The Pod's readiness probe passed too quickly"
+    ],
+    "answer": 2,
+    "explanation": "A Pod stuck in `Pending` typically means the scheduler can't find a suitable node \u2014 commonly due to insufficient available CPU/memory to meet the Pod's resource requests, or scheduling constraints (node selectors, taints/tolerations, affinity) that no node currently satisfies.",
+    "tags": [
+      "troubleshooting",
+      "scheduling"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "What is the effect of running `kubectl exec -it <pod-name> -- /bin/sh`?",
+    "code": null,
+    "options": [
+      "It opens an interactive shell session inside a running container in that Pod, useful for live debugging and inspection",
+      "It permanently modifies the Pod's container image",
+      "It deletes the Pod and recreates it with a shell attached",
+      "It schedules a brand new Pod with shell access"
+    ],
+    "answer": 0,
+    "explanation": "`kubectl exec -it ... -- /bin/sh` opens an interactive terminal session inside a container already running in the specified Pod, letting you inspect files, processes, or environment variables live \u2014 a common technique for debugging running workloads.",
+    "tags": [
+      "kubectl",
+      "debugging"
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "slug": "prompt-engineering-fundamentals",
+  "name": "Prompt Engineering Fundamentals",
+  "description": "Master the art of crafting effective prompts for LLMs. Covers zero-shot, few-shot, chain-of-thought, and advanced prompting techniques.",
+  "topic": "AI",
+  "emoji": "✍️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

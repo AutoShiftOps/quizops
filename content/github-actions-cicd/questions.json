@@ -1,0 +1,251 @@
+[
+  {
+    "id": "q1",
+    "text": "Which workflow trigger runs a GitHub Actions workflow automatically whenever code is pushed to a specified branch?",
+    "code": null,
+    "options": [
+      "workflow_dispatch",
+      "push",
+      "schedule",
+      "release"
+    ],
+    "answer": 1,
+    "explanation": "The `push` trigger runs a workflow automatically whenever commits are pushed to the branches (or paths) configured under `on: push`. `workflow_dispatch` is for manual runs, and `schedule` uses cron syntax for timed runs.",
+    "tags": [
+      "triggers",
+      "github-actions"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "Which trigger allows a workflow to be run manually from the GitHub UI or API on demand?",
+    "code": null,
+    "options": [
+      "pull_request",
+      "push",
+      "workflow_dispatch",
+      "issues"
+    ],
+    "answer": 2,
+    "explanation": "`workflow_dispatch` adds a manual \"Run workflow\" trigger in the GitHub UI (and via the API/CLI), optionally accepting input parameters, letting someone kick off the workflow on demand rather than only in response to repository events.",
+    "tags": [
+      "triggers",
+      "workflow_dispatch"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "In GitHub Actions, what is the relationship between a workflow, a job, and a step?",
+    "code": null,
+    "options": [
+      "A workflow contains one or more jobs, and each job contains a sequence of one or more steps that run commands or actions",
+      "A step contains multiple jobs, and each job contains multiple workflows",
+      "Jobs and steps are the same thing with different names",
+      "A workflow can only ever contain exactly one job and one step"
+    ],
+    "answer": 0,
+    "explanation": "A workflow is the top-level automation defined in a YAML file; it's composed of one or more jobs (which can run in parallel or depend on each other), and each job runs a sequence of steps \u2014 individual commands or reusable actions.",
+    "tags": [
+      "workflows",
+      "jobs",
+      "steps"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "What is the difference between `runs-on: ubuntu-latest` and a self-hosted runner?",
+    "code": null,
+    "options": [
+      "There is no difference; both terms refer to the same infrastructure",
+      "`ubuntu-latest` can only run Windows-specific actions",
+      "Self-hosted runners are always free, while GitHub-hosted runners always cost money",
+      "`ubuntu-latest` uses a GitHub-hosted, ephemeral VM provisioned fresh for each job, while a self-hosted runner uses your own persistent machine or infrastructure that you register and maintain"
+    ],
+    "answer": 3,
+    "explanation": "GitHub-hosted runners like `ubuntu-latest` are fresh, ephemeral virtual machines GitHub provisions and tears down per job. Self-hosted runners are machines you register and manage yourself, useful for custom hardware, private network access, or specific compliance needs.",
+    "tags": [
+      "runners"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "How should a sensitive value like an API key be made available to a GitHub Actions workflow?",
+    "code": null,
+    "options": [
+      "Stored as a GitHub Actions secret (repository, environment, or organization level) and referenced via `${{ secrets.MY_KEY }}`",
+      "Hardcoded directly into the workflow YAML file and committed to the repository",
+      "Pasted into a comment in the workflow file so it's easy to find",
+      "Sent in plaintext as a workflow input every run"
+    ],
+    "answer": 0,
+    "explanation": "Sensitive values belong in GitHub's encrypted Secrets store (repo, environment, or org level) and are referenced in the workflow via the `secrets` context \u2014 never committed directly into the YAML, which would expose them in the repository's history.",
+    "tags": [
+      "secrets"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "What does a matrix strategy in a GitHub Actions job accomplish?",
+    "code": null,
+    "options": [
+      "It encrypts the job's logs automatically",
+      "It runs the same job multiple times in parallel with different combinations of variables (e.g. multiple Node.js versions or operating systems)",
+      "It merges multiple workflows into a single YAML file",
+      "It disables caching for that job only"
+    ],
+    "answer": 1,
+    "explanation": "A `strategy.matrix` defines one or more variables (like OS or language version); GitHub Actions then runs the job once per combination in parallel, which is the standard way to test across multiple environments without duplicating job definitions.",
+    "tags": [
+      "matrix-strategy"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "What is the purpose of `actions/cache` in a CI workflow?",
+    "code": null,
+    "options": [
+      "To permanently store build artifacts for public download",
+      "To automatically cache and reuse secrets between repositories",
+      "To cache the workflow YAML file itself for faster parsing",
+      "To persist and restore dependency directories (e.g. node_modules, pip cache) between workflow runs based on a cache key, speeding up subsequent builds"
+    ],
+    "answer": 3,
+    "explanation": "`actions/cache` saves specified paths (commonly dependency directories) keyed by a hash (e.g. of the lockfile) and restores them on later runs when the key matches, avoiding redundant installs and significantly speeding up CI.",
+    "tags": [
+      "caching"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "What is the primary purpose of `actions/upload-artifact` and `actions/download-artifact`?",
+    "code": null,
+    "options": [
+      "To automatically deploy artifacts to production without any further configuration",
+      "To upload the workflow file to a different repository",
+      "To pass files (like build output, test reports, or logs) between jobs within the same workflow run, or to make them available for download after the run",
+      "To cache dependencies between different workflows"
+    ],
+    "answer": 2,
+    "explanation": "`upload-artifact` saves files produced by a job so they persist after the job ends (viewable/downloadable from the run summary), and `download-artifact` retrieves them in a later job \u2014 the standard way to share build outputs or reports across jobs.",
+    "tags": [
+      "artifacts"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "What does an environment protection rule (e.g. required reviewers) in GitHub Actions environments allow you to do?",
+    "code": null,
+    "options": [
+      "Require manual approval from designated reviewers (and/or enforce wait timers or branch restrictions) before a job targeting that environment (e.g. production) can proceed",
+      "Automatically fix failing tests before deployment",
+      "Encrypt all logs for that environment by default",
+      "Disable the environment from ever being used again"
+    ],
+    "answer": 0,
+    "explanation": "Environment protection rules let you gate deployments to sensitive environments (like production) behind required reviewer approval, wait timers, or branch restrictions, so a job pauses until the conditions are satisfied before it can run.",
+    "tags": [
+      "environments",
+      "protection-rules"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "What is the main benefit of defining a reusable workflow (`workflow_call`) instead of duplicating the same job definitions across multiple repositories or workflow files?",
+    "code": null,
+    "options": [
+      "Reusable workflows run faster purely by being reusable, with no other benefit",
+      "They eliminate the need for secrets entirely",
+      "Common logic (e.g. a standard build-and-test sequence) is defined once and called from multiple workflows/repos, reducing duplication and centralizing maintenance",
+      "They can only be used within a single job, never across jobs"
+    ],
+    "answer": 2,
+    "explanation": "Reusable workflows (triggered via `workflow_call`) let you define common CI/CD logic once and invoke it from many workflows or repositories, so updates to the shared logic happen in one place instead of being copy-pasted everywhere.",
+    "tags": [
+      "reusable-workflows"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "Why is OIDC (OpenID Connect) authentication to cloud providers (AWS, Azure, GCP) from GitHub Actions preferred over storing long-lived cloud credentials as secrets?",
+    "code": null,
+    "options": [
+      "OIDC is slower but more secure in every case",
+      "OIDC issues short-lived, workflow-scoped tokens dynamically at run time, avoiding the need to store and rotate long-lived static cloud credentials as secrets",
+      "OIDC removes the need for any permissions configuration on the cloud side",
+      "OIDC only works with GitHub-hosted runners, never self-hosted"
+    ],
+    "answer": 1,
+    "explanation": "OIDC lets a workflow request a short-lived token from the cloud provider at run time, scoped to that specific workflow run, eliminating the risk and operational overhead of storing and rotating long-lived static credentials as GitHub secrets.",
+    "tags": [
+      "oidc",
+      "security"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "By default, do jobs within the same GitHub Actions workflow run in parallel or sequentially?",
+    "code": null,
+    "options": [
+      "Always sequentially, with no way to run them in parallel",
+      "Always in parallel, with no way to make one job wait for another",
+      "In parallel by default, unless a job specifies `needs:` to declare a dependency on another job completing first",
+      "Randomly ordered on each run"
+    ],
+    "answer": 2,
+    "explanation": "Jobs run in parallel by default to maximize speed. Adding `needs: [job-name]` to a job creates an explicit dependency, forcing it to wait until the referenced job(s) complete before starting.",
+    "tags": [
+      "jobs",
+      "dependencies"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "What does `if: ${{ failure() }}` on a step accomplish in a job?",
+    "code": null,
+    "options": [
+      "It skips the entire job immediately regardless of other steps",
+      "It runs that step only if a previous step in the job has failed \u2014 commonly used for cleanup, notifications, or uploading debug logs on failure",
+      "It causes the workflow to fail intentionally every time",
+      "It deletes the failed step's logs"
+    ],
+    "answer": 1,
+    "explanation": "The `failure()` function evaluates to true if any previous step in the job failed, letting you conditionally run steps \u2014 like sending a failure notification or uploading diagnostic logs \u2014 only when something upstream went wrong.",
+    "tags": [
+      "conditionals",
+      "job-status-functions"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "What is the effect of setting `concurrency` with `cancel-in-progress: true` on a workflow?",
+    "code": null,
+    "options": [
+      "It has no functional effect, only cosmetic grouping in the UI",
+      "It permanently disables the workflow after the first cancellation",
+      "It runs all workflow runs simultaneously with no limit",
+      "It ensures that only one run for a given concurrency group runs at a time, automatically cancelling any in-progress run when a new one starts for the same group (e.g. the same PR)"
+    ],
+    "answer": 3,
+    "explanation": "A `concurrency` group with `cancel-in-progress: true` ensures new runs for the same group (like the same branch or PR) cancel any still-running previous run for that group \u2014 commonly used so pushing new commits to a PR cancels outdated in-flight CI runs.",
+    "tags": [
+      "concurrency"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Which practice most directly reduces the risk of a compromised third-party GitHub Action introducing malicious code into your CI pipeline?",
+    "code": null,
+    "options": [
+      "Pinning third-party actions to a specific, immutable commit SHA (or at minimum a specific version tag) instead of a mutable branch reference",
+      "Always using the `@latest` or a mutable branch tag for every third-party action",
+      "Disabling all logging so the malicious code can't be traced",
+      "Granting the workflow the broadest possible permissions by default"
+    ],
+    "answer": 0,
+    "explanation": "Pinning an action to an immutable commit SHA guarantees the exact code that runs, preventing a compromised or maliciously updated action from silently changing behavior under a mutable tag or branch reference like `@main` or `@latest`.",
+    "tags": [
+      "supply-chain-security",
+      "action-pinning"
+    ]
+  }
+]

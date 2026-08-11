@@ -1,0 +1,251 @@
+[
+  {
+    "id": "q1",
+    "text": "A key architectural difference publishers of GPT-4o, Claude, and Gemini all share is that they are:",
+    "code": null,
+    "options": [
+      "Decision-tree ensembles optimized for tabular data",
+      "Purely retrieval systems with no generative component",
+      "Rule-based expert systems with hand-written logic",
+      "Transformer-based large language models trained on massive text (and often multimodal) corpora"
+    ],
+    "answer": 3,
+    "explanation": "GPT-4o, Claude, and Gemini are all transformer-based large language models trained on huge datasets; they differ in training data, fine-tuning approach, and multimodal capabilities, not in the underlying architecture family.",
+    "tags": [
+      "models",
+      "architecture"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "In the context of LLM APIs, a \"token\" is best described as:",
+    "code": null,
+    "options": [
+      "Always exactly one character",
+      "A chunk of text (often a word, part of a word, or punctuation) that the model's tokenizer splits input/output into for processing",
+      "Always exactly one word",
+      "A unit of GPU compute time"
+    ],
+    "answer": 1,
+    "explanation": "Tokens are the units a model's tokenizer breaks text into \u2014 commonly whole words, sub-word pieces, or punctuation \u2014 and are the basis for both context window limits and API pricing. They don't map 1:1 to characters or words.",
+    "tags": [
+      "tokens"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "Why do most LLM providers price input tokens and output tokens differently?",
+    "code": null,
+    "options": [
+      "It's arbitrary and has no cost basis",
+      "Generating (output) tokens is typically more computationally expensive per token than processing (input) tokens, so output is usually priced higher",
+      "Input tokens are always free",
+      "Output tokens are cheaper because they are cached automatically"
+    ],
+    "answer": 1,
+    "explanation": "Generating each output token requires a full forward pass and is inherently sequential, making it more compute-intensive per token than processing input in parallel \u2014 which is why output tokens are usually priced higher than input tokens.",
+    "tags": [
+      "pricing",
+      "tokens"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "What is the main benefit of using a streaming response from an LLM API instead of waiting for the full completion?",
+    "code": null,
+    "options": [
+      "It reduces the total number of tokens generated",
+      "It guarantees a lower price per token",
+      "It automatically retries failed requests",
+      "Tokens are delivered incrementally as they're generated, letting the UI display output progressively and reducing perceived latency"
+    ],
+    "answer": 3,
+    "explanation": "Streaming sends tokens to the client as soon as they're generated rather than waiting for the entire response, which significantly improves perceived responsiveness for user-facing applications even though total generation time is unchanged.",
+    "tags": [
+      "streaming"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "Function calling (tool use) in an LLM API allows the model to:",
+    "code": null,
+    "options": [
+      "Directly execute code on the provider's servers with no application involvement",
+      "Emit a structured request (function name + arguments) that the calling application recognizes and executes, then feeds the result back to the model",
+      "Permanently modify its own weights based on the function's output",
+      "Bypass the context window entirely for tool results"
+    ],
+    "answer": 1,
+    "explanation": "Function/tool calling lets the model output a structured call (matching a schema the developer defined) instead of prose; the application executes the actual function and returns the result to the model as additional context for its next response.",
+    "tags": [
+      "function-calling",
+      "tool-use"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "An embedding, in the context of LLM APIs, is:",
+    "code": null,
+    "options": [
+      "A compressed version of the original text with characters removed",
+      "A cryptographic hash of the input used for caching",
+      "A dense numerical vector representation of text that captures semantic meaning, used for similarity comparisons",
+      "The system prompt encoded as base64"
+    ],
+    "answer": 2,
+    "explanation": "Embeddings map text (or other content) into a dense vector space such that semantically similar inputs produce vectors that are close together \u2014 enabling similarity search, clustering, and retrieval use cases.",
+    "tags": [
+      "embeddings"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "A hard limit on the total tokens (input + output) a single request can use is called the model's:",
+    "code": null,
+    "options": [
+      "Rate limit",
+      "Temperature ceiling",
+      "Context window",
+      "Token budget policy"
+    ],
+    "answer": 2,
+    "explanation": "The context window defines the maximum combined token count a single request can span; exceeding it causes the request to fail or forces truncation, independent of rate limits (which govern requests over time).",
+    "tags": [
+      "context-window"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "When would fine-tuning a model be preferred over retrieval-augmented generation (RAG) for a given use case?",
+    "code": null,
+    "options": [
+      "When the goal is to teach the model a consistent style, format, or specialized task behavior rather than to inject frequently changing factual knowledge",
+      "When the underlying facts change daily and must always be current",
+      "Fine-tuning is always strictly better than RAG in every scenario",
+      "When you want to avoid any upfront training cost"
+    ],
+    "answer": 0,
+    "explanation": "Fine-tuning is well suited to teaching consistent behavior, tone, or task-specific patterns baked into the model's weights. RAG is generally better for injecting current or frequently changing factual knowledge without retraining.",
+    "tags": [
+      "fine-tuning",
+      "rag"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "An API returns HTTP 429 with a rate-limit error. What is the recommended handling strategy?",
+    "code": null,
+    "options": [
+      "Immediately retry in a tight loop as fast as possible",
+      "Implement exponential backoff with jitter before retrying",
+      "Give up permanently and stop the application",
+      "Switch to a different API key without any delay to bypass the limit"
+    ],
+    "answer": 1,
+    "explanation": "The standard, provider-recommended pattern for handling 429 rate-limit responses is exponential backoff with jitter \u2014 waiting progressively longer between retries with some randomness \u2014 rather than retrying immediately or hammering the endpoint.",
+    "tags": [
+      "rate-limits",
+      "retry-strategy"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "Which factor is generally LEAST relevant when choosing which model to use for a production feature?",
+    "code": null,
+    "options": [
+      "Latency and throughput requirements of the feature",
+      "Cost per token at expected usage volume",
+      "The color scheme of the provider's developer dashboard",
+      "The model's capability on the specific task (reasoning, coding, summarization, etc.)"
+    ],
+    "answer": 2,
+    "explanation": "Model selection should weigh task capability, latency/throughput needs, and cost at scale. Cosmetic details of a provider's dashboard UI have no bearing on the model's suitability for a production workload.",
+    "tags": [
+      "model-selection"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "A \"mini\" or \"nano\" tier model (e.g. a smaller model in a provider's lineup) is typically chosen over the flagship model when:",
+    "code": null,
+    "options": [
+      "The task is simpler or high-volume, and lower cost/latency matters more than squeezing out the absolute best quality",
+      "Maximum reasoning capability is required regardless of cost or latency",
+      "It is always strictly more capable than the flagship model",
+      "Function calling needs to be disabled"
+    ],
+    "answer": 0,
+    "explanation": "Smaller/cheaper model tiers trade some capability for significantly lower cost and latency, making them a good fit for simpler, high-volume, or latency-sensitive tasks where the flagship model's extra capability isn't needed.",
+    "tags": [
+      "model-selection",
+      "cost"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "What is a key practical advantage of open-source/open-weight models (e.g. Llama-family models) over closed API-only models?",
+    "code": null,
+    "options": [
+      "They can be self-hosted, fine-tuned, and run offline without sending data to a third-party API",
+      "They are always more capable than every closed model",
+      "They require no compute resources to run",
+      "They automatically stay updated with no maintenance"
+    ],
+    "answer": 0,
+    "explanation": "Open-weight models can be downloaded, self-hosted, and fully fine-tuned, giving teams control over data residency, customization, and offline operation \u2014 trade-offs closed API-only models don't offer, in exchange for owning the infrastructure.",
+    "tags": [
+      "open-source-models"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "Why might an application send the same large system prompt or document on every request to an LLM API that supports prompt caching?",
+    "code": null,
+    "options": [
+      "To let the provider reuse previously processed portions of the prompt, reducing latency and cost on repeated shared prefixes",
+      "Because caching is not possible with LLM APIs",
+      "Because it guarantees a completely different response each time",
+      "Because it disables rate limiting"
+    ],
+    "answer": 0,
+    "explanation": "Prompt caching lets providers skip reprocessing an identical prefix (like a long system prompt or reference document) across requests, cutting both latency and cost for the cached portion on subsequent calls that share it.",
+    "tags": [
+      "caching",
+      "cost"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "If a request repeatedly hits the model's context window limit when including conversation history, which is the most appropriate fix?",
+    "code": null,
+    "options": [
+      "Ignore the error \u2014 it resolves itself over time",
+      "Increase the temperature parameter",
+      "Summarize or truncate older parts of the conversation history before sending, or switch to a model with a larger context window if appropriate",
+      "Switch to a smaller, cheaper model with less capability"
+    ],
+    "answer": 2,
+    "explanation": "The direct fix for exceeding context limits is to manage what's included in the request \u2014 summarizing/truncating older history, retrieving only relevant context, or moving to a model with a larger context window if that's the real constraint.",
+    "tags": [
+      "context-window",
+      "conversation-management"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Multimodal LLM APIs (e.g. accepting images alongside text) typically bill image inputs by:",
+    "code": null,
+    "options": [
+      "Never billing for images \u2014 they are always free",
+      "Charging only if the image contains recognizable text",
+      "A flat one-time fee regardless of how many images are used across all requests",
+      "Converting the image into an equivalent token count (often based on resolution/size) that counts toward the request's token usage"
+    ],
+    "answer": 3,
+    "explanation": "Most multimodal APIs convert image inputs into an equivalent token cost \u2014 often scaling with resolution or tile count \u2014 which is added to the request's token usage and billed alongside text tokens.",
+    "tags": [
+      "multimodal",
+      "pricing"
+    ]
+  }
+]

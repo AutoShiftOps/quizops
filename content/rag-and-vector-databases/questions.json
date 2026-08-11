@@ -1,0 +1,251 @@
+[
+  {
+    "id": "q1",
+    "text": "What problem does Retrieval-Augmented Generation (RAG) primarily solve?",
+    "code": null,
+    "options": [
+      "It makes the model generate text faster by skipping tokenization",
+      "It grounds the model's responses in external, up-to-date, or domain-specific knowledge retrieved at query time, rather than relying solely on what was baked into training",
+      "It removes the need for a system prompt entirely",
+      "It replaces the need for an API key"
+    ],
+    "answer": 1,
+    "explanation": "RAG retrieves relevant documents or passages at query time and includes them in the prompt, letting the model answer using current or domain-specific knowledge it wasn't necessarily trained on \u2014 reducing reliance on static, frozen training data.",
+    "tags": [
+      "rag",
+      "fundamentals"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "In RAG, what does an embedding represent?",
+    "code": null,
+    "options": [
+      "The raw, unprocessed text of a document",
+      "A compressed image thumbnail of a text document",
+      "A unique random identifier with no relationship to content",
+      "A dense numeric vector that captures the semantic meaning of a piece of text, positioned so similar meanings are close together in vector space"
+    ],
+    "answer": 3,
+    "explanation": "An embedding is a fixed-length numeric vector produced by an embedding model, positioned in a high-dimensional space such that semantically similar text ends up with vectors that are close together \u2014 enabling similarity-based retrieval.",
+    "tags": [
+      "embeddings"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "Why is chunking (splitting documents into smaller pieces) necessary before embedding them for RAG?",
+    "code": null,
+    "options": [
+      "It is required to encrypt the document",
+      "Chunking is purely cosmetic and has no effect on retrieval quality",
+      "Embedding models can only process a limited amount of text at once, and smaller, focused chunks generally produce more precise, retrievable matches than huge undifferentiated documents",
+      "It permanently deletes irrelevant parts of the document"
+    ],
+    "answer": 2,
+    "explanation": "Embedding models have input size limits, and retrieval works better when chunks are focused enough that a single chunk's embedding accurately represents one coherent idea \u2014 large, mixed-topic chunks dilute the semantic signal and hurt retrieval precision.",
+    "tags": [
+      "chunking"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "What is a key trade-off when choosing a smaller chunk size versus a larger chunk size for RAG?",
+    "code": null,
+    "options": [
+      "There is no trade-off \u2014 smaller is always strictly better in every case",
+      "Larger chunks always retrieve faster regardless of size",
+      "Smaller chunks can improve retrieval precision but may lose surrounding context, while larger chunks preserve more context but risk diluting relevance and using more tokens per retrieved chunk",
+      "Chunk size only affects billing, never retrieval quality"
+    ],
+    "answer": 2,
+    "explanation": "Smaller chunks tend to yield more targeted matches but can strip away useful surrounding context, while larger chunks retain context at the cost of precision and higher token usage per retrieved passage \u2014 the right size depends on the content and use case.",
+    "tags": [
+      "chunking",
+      "tradeoffs"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "Cosine similarity between two embedding vectors measures:",
+    "code": null,
+    "options": [
+      "The exact word-for-word overlap between two texts",
+      "The file size difference between two documents",
+      "The cosine of the angle between the two vectors, indicating how similar their direction (and thus semantic meaning) is, regardless of magnitude",
+      "The number of shared embeddings between two databases"
+    ],
+    "answer": 2,
+    "explanation": "Cosine similarity measures the angle between two vectors, producing a value close to 1 for vectors pointing in nearly the same direction (semantically similar) and closer to 0 or negative for dissimilar ones \u2014 independent of vector length.",
+    "tags": [
+      "cosine-similarity",
+      "vector-math"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "Which of these is a purpose-built vector database or vector-search extension commonly used in RAG pipelines?",
+    "code": null,
+    "options": [
+      "Pinecone, Weaviate, or Postgres with the pgvector extension",
+      "A plain CSV file with no indexing",
+      "A standard relational table with only integer primary keys",
+      "A static JSON file loaded fresh on every single query with no index"
+    ],
+    "answer": 0,
+    "explanation": "Pinecone and Weaviate are purpose-built vector databases, and pgvector adds efficient vector similarity search directly to PostgreSQL \u2014 all designed to index and query high-dimensional embeddings at scale, unlike plain flat files or unindexed tables.",
+    "tags": [
+      "vector-databases"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "How does semantic search differ from traditional keyword search?",
+    "code": null,
+    "options": [
+      "Keyword search always requires a GPU, while semantic search does not",
+      "They are the same technique with different names",
+      "Semantic search matches based on the meaning/similarity of embeddings, so it can find relevant results even without exact keyword overlap, while keyword search matches literal terms",
+      "Semantic search only works on images, never on text"
+    ],
+    "answer": 2,
+    "explanation": "Semantic search compares embeddings to find conceptually related content even when the exact words differ, whereas traditional keyword search (e.g. BM25/full-text search) relies on literal term matching and frequency statistics.",
+    "tags": [
+      "semantic-search"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "What is the main motivation for using hybrid search (combining keyword and semantic search) in a RAG system?",
+    "code": null,
+    "options": [
+      "It guarantees zero retrieval errors",
+      "It combines the precision of exact keyword/term matching (good for names, codes, IDs) with the recall benefits of semantic similarity (good for paraphrased or conceptual queries)",
+      "It removes the need for an embedding model entirely",
+      "It is required by law in production systems"
+    ],
+    "answer": 1,
+    "explanation": "Hybrid search blends keyword-based matching \u2014 which excels at exact terms, product codes, or names \u2014 with semantic/vector search, which handles paraphrased or conceptually related queries, generally producing more robust retrieval than either alone.",
+    "tags": [
+      "hybrid-search"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "What is the purpose of a reranking step after initial vector retrieval in a production RAG pipeline?",
+    "code": null,
+    "options": [
+      "To delete irrelevant documents from the vector database permanently",
+      "To re-embed the user's original query into a different language",
+      "To convert text back into raw bytes",
+      "To re-score and reorder a larger initial candidate set using a more precise (often cross-encoder) model, surfacing the most relevant results before passing them to the LLM"
+    ],
+    "answer": 3,
+    "explanation": "Reranking takes the top-N candidates from a fast initial vector search and applies a more computationally expensive but more accurate model to reorder them by relevance, improving the quality of what's ultimately passed to the LLM as context.",
+    "tags": [
+      "reranking"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "Which metric is commonly used to evaluate the retrieval component of a RAG system?",
+    "code": null,
+    "options": [
+      "Recall@k / precision@k \u2014 whether the truly relevant document(s) appear within the top-k retrieved results",
+      "GPU temperature during inference",
+      "The total number of documents stored, regardless of relevance",
+      "The color scheme of the search UI"
+    ],
+    "answer": 0,
+    "explanation": "Retrieval quality in RAG is commonly evaluated with recall@k and precision@k, which measure whether (and how often) the genuinely relevant documents show up among the top-k results returned by the retriever.",
+    "tags": [
+      "evaluation",
+      "rag"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "Faithfulness (or groundedness) as a RAG evaluation metric measures:",
+    "code": null,
+    "options": [
+      "How quickly the vector database responds to queries",
+      "Whether the generated answer is actually supported by the retrieved context, rather than the model hallucinating claims not present in the source material",
+      "How many tokens the final answer uses",
+      "Whether the embeddings were computed using cosine or dot product"
+    ],
+    "answer": 1,
+    "explanation": "Faithfulness/groundedness checks whether the LLM's generated answer is actually backed by the retrieved context, rather than the model introducing unsupported claims \u2014 a key signal for whether RAG is successfully reducing hallucination.",
+    "tags": [
+      "evaluation",
+      "faithfulness"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "Which scenario is a case where RAG is NOT the right tool, and a different approach would be more appropriate?",
+    "code": null,
+    "options": [
+      "Answering questions about a rapidly changing internal knowledge base",
+      "Citing specific passages from a company's policy documents",
+      "Answering questions grounded in a large, frequently-updated document collection",
+      "Teaching the model a consistent output format, tone, or specialized reasoning skill that should apply to every response \u2014 better suited to prompting or fine-tuning than retrieval"
+    ],
+    "answer": 3,
+    "explanation": "RAG is designed for injecting relevant knowledge at query time \u2014 it isn't the right tool for teaching consistent style, format, or behavioral patterns, which are better addressed through prompt engineering or fine-tuning rather than retrieval.",
+    "tags": [
+      "rag",
+      "when-not-to-use"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "What does dot product similarity measure, and how does it differ from cosine similarity?",
+    "code": null,
+    "options": [
+      "Dot product combines both the angle and magnitude of the vectors, so it can be influenced by vector length, whereas cosine similarity normalizes out magnitude and considers only direction",
+      "Dot product is identical to cosine similarity in every case with no exceptions",
+      "Dot product only works for 2-dimensional vectors",
+      "Dot product measures the difference in file size between two embeddings"
+    ],
+    "answer": 0,
+    "explanation": "Dot product similarity is sensitive to both the angle between vectors and their magnitudes, while cosine similarity divides out magnitude, comparing direction alone \u2014 which is why some embedding models are specifically trained/normalized for one metric or the other.",
+    "tags": [
+      "vector-math",
+      "similarity"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "What is metadata filtering in a vector database query, and why is it useful?",
+    "code": null,
+    "options": [
+      "A method for compressing embeddings to save storage",
+      "Filtering results by structured attributes (e.g. date, source, author, permissions) alongside the vector similarity search, to narrow results to a relevant/authorized subset",
+      "A step that deletes all metadata to save space",
+      "A technique only used to speed up embedding generation, not retrieval"
+    ],
+    "answer": 1,
+    "explanation": "Metadata filtering lets a query combine vector similarity with structured constraints \u2014 like restricting results to a specific date range, document source, or the requesting user's permitted documents \u2014 improving relevance and enforcing access control.",
+    "tags": [
+      "metadata-filtering",
+      "vector-databases"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "In a production RAG system, what commonly happens if the retrieved context doesn't actually contain the answer to the user's question?",
+    "code": null,
+    "options": [
+      "The system should ideally be prompted/designed to acknowledge it doesn't have enough information rather than have the model fabricate an answer from unsupported context",
+      "The vector database automatically generates the missing fact",
+      "The system always returns an HTTP 500 error",
+      "RAG systems are guaranteed to always retrieve the correct answer"
+    ],
+    "answer": 0,
+    "explanation": "A well-designed RAG system should be prompted to recognize when retrieved context is insufficient and say so, rather than have the model hallucinate an answer \u2014 this graceful \"I don't know\" behavior is an important part of responsible RAG design.",
+    "tags": [
+      "rag",
+      "failure-handling"
+    ]
+  }
+]

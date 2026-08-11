@@ -1,0 +1,11 @@
+{
+  "slug": "kubernetes-essentials",
+  "name": "Kubernetes Essentials",
+  "description": "Container orchestration for engineers who actually use it. Pods, deployments, services, ingress, ConfigMaps, and troubleshooting real issues.",
+  "topic": "Cloud",
+  "emoji": "☸️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}

@@ -1,0 +1,251 @@
+[
+  {
+    "id": "q1",
+    "text": "What is the correct order of the core Terraform workflow commands for applying a change?",
+    "code": null,
+    "options": [
+      "init \u2192 plan \u2192 apply",
+      "apply \u2192 plan \u2192 init",
+      "plan \u2192 init \u2192 destroy",
+      "destroy \u2192 apply \u2192 init"
+    ],
+    "answer": 0,
+    "explanation": "The standard workflow is `terraform init` (set up providers/modules/backend), `terraform plan` (preview the proposed changes), then `terraform apply` (actually make the changes) \u2014 in that order.",
+    "tags": [
+      "workflow",
+      "terraform-basics"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "What does `terraform destroy` do?",
+    "code": null,
+    "options": [
+      "Deletes the local Terraform configuration files only",
+      "Resets the state file to empty without touching real infrastructure",
+      "Tears down all infrastructure resources currently managed by that Terraform configuration/state",
+      "Rolls back to the previous apply automatically"
+    ],
+    "answer": 2,
+    "explanation": "`terraform destroy` removes all the real infrastructure resources tracked in the current state for that configuration \u2014 it's the inverse of `apply`, and should be used carefully since it actually deletes provisioned resources.",
+    "tags": [
+      "destroy",
+      "terraform-basics"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "What is the purpose of Terraform's state file?",
+    "code": null,
+    "options": [
+      "It records the mapping between your configuration's resources and the real-world infrastructure objects, letting Terraform know what exists and detect drift/changes needed",
+      "It has no real purpose and can be safely deleted at any time with no consequences",
+      "It stores only the provider credentials in plaintext for convenience",
+      "It is used exclusively to store variable default values"
+    ],
+    "answer": 0,
+    "explanation": "The state file tracks the real-world resources Terraform manages and maps them to your configuration, allowing Terraform to compute what needs to change on the next plan/apply and to detect drift between configuration and actual infrastructure.",
+    "tags": [
+      "state"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "Why is using a remote backend (e.g. an S3 bucket with state locking) generally preferred over keeping Terraform state as a local file for team environments?",
+    "code": null,
+    "options": [
+      "Local state files are always faster and should be preferred for teams",
+      "A remote backend provides shared access to state for the whole team, supports locking to prevent concurrent conflicting applies, and avoids losing state if a single laptop is lost",
+      "Remote backends remove the need for `terraform init` entirely",
+      "Remote backends automatically write your .tf configuration files for you"
+    ],
+    "answer": 1,
+    "explanation": "A remote backend centralizes state so the whole team works from the same source of truth, supports state locking to prevent two people from applying simultaneously and corrupting state, and isn't at risk of being lost if one person's machine fails.",
+    "tags": [
+      "remote-backend",
+      "state-locking"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "What is the difference between a `resource` block and a `data` block in Terraform?",
+    "code": null,
+    "options": [
+      "A `resource` block declares infrastructure Terraform should create/manage, while a `data` block reads/references information about an existing resource that Terraform does not manage",
+      "They are interchangeable and behave identically",
+      "`data` blocks can only be used for variables, never for infrastructure",
+      "`resource` blocks are read-only and never modify infrastructure"
+    ],
+    "answer": 0,
+    "explanation": "A `resource` block tells Terraform to create and manage that infrastructure object. A `data` block instead queries information about something that already exists (managed by Terraform or not) without creating or modifying it.",
+    "tags": [
+      "resources",
+      "data-sources"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "What is the purpose of Terraform `variable` and `output` blocks?",
+    "code": null,
+    "options": [
+      "Variables can only hold string values, and outputs can only hold numbers",
+      "They are only used for documentation and have no functional effect",
+      "Outputs are used to define resources, and variables are used to destroy them",
+      "Variables parameterize a configuration with external input values, and outputs expose selected values from the configuration for use elsewhere (e.g. by other modules or for display after apply)"
+    ],
+    "answer": 3,
+    "explanation": "`variable` blocks define configurable inputs to a module/configuration (with optional defaults, types, and validation), while `output` blocks expose values (like a resource's generated ID or IP) for use by the caller, other modules, or for inspection after apply.",
+    "tags": [
+      "variables",
+      "outputs"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "What is a Terraform module?",
+    "code": null,
+    "options": [
+      "A single resource block with no reusability",
+      "A reusable, self-contained package of Terraform configuration (resources, variables, outputs) that can be called multiple times with different inputs, promoting DRY infrastructure code",
+      "A cloud provider's authentication token",
+      "A file format only used for storing state"
+    ],
+    "answer": 1,
+    "explanation": "A module is a reusable, encapsulated set of Terraform configuration \u2014 its own resources, variables, and outputs \u2014 that can be invoked multiple times with different input variables, avoiding repetition across environments or components.",
+    "tags": [
+      "modules"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "When should `for_each` generally be preferred over `count` for creating multiple similar resources?",
+    "code": null,
+    "options": [
+      "`for_each` should never be used; `count` is always superior",
+      "`for_each` (keyed by a map or set of strings) is generally preferred when resources are identified by meaningful, stable keys, since removing an item from the middle doesn't shift indices and force unrelated resources to be recreated, unlike `count`",
+      "`count` only works with exactly one resource, while `for_each` allows unlimited resources",
+      "`for_each` cannot reference variables, only literal values"
+    ],
+    "answer": 1,
+    "explanation": "`count` indexes resources numerically (0, 1, 2...), so removing an item from the middle of the list shifts every subsequent index and can cause unrelated resources to be destroyed/recreated. `for_each` keys resources by stable map/set keys, so changes to one item don't disturb the others.",
+    "tags": [
+      "count",
+      "for_each"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "What is the purpose of Terraform workspaces?",
+    "code": null,
+    "options": [
+      "They replace the need for variables entirely",
+      "They are folders for organizing .tf files with no effect on state",
+      "They provide a lightweight way to manage multiple distinct state files from a single configuration \u2014 commonly used to separate environments like dev/staging/prod",
+      "They are only usable with a single specific cloud provider"
+    ],
+    "answer": 2,
+    "explanation": "Terraform workspaces let a single configuration maintain multiple separate state files (e.g. one per environment), so you can apply the same configuration against dev, staging, and prod without them sharing or clobbering each other's state.",
+    "tags": [
+      "workspaces"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "How does a `provider` block relate to Terraform's overall architecture?",
+    "code": null,
+    "options": [
+      "Providers are optional and Terraform can manage cloud resources without configuring any",
+      "A provider is a plugin that translates Terraform configuration into API calls for a specific platform (e.g. AWS, Azure, GCP, Kubernetes), and the `provider` block configures things like region and credentials for it",
+      "Providers only affect the visual formatting of the .tf files",
+      "A provider block is used exclusively to define output values"
+    ],
+    "answer": 1,
+    "explanation": "Providers are plugins that know how to talk to a specific platform's API (AWS, Azure, GCP, Kubernetes, etc.); the `provider` block configures connection details like region, credentials, or endpoint for that plugin so resources can be created against it.",
+    "tags": [
+      "providers"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "What does `terraform import` allow you to do?",
+    "code": null,
+    "options": [
+      "Copy an entire Terraform configuration from another repository",
+      "Import variable values from a spreadsheet automatically",
+      "Bring an existing, manually-created infrastructure resource under Terraform management by associating it with a resource block in state, without recreating it",
+      "Download provider plugin binaries"
+    ],
+    "answer": 2,
+    "explanation": "`terraform import` maps an already-existing real-world resource (created outside Terraform, e.g. manually in a console) to a resource address in your configuration/state, letting Terraform manage it going forward without destroying and recreating it.",
+    "tags": [
+      "import"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "What is the main difference between Terraform Cloud/Enterprise and the open-source Terraform CLI?",
+    "code": null,
+    "options": [
+      "Terraform Cloud adds hosted remote state management, remote execution, a UI, policy-as-code (Sentinel/OPA), and team collaboration features on top of the same core Terraform engine used by the open-source CLI",
+      "They use a completely different, incompatible configuration language",
+      "The open-source CLI cannot create any cloud resources at all",
+      "Terraform Cloud can only be used with a single specific cloud provider"
+    ],
+    "answer": 0,
+    "explanation": "Terraform Cloud/Enterprise builds collaboration, hosted state, remote plan/apply execution, a web UI, and policy enforcement (like Sentinel) on top of the same underlying Terraform engine and configuration language used by the free, open-source CLI.",
+    "tags": [
+      "terraform-cloud"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "What does the `lifecycle { prevent_destroy = true }` argument on a resource do?",
+    "code": null,
+    "options": [
+      "It has no real effect and is purely a comment",
+      "It permanently locks the resource's configuration from ever being changed",
+      "It automatically backs up the resource before every apply",
+      "It causes Terraform to error out and refuse to destroy that resource (via plan/apply/destroy) as a safeguard against accidental deletion of critical infrastructure"
+    ],
+    "answer": 3,
+    "explanation": "`prevent_destroy = true` in a resource's `lifecycle` block makes Terraform refuse any operation that would destroy that resource, causing an error instead \u2014 a safeguard commonly applied to critical resources like production databases.",
+    "tags": [
+      "lifecycle",
+      "prevent_destroy"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "Two engineers run `terraform apply` on the same configuration at nearly the same time without state locking. What is the risk?",
+    "code": null,
+    "options": [
+      "There is no risk \u2014 Terraform automatically merges concurrent applies safely",
+      "This only matters if using local state, never with any remote backend",
+      "Terraform will always refuse the second apply automatically even without locking configured",
+      "Concurrent, unlocked applies can race and corrupt the state file or produce conflicting changes, since each apply may be working from an outdated view of state"
+    ],
+    "answer": 3,
+    "explanation": "Without state locking, two simultaneous applies can each read and write state without awareness of the other, leading to corrupted or inconsistent state and infrastructure that doesn't match what either engineer intended \u2014 which is exactly why remote backends with locking exist.",
+    "tags": [
+      "state-locking",
+      "concurrency"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Why should `terraform plan` output generally be reviewed carefully before running `apply`, especially in production?",
+    "code": null,
+    "options": [
+      "Plan output is purely informational and can be safely ignored since apply always does the safe thing automatically",
+      "Reviewing plan output is only necessary the very first time a configuration is ever applied",
+      "The plan shows exactly what will be created, changed, or destroyed \u2014 catching an unintended destroy/replace (e.g. from a renamed resource) before it actually happens is much cheaper than fixing it after apply",
+      "Plan output cannot show destructive changes, only additive ones"
+    ],
+    "answer": 2,
+    "explanation": "`terraform plan` previews exactly what will be added, changed, or destroyed. Reviewing it catches unintended consequences \u2014 like a resource rename accidentally triggering a destroy-and-recreate \u2014 before they're applied to real infrastructure, which is far cheaper than remediating afterward.",
+    "tags": [
+      "plan",
+      "best-practices"
+    ]
+  }
+]

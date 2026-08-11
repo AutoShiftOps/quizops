@@ -1,0 +1,255 @@
+[
+  {
+    "id": "q1",
+    "text": "What distinguishes few-shot prompting from zero-shot prompting?",
+    "code": null,
+    "options": [
+      "Few-shot prompting includes a handful of example input/output pairs in the prompt, while zero-shot gives no examples at all",
+      "Few-shot prompting always requires fine-tuning the model on the examples first",
+      "Zero-shot prompting only works with instruction-tuned models, while few-shot works with any model",
+      "Few-shot prompting is a technique for reducing token usage compared to zero-shot"
+    ],
+    "answer": 0,
+    "explanation": "Few-shot prompting demonstrates the desired behavior by including a small number of example input/output pairs directly in the prompt, giving the model context for the pattern to follow. Zero-shot prompting relies purely on the instruction with no examples.",
+    "tags": [
+      "prompting",
+      "zero-shot",
+      "few-shot"
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "Chain-of-thought (CoT) prompting improves performance on complex reasoning tasks primarily by:",
+    "code": null,
+    "options": [
+      "Reducing the number of tokens the model needs to generate",
+      "Encouraging the model to generate intermediate reasoning steps before producing a final answer",
+      "Forcing the model to only output numerical answers",
+      "Automatically calling external tools to verify the answer"
+    ],
+    "answer": 1,
+    "explanation": "Chain-of-thought prompting asks the model to reason step by step, generating intermediate steps before the final answer. This decomposition tends to improve accuracy on multi-step arithmetic, logic, and reasoning tasks.",
+    "tags": [
+      "chain-of-thought",
+      "reasoning"
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "What is the functional difference between a system prompt and a user prompt in a typical chat-based LLM API?",
+    "code": null,
+    "options": [
+      "There is no functional difference \u2014 they are processed identically",
+      "The system prompt sets persistent behavior, tone, and constraints for the whole conversation, while user prompts are individual turns from the person interacting with the model",
+      "The system prompt is only visible to the model after the conversation ends",
+      "User prompts are always given higher priority than system prompts by the model"
+    ],
+    "answer": 1,
+    "explanation": "The system prompt establishes the assistant's persona, rules, and high-level instructions that should hold across the conversation, while user prompts represent the individual messages/queries from the end user in each turn.",
+    "tags": [
+      "system-prompt",
+      "roles"
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "Lowering the temperature parameter toward 0 during generation makes the model's output:",
+    "code": null,
+    "options": [
+      "More random and creative",
+      "Longer, since lower temperature increases max token limits",
+      "More deterministic, consistently favoring the highest-probability tokens",
+      "Unaffected \u2014 temperature only controls latency, not token selection"
+    ],
+    "answer": 2,
+    "explanation": "Temperature scales the probability distribution over the next token. A temperature near 0 sharpens the distribution so the model nearly always picks the highest-probability token, producing more deterministic, repeatable output.",
+    "tags": [
+      "temperature",
+      "sampling"
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "What does the top-p (nucleus sampling) parameter control?",
+    "code": null,
+    "options": [
+      "The maximum number of tokens the model can generate in total",
+      "The number of parallel completions the API returns",
+      "The smallest set of highest-probability tokens whose cumulative probability exceeds p, from which the next token is sampled",
+      "Whether the model uses greedy decoding or beam search exclusively"
+    ],
+    "answer": 2,
+    "explanation": "Top-p sampling restricts candidate tokens to the smallest set whose cumulative probability mass is at least p, then samples from that set \u2014 dynamically adjusting how many tokens are considered based on the model's confidence at each step.",
+    "tags": [
+      "top-p",
+      "sampling"
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "Which of these is an example of a prompt injection attack?",
+    "code": null,
+    "options": [
+      "A user submitting a very long prompt that exceeds the context window",
+      "Untrusted content fetched by the application (e.g. a webpage or email) containing hidden instructions that override the application's original system prompt",
+      "A developer testing the model with multiple different temperature settings",
+      "The model refusing to answer a question due to safety guidelines"
+    ],
+    "answer": 1,
+    "explanation": "Prompt injection occurs when untrusted input \u2014 often embedded in retrieved documents, web pages, or user-supplied text \u2014 contains instructions designed to hijack the model's behavior, overriding the developer's intended system prompt.",
+    "tags": [
+      "prompt-injection",
+      "security"
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "\"Act as a senior security engineer reviewing this code for vulnerabilities\" is an example of which prompting technique?",
+    "code": null,
+    "options": [
+      "Role prompting \u2014 assigning the model a persona to shape the tone, expertise, and framing of its response",
+      "Chain-of-thought prompting",
+      "Retrieval-augmented generation",
+      "Function calling"
+    ],
+    "answer": 0,
+    "explanation": "Role prompting assigns the model a persona or expertise framing (e.g. \"act as a...\") to influence the style, vocabulary, and perspective of its output, often improving relevance for domain-specific tasks.",
+    "tags": [
+      "role-prompting"
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "Which instruction is most effective for reliably getting structured JSON output from an LLM?",
+    "code": null,
+    "options": [
+      "Providing an explicit schema or example JSON structure in the prompt and, where supported, using the API's structured-output/JSON mode",
+      "Simply asking politely for \"nice formatting\"",
+      "Increasing the temperature to encourage more varied formatting",
+      "Asking the model to describe the format in prose instead of showing an example"
+    ],
+    "answer": 0,
+    "explanation": "The most reliable way to get structured output is to show the model the exact shape you want (a schema or example) and, when the provider supports it, use a dedicated structured-output or JSON mode that constrains generation to valid JSON.",
+    "tags": [
+      "output-formatting",
+      "structured-output"
+    ]
+  },
+  {
+    "id": "q9",
+    "text": "Which technique most directly reduces hallucination when asking an LLM about facts that may be outside its training data?",
+    "code": null,
+    "options": [
+      "Increasing the temperature so the model considers more possibilities",
+      "Grounding the model's response in retrieved, verifiable source documents (RAG) and instructing it to cite them or say \"I don't know\" if unsupported",
+      "Shortening the prompt as much as possible",
+      "Asking the same question multiple times and picking the first answer"
+    ],
+    "answer": 1,
+    "explanation": "Grounding responses in retrieved source material and explicitly instructing the model to rely on that context (or admit uncertainty) is the most effective mitigation, since it gives the model verifiable facts instead of relying purely on parametric memory.",
+    "tags": [
+      "hallucination",
+      "grounding"
+    ]
+  },
+  {
+    "id": "q10",
+    "text": "A model's context window refers to:",
+    "code": null,
+    "options": [
+      "The physical GPU memory allocated per request",
+      "The rate limit on requests per minute",
+      "The number of previous conversations the model remembers permanently",
+      "The maximum number of tokens (input + output combined, depending on the provider) the model can attend to in a single request"
+    ],
+    "answer": 3,
+    "explanation": "The context window is the maximum span of tokens \u2014 prompt plus generated output \u2014 that the model can process and attend to at once. Content beyond this limit is truncated or must be summarized/managed externally.",
+    "tags": [
+      "context-window"
+    ]
+  },
+  {
+    "id": "q11",
+    "text": "When a task exceeds a model's context window (e.g. summarizing a very long document), which strategy is most appropriate?",
+    "code": null,
+    "options": [
+      "Chunk the document, summarize each chunk, then summarize the summaries (a map-reduce style approach)",
+      "Always upgrade to a model with unlimited context, since no context management is ever needed",
+      "Truncate the document arbitrarily and hope the missing parts don't matter",
+      "Increase the temperature so the model compresses information more efficiently"
+    ],
+    "answer": 0,
+    "explanation": "A map-reduce approach \u2014 splitting long input into chunks, summarizing each independently, then combining/summarizing those summaries \u2014 is a standard way to work within context window limits while still covering the full document.",
+    "tags": [
+      "context-window",
+      "chunking"
+    ]
+  },
+  {
+    "id": "q12",
+    "text": "What is prompt chaining?",
+    "code": null,
+    "options": [
+      "Concatenating multiple unrelated prompts into a single API call to save cost",
+      "Randomly shuffling few-shot examples between requests",
+      "A method for encrypting prompts before sending them to the API",
+      "Breaking a complex task into a sequence of smaller prompts, where the output of one step feeds into the input of the next"
+    ],
+    "answer": 3,
+    "explanation": "Prompt chaining decomposes a complex task into an ordered sequence of smaller, more focused prompts, where each step's output becomes context for the next \u2014 improving reliability compared to asking for everything in one shot.",
+    "tags": [
+      "prompt-chaining"
+    ]
+  },
+  {
+    "id": "q13",
+    "text": "Which of the following is generally considered a best practice for writing clear system prompts?",
+    "code": null,
+    "options": [
+      "Keep instructions vague so the model has maximum creative freedom",
+      "Never include any examples, since examples bias the model incorrectly",
+      "State the desired behavior explicitly and positively (what to do), rather than relying only on lists of things not to do",
+      "Put all constraints at the very end of a long, unstructured paragraph"
+    ],
+    "answer": 2,
+    "explanation": "Clear, explicit, positively-framed instructions (\"respond in this format\", \"always do X\") tend to be followed more reliably than long lists of prohibitions alone, and well-placed examples typically improve compliance rather than bias it incorrectly.",
+    "tags": [
+      "system-prompt",
+      "best-practices"
+    ]
+  },
+  {
+    "id": "q14",
+    "text": "In a self-consistency prompting approach, the model is typically:",
+    "code": null,
+    "options": [
+      "Run once at temperature 0 for a single deterministic answer",
+      "Restricted to only yes/no answers to reduce ambiguity",
+      "Fine-tuned on its own previous outputs before answering",
+      "Sampled multiple times (often with chain-of-thought) and the most common final answer among the samples is selected"
+    ],
+    "answer": 3,
+    "explanation": "Self-consistency generates multiple independent reasoning paths (usually via chain-of-thought at nonzero temperature) and takes a majority vote over the final answers, which tends to be more robust than any single sample.",
+    "tags": [
+      "self-consistency",
+      "chain-of-thought"
+    ]
+  },
+  {
+    "id": "q15",
+    "text": "Why is it good practice to specify output constraints (e.g. \"respond in under 100 words\" or \"return only valid JSON, no prose\") explicitly in the prompt?",
+    "code": null,
+    "options": [
+      "It has no measurable effect on the model's output",
+      "It reduces token costs by making prompts shorter",
+      "LLMs follow explicit, unambiguous constraints far more reliably than implicit expectations, reducing the need for brittle post-processing",
+      "It is required by every LLM API's terms of service"
+    ],
+    "answer": 2,
+    "explanation": "Being explicit about format, length, and content constraints gives the model a concrete target to satisfy, which meaningfully improves adherence compared to leaving formatting expectations implicit and trying to parse/fix the output afterward.",
+    "tags": [
+      "output-formatting",
+      "best-practices"
+    ]
+  }
+]

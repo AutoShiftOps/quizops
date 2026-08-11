@@ -1,0 +1,11 @@
+{
+  "slug": "terraform-infrastructure-as-code",
+  "name": "Terraform: Infrastructure as Code",
+  "description": "Provision cloud infrastructure with Terraform. State management, modules, workspaces, providers, and real-world IaC patterns.",
+  "topic": "DevOps",
+  "emoji": "🏗️",
+  "source_url": null,
+  "duration_seconds": 1200,
+  "pass_mark": 70,
+  "question_count": 15
+}
