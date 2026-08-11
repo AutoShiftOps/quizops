@@ -172,7 +172,7 @@ export default function DashboardPage() {
           </h1>
           <Link
             href={`/q/${publisher.username}`}
-            className="inline-block text-sm text-[#94A3B8] hover:text-[#F1F5F9] hover:underline transition-colors mb-3"
+            className="inline-block text-sm text-[#94A3B8] hover:text-[#F1F5F9] hover:underline transition-colors mb-4"
           >
             {origin ? origin.replace(/^https?:\/\//, '') : 'quiz.autoshiftops.com'}/q/
             {publisher.username}
