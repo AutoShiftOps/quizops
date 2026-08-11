@@ -9,6 +9,7 @@ import { track } from '@/lib/analytics';
 import QuestionEditor from '@/components/QuestionEditor';
 import QuizMetadataForm from '@/components/QuizMetadataForm';
 import SharePanel from '@/components/SharePanel';
+import WaitlistModal from '@/components/WaitlistModal';
 
 type Step = 'select' | 'input' | 'generating' | 'review' | 'published';
 type Mode = 'ai' | 'manual';
@@ -64,7 +65,9 @@ export default function NewQuizPage() {
   const [publishing, setPublishing] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
-  const [upgradeToast, setUpgradeToast] = useState(false);
+  // Stripe isn't built yet (M2-01) — every "Upgrade to Pro" CTA opens the
+  // waitlist modal in the meantime rather than a fake "coming soon" toast.
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const [moderationError, setModerationError] = useState<{ message: string; reason?: string } | null>(
     null
   );
@@ -383,34 +386,29 @@ export default function NewQuizPage() {
   // it) — the navbar avatar is the way back.
   if (checkTierLimit(publisher)) {
     return (
-      <div className="mt-16 max-w-md mx-auto text-center">
-        <div className="w-16 h-16 mx-auto rounded-full bg-warning/10 text-warning flex items-center justify-center text-3xl mb-6">
-          🔒
-        </div>
-        <h1 className="font-heading text-xl font-semibold mb-2 text-[#F1F5F9]">
-          Free tier limit reached
-        </h1>
-        <p className="text-sm text-[#94A3B8] mb-8">
-          You&apos;ve published 3 of 3 free quizzes. Upgrade to Pro for unlimited
-          quizzes, advanced analytics, and more.
-        </p>
-        <div className="flex items-center justify-center">
-          <button
-            onClick={() => {
-              setUpgradeToast(true);
-              setTimeout(() => setUpgradeToast(false), 3000);
-            }}
-            className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
-          >
-            Upgrade to Pro →
-          </button>
-        </div>
-        {upgradeToast && (
-          <div className="fixed bottom-6 right-6 bg-[#0F1520] border border-[#1E2D45] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#F1F5F9]">
-            Pro tier coming soon! We&apos;ll notify you when it&apos;s available.
+      <>
+        <div className="mt-16 max-w-md mx-auto text-center">
+          <div className="w-16 h-16 mx-auto rounded-full bg-warning/10 text-warning flex items-center justify-center text-3xl mb-6">
+            🔒
           </div>
-        )}
-      </div>
+          <h1 className="font-heading text-xl font-semibold mb-2 text-[#F1F5F9]">
+            Free tier limit reached
+          </h1>
+          <p className="text-sm text-[#94A3B8] mb-8">
+            You&apos;ve published 3 of 3 free quizzes. Upgrade to Pro for unlimited
+            quizzes, advanced analytics, and more.
+          </p>
+          <div className="flex items-center justify-center">
+            <button
+              onClick={() => setShowWaitlist(true)}
+              className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
+            >
+              Upgrade to Pro →
+            </button>
+          </div>
+        </div>
+        <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
+      </>
     );
   }
 

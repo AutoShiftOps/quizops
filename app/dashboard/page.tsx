@@ -11,6 +11,7 @@ import { track } from '@/lib/analytics';
 import PublisherOnboarding from '@/components/PublisherOnboarding';
 import TierBadge from '@/components/TierBadge';
 import PublisherQuizCard from '@/components/PublisherQuizCard';
+import WaitlistModal from '@/components/WaitlistModal';
 
 type Stats = {
   totalAttempts: number;
@@ -31,13 +32,12 @@ export default function DashboardPage() {
   });
   const [passRates, setPassRates] = useState<Record<string, number | null>>({});
   const [origin, setOrigin] = useState('');
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-
-  function showProComingSoonToast() {
-    setToast("Pro tier coming soon! We'll notify you when it's available.");
-    setTimeout(() => setToast(null), 3000);
-  }
+  // Stripe isn't built yet (M2-01) — every "Upgrade" CTA on this page opens
+  // the waitlist modal in the meantime rather than a fake "coming soon"
+  // toast. Replaces the old showUpgradeModal feature-list dialog (whose own
+  // internal "Upgrade to Pro" button had the exact same problem) — one
+  // consistent upgrade path instead of two.
+  const [showWaitlist, setShowWaitlist] = useState(false);
 
   // Placed before the loading/onboarding early returns below (hooks can't
   // follow a conditional return), keyed off `publisher` directly rather
@@ -181,7 +181,7 @@ export default function DashboardPage() {
         </div>
         {limitReached ? (
           <button
-            onClick={() => setShowUpgradeModal(true)}
+            onClick={() => setShowWaitlist(true)}
             className="px-5 py-2.5 rounded-md bg-warning/10 text-warning border border-warning/40 font-medium hover:bg-warning/20 transition-colors shrink-0"
           >
             Upgrade to create more
@@ -277,7 +277,7 @@ export default function DashboardPage() {
             </p>
             <p className="text-sm text-[#94A3B8] mb-5">You&apos;ve used all 3 free slots.</p>
             <button
-              onClick={() => setShowUpgradeModal(true)}
+              onClick={() => setShowWaitlist(true)}
               className="px-4 py-2 rounded-md border border-warning/40 text-warning text-sm hover:bg-warning/10 transition-colors"
             >
               Learn about Pro →
@@ -302,47 +302,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {showUpgradeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-sm rounded-xl border border-[#1E2D45] bg-[#0F1520] p-6">
-            <h3 className="font-heading text-lg font-semibold mb-2 text-[#F1F5F9]">
-              You&apos;ve reached the free limit
-            </h3>
-            <p className="text-sm text-[#94A3B8] mb-4">
-              Free tier includes 3 published quizzes. Upgrade to Pro for:
-            </p>
-            <ul className="text-sm text-[#F1F5F9] space-y-1.5 mb-6">
-              <li>✓ Unlimited quizzes</li>
-              <li>✓ Full analytics history</li>
-              <li>✓ Remove QuizOps branding</li>
-              <li>✓ iFrame embed support</li>
-            </ul>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowUpgradeModal(false)}
-                className="flex-1 px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setShowUpgradeModal(false);
-                  showProComingSoonToast();
-                }}
-                className="flex-1 px-4 py-2 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
-              >
-                Upgrade to Pro →
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {toast && (
-        <div className="fixed bottom-6 right-6 bg-[#0F1520] border border-[#1E2D45] px-4 py-2.5 rounded-md shadow-lg text-sm text-[#F1F5F9]">
-          {toast}
-        </div>
-      )}
+      <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </div>
   );
 }
