@@ -23,7 +23,7 @@ export default function Footer() {
             Pricing
           </a>
           <a
-            href="https://stats.uptimerobot.com/ri4adm0vP1"
+            href="https://status.autoshiftops.com"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:underline inline-flex items-center gap-1"

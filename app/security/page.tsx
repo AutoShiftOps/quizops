@@ -151,7 +151,7 @@ export default function SecurityPage() {
               <span style={{ color: '#22C55E' }}>●</span> All systems operational
             </p>
             <a
-              href="https://stats.uptimerobot.com/ri4adm0vP1"
+              href="https://status.autoshiftops.com"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline text-sm"
