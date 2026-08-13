@@ -131,6 +131,12 @@ export default function PublisherQuizCard({
         >
           ✎ Edit
         </Link>
+        <Link
+          href={`/dashboard/quiz/${quiz.id}/analytics`}
+          className="px-3 py-1.5 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors"
+        >
+          📊 Analytics
+        </Link>
         {!isDraft && (
           <button
             onClick={handleShare}
