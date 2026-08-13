@@ -76,6 +76,15 @@ function performanceColor(rate: number): string {
   return '#EF4444';
 }
 
+// Specific guidance for a <50%-correct question, instead of a generic
+// "needs attention" label — the lower the rate, the more likely the article
+// itself (not just the quiz) needs work.
+function attentionMessage(correctRate: number): string {
+  if (correctRate === 0) return 'No one answered this correctly — consider rewriting this section';
+  if (correctRate < 25) return 'Most readers missed this — this concept may need clearer explanation';
+  return 'Less than half answered correctly — consider adding more detail';
+}
+
 export default function QuizAnalyticsPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const quizId = params.id;
@@ -259,6 +268,41 @@ export default function QuizAnalyticsPage({ params }: { params: { id: string } }
           </div>
         ) : (
           <div className="space-y-3">
+            {(() => {
+              const needsAttentionCount = questionPerformance.filter((q) => q.needsAttention).length;
+              if (needsAttentionCount === 0) {
+                return (
+                  <div
+                    className="rounded-lg py-3 px-4 text-sm"
+                    style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', color: '#22C55E' }}
+                  >
+                    ✓ Great comprehension — readers understood all questions well
+                  </div>
+                );
+              }
+              if (needsAttentionCount <= 3) {
+                const qWord = needsAttentionCount === 1 ? 'question' : 'questions';
+                const needWord = needsAttentionCount === 1 ? 'needs' : 'need';
+                return (
+                  <div
+                    className="rounded-lg py-3 px-4 text-sm"
+                    style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B' }}
+                  >
+                    ⚠ {needsAttentionCount} {qWord} {needWord} attention — readers struggled with these concepts. Consider
+                    revising those sections in your article.
+                  </div>
+                );
+              }
+              return (
+                <div
+                  className="rounded-lg py-3 px-4 text-sm"
+                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}
+                >
+                  ✗ {needsAttentionCount} questions need attention — readers found this quiz difficult. Your article may
+                  need significant revision or the questions may be too advanced.
+                </div>
+              );
+            })()}
             {questionPerformance.map((q) => {
               const color = q.correctRate === null ? '#475569' : performanceColor(q.correctRate);
               const truncated = q.text.length > 60 ? `${q.text.slice(0, 60)}…` : q.text;
@@ -294,14 +338,26 @@ export default function QuizAnalyticsPage({ params }: { params: { id: string } }
                       {q.correctRate === null ? '—' : `${q.correctRate}%`}
                     </span>
                   </div>
-                  {q.needsAttention && (
-                    <p
-                      className="text-xs mt-2"
-                      style={{ color: '#F59E0B' }}
-                      title="Less than half your readers answered this correctly — consider rewriting this section of your article"
-                    >
-                      ⚠ Needs attention
-                    </p>
+                  {q.needsAttention && q.correctRate !== null && (
+                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                      <span className="text-xs" style={{ color: '#F59E0B' }}>
+                        ⚠ {attentionMessage(q.correctRate)}
+                      </span>
+                      {quiz.source_url && (
+                        <>
+                          <span className="text-xs" style={{ color: '#475569' }}>·</span>
+                          <a
+                            href={quiz.source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: '#3E7BFA', fontSize: 12 }}
+                          >
+                            Open article →
+                          </a>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               );
@@ -390,6 +446,89 @@ export default function QuizAnalyticsPage({ params }: { params: { id: string } }
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* WHAT TO DO NEXT */}
+      <div className="mb-10">
+        {analytics.passRate >= 70 && analytics.total > 0 ? (
+          <div
+            className="rounded-xl p-5"
+            style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)' }}
+          >
+            <h3 className="text-sm font-semibold mb-1" style={{ color: '#22C55E' }}>
+              ✓ Your readers are getting it
+            </h3>
+            <p className="text-sm text-[#94A3B8] mb-4">
+              Pass rate is strong. Share this quiz more widely to validate further.
+            </p>
+            <button
+              onClick={copyLink}
+              disabled={!quizUrl}
+              className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm disabled:opacity-50"
+            >
+              {copiedLink ? 'Copied!' : 'Copy quiz link'}
+            </button>
+          </div>
+        ) : analytics.passRate >= 40 && analytics.total > 0 ? (
+          <div
+            className="rounded-xl p-5"
+            style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}
+          >
+            <h3 className="text-sm font-semibold mb-1" style={{ color: '#F59E0B' }}>
+              Your readers are partially getting it
+            </h3>
+            <p className="text-sm text-[#94A3B8] mb-4">
+              Focus on the questions marked &quot;Needs attention&quot; and revise those sections in your article.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {quiz.source_url && (
+                <a
+                  href={quiz.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm"
+                >
+                  Open article →
+                </a>
+              )}
+              <button
+                onClick={copyLink}
+                disabled={!quizUrl}
+                className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm disabled:opacity-50"
+              >
+                {copiedLink ? 'Copied!' : 'Copy quiz link'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="rounded-xl p-5"
+            style={{ background: 'rgba(62,123,250,0.06)', border: '1px solid rgba(62,123,250,0.15)' }}
+          >
+            <h3 className="text-sm font-semibold mb-1" style={{ color: '#3E7BFA' }}>
+              Get your first readers
+            </h3>
+            <p className="text-sm text-[#94A3B8] mb-4">
+              Share your quiz link at the end of your article to start collecting comprehension data.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={copyLink}
+                disabled={!quizUrl}
+                className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm disabled:opacity-50"
+              >
+                {copiedLink ? 'Copied!' : 'Copy quiz link'}
+              </button>
+              <button
+                onClick={copyEmbed}
+                disabled={!quizUrl}
+                className="px-4 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-sm disabled:opacity-50"
+              >
+                {copiedEmbed ? 'Copied!' : 'Copy embed code'}
+              </button>
+            </div>
           </div>
         )}
       </div>
