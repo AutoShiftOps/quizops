@@ -288,8 +288,8 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
 
       {quiz.status === 'draft' && belowMinimum && (
         <div className="mb-6 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-          Add at least 3 questions to publish. Each question needs 4 options and one correct
-          answer marked.
+          Add at least 3 questions to publish. Each question needs options (4 for
+          multiple-choice, 2 for True/False) and one correct answer marked.
         </div>
       )}
 

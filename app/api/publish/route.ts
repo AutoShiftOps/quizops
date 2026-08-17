@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
         error: 'invalid_questions',
         message:
           status === 'draft'
-            ? 'Add at least 1 question with 4 options, a correct answer, and an explanation.'
-            : 'Every question needs 4 options, a correct answer, and an explanation — check for any blank fields.',
+            ? 'Add at least 1 question with options, a correct answer, and an explanation.'
+            : 'Every question needs options (4 for multiple-choice, 2 for True/False), a correct answer, and an explanation — check for any blank fields.',
       },
       { status: 400 }
     );

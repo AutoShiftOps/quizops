@@ -10,14 +10,18 @@ export function validateQuestions(questions: unknown, minCount = 3): questions i
   return questions.every((q) => {
     if (!q || typeof q !== 'object') return false;
     const question = q as Record<string, unknown>;
+    // True/false questions carry only 2 options ("True"/"False") — MCQ
+    // questions still require the full 4.
+    const isTrueFalse = question.type === 'true_false';
+    const minOptions = isTrueFalse ? 2 : 4;
     return (
       typeof question.text === 'string' &&
       question.text.trim().length > 0 &&
       Array.isArray(question.options) &&
-      question.options.length === 4 &&
+      question.options.length >= minOptions &&
       typeof question.answer === 'number' &&
       question.answer >= 0 &&
-      question.answer <= 3 &&
+      question.answer < question.options.length &&
       typeof question.explanation === 'string' &&
       question.explanation.trim().length > 0
     );

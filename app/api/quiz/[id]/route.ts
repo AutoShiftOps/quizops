@@ -111,7 +111,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       {
         error: 'invalid_questions',
         message:
-          'Every question needs 4 options, a correct answer, and an explanation — check for any blank fields.',
+          'Every question needs options (4 for multiple-choice, 2 for True/False), a correct answer, and an explanation — check for any blank fields.',
       },
       { status: 400 }
     );
