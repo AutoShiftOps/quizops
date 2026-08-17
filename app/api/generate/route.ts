@@ -8,6 +8,24 @@ const MAX_WORDS = 6000;
 const FREE_TIER_HOURLY_LIMIT = 5;
 const HOUR_MS = 60 * 60 * 1000;
 
+// Domains known to serve video/audio/social feeds instead of extractable
+// article text — checked before ever fetching or spending an OpenAI
+// moderation call, so the user gets an immediate, honest error instead of
+// a slow fetch that would fail (or "succeed" against a near-empty page).
+const UNSUPPORTED_DOMAINS = [
+  'youtube.com',
+  'youtu.be',
+  'spotify.com',
+  'twitter.com',
+  'x.com',
+  'instagram.com',
+  'tiktok.com',
+  'facebook.com',
+  'linkedin.com',
+  'netflix.com',
+  'twitch.tv',
+];
+
 // Best-effort in-memory rate limit. Resets on cold start / across serverless
 // instances — acceptable for an MVP; a persistent store (Redis, etc.) would
 // be needed for a real guarantee.
@@ -256,7 +274,6 @@ export async function POST(req: NextRequest) {
   let extractedTitle: string | null = null;
 
   if (url) {
-    // Layer 1 — domain intent check, before ever fetching the URL.
     let domain = url;
     try {
       domain = new URL(url).hostname;
@@ -264,6 +281,23 @@ export async function POST(req: NextRequest) {
       // Malformed URL — let the fetch below produce the normal fetch_failed
       // error rather than a moderation-shaped one.
     }
+
+    // Layer 0 — known-unsupported domains, checked before the (async, paid)
+    // moderation call below. No point spending an OpenAI request on a URL
+    // we already know can't be extracted as text.
+    const normalizedDomain = domain.replace(/^www\./, '');
+    if (UNSUPPORTED_DOMAINS.some((d) => normalizedDomain.includes(d))) {
+      return NextResponse.json(
+        {
+          error: 'unsupported_url',
+          message: 'This URL type is not supported.',
+          reason: `${normalizedDomain} content cannot be extracted as text. QuizOps works with text-based articles and blog posts. Try pasting the article text directly instead.`,
+        },
+        { status: 422 }
+      );
+    }
+
+    // Layer 1 — domain intent check, before ever fetching the URL.
     const domainCheck = await checkDomainAllowed(openai, domain);
     if (!domainCheck.ok) {
       return NextResponse.json(

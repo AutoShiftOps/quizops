@@ -18,7 +18,7 @@ const STREAM_LINE_INTERVAL_MS = 1200;
 const STREAM_RESTART_PAUSE_MS = 2000;
 const STREAM_WINDOW_SIZE = 3;
 
-const PLATFORM_PILLS = ['Medium', 'dev.to', 'Substack', 'Hashnode', 'Your blog', 'Any URL'];
+const PLATFORM_PILLS = ['Medium', 'dev.to', 'Substack', 'Hashnode', 'Your blog URL'];
 
 const INSIGHT_ROWS = [
   { label: 'Q1: What is CI?', pct: 92 },
@@ -186,6 +186,10 @@ export default function BentoGrid() {
                 </span>
               ))}
             </div>
+            <p style={{ fontSize: 11, color: '#475569', marginTop: 8, textAlign: 'center' }}>
+              Works best with text-based articles. YouTube, paywalled, and login-required pages
+              are not supported.
+            </p>
           </div>
 
           {/* Card D — Reader insight, col-span 2 */}
