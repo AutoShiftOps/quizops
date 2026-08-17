@@ -6,6 +6,7 @@ export type Question = {
   answer: number; // 0-based index
   explanation: string;
   tags?: string[]; // optional topic tags
+  type?: 'mcq' | 'true_false'; // defaults to 'mcq' when absent
 };
 
 export type QuizBank = {

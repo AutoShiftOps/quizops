@@ -13,6 +13,8 @@ import WaitlistModal from '@/components/WaitlistModal';
 
 type Step = 'select' | 'input' | 'generating' | 'review' | 'published';
 type Mode = 'ai' | 'manual';
+type Difficulty = 'easy' | 'mixed' | 'hard';
+type QuestionType = 'mcq' | 'mixed';
 
 function blankQuestion(n: number): Question {
   return {
@@ -47,6 +49,8 @@ export default function NewQuizPage() {
   const [showPasteArea, setShowPasteArea] = useState(false);
   const [pastedText, setPastedText] = useState('');
   const [questionCount, setQuestionCount] = useState(10);
+  const [difficulty, setDifficulty] = useState<Difficulty>('mixed');
+  const [questionType, setQuestionType] = useState<QuestionType>('mcq');
   const [inputError, setInputError] = useState<string | null>(null);
 
   // Generating step (AI path only)
@@ -123,6 +127,8 @@ export default function NewQuizPage() {
     setShowPasteArea(false);
     setPastedText('');
     setQuestionCount(10);
+    setDifficulty('mixed');
+    setQuestionType('mcq');
     setInputError(null);
     setQuestions([]);
     resetMetadata();
@@ -155,7 +161,7 @@ export default function NewQuizPage() {
       response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...headers },
-        body: JSON.stringify({ ...payload, questionCount }),
+        body: JSON.stringify({ ...payload, questionCount, difficulty, questionType }),
         signal: controller.signal,
       });
     } catch (err) {
@@ -457,6 +463,11 @@ export default function NewQuizPage() {
   }
 
   if (step === 'generating') {
+    // 'True/False mix' always asks the API for 7 MCQ + 3 true/false (10
+    // total), regardless of the questionCount button selected — the
+    // progress counter here needs to reflect what's actually being
+    // generated, not the (ignored, in that mode) selector value.
+    const targetCount = questionType === 'mixed' ? 10 : questionCount;
     return (
       <div className="mt-8 max-w-xl mx-auto">
         <h1 className="font-heading text-xl font-semibold mb-6 text-center text-[#F1F5F9]">
@@ -469,14 +480,14 @@ export default function NewQuizPage() {
               {q.text?.length > 60 ? '…' : ''}
             </p>
           ))}
-          {questions.length < questionCount && (
+          {questions.length < targetCount && (
             <p className="text-sm text-[#94A3B8] animate-pulse">
               ⟳ Generating Q{questions.length + 1}...
             </p>
           )}
         </div>
         <p className="text-sm text-[#94A3B8] text-center mb-6">
-          Generated {questions.length} of {questionCount} questions
+          Generated {questions.length} of {targetCount} questions
         </p>
         <div className="text-center">
           <button
@@ -678,8 +689,9 @@ export default function NewQuizPage() {
             <button
               key={count}
               type="button"
+              disabled={questionType === 'mixed'}
               onClick={() => setQuestionCount(count)}
-              className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
+              className={`px-4 py-1.5 rounded-md border text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                 questionCount === count
                   ? 'border-accent bg-accent/10 text-accent'
                   : 'border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447]'
@@ -688,6 +700,59 @@ export default function NewQuizPage() {
               {count}
             </button>
           ))}
+        </div>
+        {questionType === 'mixed' && (
+          <p className="text-xs text-[#94A3B8] mt-1.5">
+            Fixed at 10 questions (7 MCQ + 3 True/False) for this mode.
+          </p>
+        )}
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-sm font-medium mb-1.5 text-[#F1F5F9]">Difficulty</label>
+        <div className="flex gap-2">
+          {(['easy', 'mixed', 'hard'] as Difficulty[]).map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDifficulty(d)}
+              className={`px-4 py-1.5 rounded-md border text-sm capitalize transition-colors ${
+                difficulty === d
+                  ? 'border-accent bg-accent/10 text-accent'
+                  : 'border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447]'
+              }`}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-sm font-medium mb-1.5 text-[#F1F5F9]">Question type</label>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setQuestionType('mcq')}
+            className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
+              questionType === 'mcq'
+                ? 'border-accent bg-accent/10 text-accent'
+                : 'border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447]'
+            }`}
+          >
+            MCQ only{questionType === 'mcq' ? ' ✓' : ''}
+          </button>
+          <button
+            type="button"
+            onClick={() => setQuestionType('mixed')}
+            className={`px-4 py-1.5 rounded-md border text-sm transition-colors ${
+              questionType === 'mixed'
+                ? 'border-accent bg-accent/10 text-accent'
+                : 'border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447]'
+            }`}
+          >
+            True/False mix{questionType === 'mixed' ? ' ✓' : ''}
+          </button>
         </div>
       </div>
 

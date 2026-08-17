@@ -228,7 +228,7 @@ export default function QuizEngine({ bank, questions }: Props) {
           </pre>
         )}
 
-        <div className="space-y-3">
+        <div className={currentQuestion.type === 'true_false' ? 'grid grid-cols-2 gap-3' : 'space-y-3'}>
           {currentQuestion.options.map((option, i) => {
             const isSelected = answers[currentQuestion.id] === i;
             const isCorrect = i === currentQuestion.answer;

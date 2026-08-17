@@ -157,20 +157,58 @@ async function checkContentAppropriate(openai: OpenAI, articleText: string): Pro
   }
 }
 
-function buildSystemPrompt(questionCount: number): string {
-  return `You are a technical quiz generator. Generate exactly ${questionCount} multiple-choice questions that test a reader's understanding of the article provided.
+type Difficulty = 'easy' | 'mixed' | 'hard';
+type QuestionType = 'mcq' | 'mixed';
+
+const DIFFICULTY_LINES: Record<Difficulty, string> = {
+  easy: 'Generate beginner-friendly questions. Test recall of facts directly stated in the article. Wrong options should be clearly incorrect to an attentive reader.',
+  // No override — this is the original prompt's difficulty line, unchanged.
+  mixed: 'Difficulty: 30% easy, 50% medium, 20% hard',
+  hard: 'Generate challenging questions that require deep understanding. Test application and inference, not just recall. Wrong options should be plausible to someone who skimmed the article.',
+};
+
+function buildSystemPrompt(
+  questionCount: number,
+  difficulty: Difficulty,
+  questionType: QuestionType
+): string {
+  const intro =
+    questionType === 'mixed'
+      ? `Generate 7 multiple-choice questions and 3 true/false questions that test a reader's understanding of the article provided.`
+      : `Generate exactly ${questionCount} multiple-choice questions that test a reader's understanding of the article provided.`;
+
+  const trueFalseSchema =
+    questionType === 'mixed'
+      ? `
+
+For true/false questions output:
+{"id":"q8","type":"true_false","text":"Kubernetes Operators require a controller manager — True or False?","options":["True","False"],"answer":0,"explanation":"..."}`
+      : '';
+
+  return `You are a technical quiz generator. ${intro}
 
 Rules:
 - Questions must be answerable from the article only
-- 4 options per question, exactly one correct
+- 4 options per question, exactly one correct${questionType === 'mixed' ? ' (true/false questions use exactly 2 options: ["True","False"])' : ''}
 - Wrong options must be plausible, not obviously wrong
 - Explanations must reference the article content
-- Difficulty: 30% easy, 50% medium, 20% hard
+- ${DIFFICULTY_LINES[difficulty]}
 - Output ONLY newline-delimited JSON (NDJSON)
 - One complete JSON object per line, no markdown, no preamble, no trailing text
 
 Each line must match this exact schema:
-{"id":"q1","text":"...","code":null,"options":["A","B","C","D"],"answer":0,"explanation":"...","tags":["tag"]}`;
+{"id":"q1","text":"...","code":null,"options":["A","B","C","D"],"answer":0,"explanation":"...","tags":["tag"]}${trueFalseSchema}`;
+}
+
+// Body values come straight from the client with an `as` cast, not runtime
+// validation — narrow to a known value here so an unexpected string can't
+// silently degrade the prompt (e.g. DIFFICULTY_LINES[garbage] -> undefined).
+function parseDifficulty(raw: unknown): Difficulty {
+  return raw === 'easy' || raw === 'hard' ? raw : 'mixed';
+}
+
+function parseQuestionType(raw: unknown): QuestionType {
+  return raw === 'mixed' ? 'mixed' : 'mcq';
 }
 
 export async function POST(req: NextRequest) {
@@ -209,6 +247,8 @@ export async function POST(req: NextRequest) {
     text?: string;
     questionCount?: number;
   };
+  const difficulty = parseDifficulty((body as { difficulty?: unknown }).difficulty);
+  const questionType = parseQuestionType((body as { questionType?: unknown }).questionType);
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -282,7 +322,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const systemPrompt = buildSystemPrompt(questionCount);
+  const systemPrompt = buildSystemPrompt(questionCount, difficulty, questionType);
 
   const stream = await openai.chat.completions.create({
     model: process.env.AI_MODEL || 'gpt-4o-mini',
