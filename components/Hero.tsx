@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import Link from 'next/link';
 
 // Full-dark homepage hero (M2-03 redesign). Guest and signed-in visitors
@@ -12,6 +13,15 @@ const TRUST_ITEMS = [
   'No code needed',
   'Free to start',
   '60 seconds setup',
+];
+
+// Answers the 3 questions dev.to readers said the hero didn't: whose
+// article (yours), what the reader gets (a quiz), what signal comes back
+// (a comprehension report).
+const FLOW_STEPS = [
+  { icon: '📝', label: 'Your article URL' },
+  { icon: '✨', label: 'AI generates quiz' },
+  { icon: '📊', label: 'Comprehension report' },
 ];
 
 // Hardcoded per spec — these will grow, and can be wired to real Supabase
@@ -87,9 +97,42 @@ export default function Hero({ isSignedIn = false }: { isSignedIn?: boolean }) {
           margin: '16px auto 32px',
         }}
       >
-        Paste your article URL. AI generates 10 questions in 60 seconds. See exactly how many
-        readers understood what you wrote.
+        Paste your article URL. AI builds a quiz in 60 seconds. Share it with your readers. Get
+        back question-level data showing exactly what they understood — and what they missed.
       </p>
+
+      {/* Flow line — stacks vertically below 640px (Tailwind's `sm`), the
+          connecting arrow rotates to point down to match. */}
+      <div
+        className="relative z-10 flex flex-col sm:flex-row items-center justify-center"
+        style={{ gap: 8, margin: '20px auto', maxWidth: 560, flexWrap: 'wrap' }}
+      >
+        {FLOW_STEPS.map((step, i) => (
+          <Fragment key={step.label}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                background: '#0F1520',
+                border: '1px solid #1E2D45',
+                borderRadius: 8,
+                fontSize: 13,
+                color: '#94A3B8',
+              }}
+            >
+              <span style={{ fontSize: 16 }}>{step.icon}</span>
+              {step.label}
+            </div>
+            {i < FLOW_STEPS.length - 1 && (
+              <span className="rotate-90 sm:rotate-0" style={{ color: '#253447', fontSize: 18 }}>
+                →
+              </span>
+            )}
+          </Fragment>
+        ))}
+      </div>
 
       <div
         className="relative z-10 flex flex-wrap justify-center"
