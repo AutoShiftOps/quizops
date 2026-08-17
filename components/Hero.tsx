@@ -17,12 +17,9 @@ const TRUST_ITEMS = [
 
 // Answers the 3 questions dev.to readers said the hero didn't: whose
 // article (yours), what the reader gets (a quiz), what signal comes back
-// (a comprehension report).
-const FLOW_STEPS = [
-  { icon: '📝', label: 'Your article URL' },
-  { icon: '✨', label: 'AI generates quiz' },
-  { icon: '📊', label: 'Comprehension report' },
-];
+// (a comprehension report). Text-only — a prior icon version had
+// inconsistent emoji rendering across platforms/browsers.
+const FLOW_STEPS = ['Your article', 'AI quiz', 'Comprehension data'];
 
 // Hardcoded per spec — these will grow, and can be wired to real Supabase
 // counts later.
@@ -101,34 +98,30 @@ export default function Hero({ isSignedIn = false }: { isSignedIn?: boolean }) {
         back question-level data showing exactly what they understood — and what they missed.
       </p>
 
-      {/* Flow line — stacks vertically below 640px (Tailwind's `sm`), the
-          connecting arrow rotates to point down to match. */}
+      {/* Flow line — one line on desktop (nowrap), wraps freely on mobile
+          (< 640px, Tailwind's `sm`) since forcing nowrap there would
+          overflow the viewport. */}
       <div
-        className="relative z-10 flex flex-col sm:flex-row items-center justify-center"
-        style={{ gap: 8, margin: '20px auto', maxWidth: 560, flexWrap: 'wrap' }}
+        className="relative z-10 flex flex-wrap sm:flex-nowrap items-center justify-center"
+        style={{ gap: 6, margin: '20px auto', maxWidth: 600 }}
       >
         {FLOW_STEPS.map((step, i) => (
-          <Fragment key={step.label}>
-            <div
+          <Fragment key={step}>
+            <span
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '6px 14px',
+                padding: '6px 16px',
                 background: '#0F1520',
                 border: '1px solid #1E2D45',
-                borderRadius: 8,
+                borderRadius: 20,
                 fontSize: 13,
                 color: '#94A3B8',
+                whiteSpace: 'nowrap',
               }}
             >
-              <span style={{ fontSize: 16 }}>{step.icon}</span>
-              {step.label}
-            </div>
+              {step}
+            </span>
             {i < FLOW_STEPS.length - 1 && (
-              <span className="rotate-90 sm:rotate-0" style={{ color: '#253447', fontSize: 18 }}>
-                →
-              </span>
+              <span style={{ color: '#3E7BFA', fontSize: 16 }}>→</span>
             )}
           </Fragment>
         ))}
