@@ -25,7 +25,12 @@ function getFirstName(user: User): string {
   const fullName = typeof meta.full_name === 'string' ? meta.full_name.trim() : '';
   // Some OAuth providers populate `name` instead of `full_name`.
   const name = typeof meta.name === 'string' ? meta.name.trim() : '';
-  const source = fullName || name || user.email?.split('@')[0] || 'there';
+  const preferredUsername =
+    typeof meta.preferred_username === 'string' ? meta.preferred_username.trim() : '';
+  // Email prefix is a last resort only — it's what produced the original
+  // bug ("Sudhakarrao" from "sudhakarrao@...") whenever the fields above
+  // were empty.
+  const source = fullName || name || preferredUsername || user.email?.split('@')[0] || 'there';
 
   const firstName = source.split(' ')[0];
   return firstName.charAt(0).toUpperCase() + firstName.slice(1);
