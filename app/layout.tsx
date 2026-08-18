@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
-import NavBar from '@/components/NavBar';
-import Footer from '@/components/Footer';
+import SiteChrome from '@/components/SiteChrome';
 import '@/styles/globals.css';
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -58,9 +57,10 @@ export const metadata: Metadata = {
 };
 
 // Single root layout for the whole site (M2-03 full-dark redesign) — the
-// (light) and (dark) route groups are gone now that there's only one theme,
-// so NavBar renders here directly instead of via two separate group
-// layouts.
+// (light) and (dark) route groups are gone now that there's only one theme.
+// NavBar/Footer render via SiteChrome (M3-05) rather than directly here, so
+// /embed/* pages can render chrome-free without needing a second root
+// layout (Next.js only allows that via an app-wide route-group split).
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -81,9 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Script>
           </>
         )}
-        <NavBar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

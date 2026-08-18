@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
-import { PublishedQuiz, Question } from '@/lib/types';
+import { getPublisher } from '@/lib/publisher';
+import { Publisher, PublishedQuiz, Question } from '@/lib/types';
 import QuestionEditor from '@/components/QuestionEditor';
 import QuizMetadataForm from '@/components/QuizMetadataForm';
+import WaitlistModal from '@/components/WaitlistModal';
 
 function relativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -32,6 +34,9 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
 
   const [loading, setLoading] = useState(true);
   const [quiz, setQuiz] = useState<PublishedQuiz | null>(null);
+  const [publisher, setPublisher] = useState<Publisher | null>(null);
+  const [showWaitlist, setShowWaitlist] = useState(false);
+  const [copiedEmbed, setCopiedEmbed] = useState(false);
 
   const [title, setTitle] = useState('');
   const [titleTouched, setTitleTouched] = useState(false);
@@ -73,6 +78,11 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
         router.replace('/dashboard');
         return;
       }
+
+      // Needed for the embed-code section's URL (username) and Pro-tier
+      // gating — this page didn't fetch the publisher at all before M3-05.
+      const pub = await getPublisher(supabase, session.user.id);
+      setPublisher(pub);
 
       setQuiz(found);
       setTitle(found.title);
@@ -317,6 +327,58 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
         + Add question
       </button>
 
+      {quiz.status === 'published' && publisher && (
+        <div className="mb-8 rounded-lg border border-border bg-surface p-5">
+          <p className="text-sm font-medium mb-2">Embed in your article (Pro)</p>
+          {publisher.tier === 'pro' || publisher.tier === 'team' ? (
+            (() => {
+              const origin = typeof window !== 'undefined' ? window.location.origin : '';
+              const iframeEmbed = `<iframe src="${origin}/embed/${publisher.username}/${quiz.slug}" width="100%" height="500" frameborder="0"></iframe>`;
+              async function copyEmbed() {
+                await navigator.clipboard.writeText(iframeEmbed);
+                setCopiedEmbed(true);
+                setTimeout(() => setCopiedEmbed(false), 2000);
+              }
+              return (
+                <>
+                  <div className="flex items-stretch gap-2 mb-2">
+                    <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-background border border-border text-xs text-gray-400 overflow-x-auto whitespace-nowrap">
+                      {iframeEmbed}
+                    </code>
+                    <button
+                      onClick={copyEmbed}
+                      className="px-4 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm shrink-0"
+                    >
+                      {copiedEmbed ? 'Copied!' : 'Copy embed code'}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Readers take the quiz without leaving your article
+                  </p>
+                </>
+              );
+            })()
+          ) : (
+            <>
+              <div style={{ opacity: 0.5 }} className="mb-2">
+                <code className="block px-3 py-2 rounded-md bg-background border border-border text-xs text-gray-400 overflow-x-auto whitespace-nowrap">
+                  {`<iframe src="${typeof window !== 'undefined' ? window.location.origin : ''}/embed/${publisher.username}/${quiz.slug}" width="100%" height="500" frameborder="0"></iframe>`}
+                </code>
+              </div>
+              <p className="text-sm text-gray-400 mb-2">
+                Upgrade to Pro to embed quizzes directly in your articles
+              </p>
+              <button
+                onClick={() => setShowWaitlist(true)}
+                className="px-4 py-2 rounded-md border border-amber-500/40 text-amber-400 text-sm hover:bg-amber-500/10 transition-colors"
+              >
+                Upgrade to Pro →
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       {saveError && <p className="text-sm text-red-400 mb-4">{saveError}</p>}
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
@@ -385,6 +447,8 @@ export default function EditQuizPage({ params }: { params: { id: string } }) {
           </div>
         </div>
       )}
+
+      <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </div>
   );
 }

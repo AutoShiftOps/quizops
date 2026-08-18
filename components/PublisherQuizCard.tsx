@@ -3,15 +3,54 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
-import { PublishedQuiz } from '@/lib/types';
+import { PublishedQuiz, Publisher } from '@/lib/types';
+import WaitlistModal from './WaitlistModal';
 
 type Props = {
   quiz: PublishedQuiz;
   username: string;
+  tier: Publisher['tier'];
   passRate: number | null;
   onDeleted: (quizId: string) => void;
   onPublished: (quizId: string) => void;
 };
+
+function ShareRow({
+  label,
+  value,
+  locked,
+}: {
+  label?: string;
+  value: string;
+  locked?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="mb-4">
+      {label && <p className="text-xs font-medium mb-1.5 text-[#94A3B8]">{label}</p>}
+      <div className="flex items-stretch gap-2" style={locked ? { opacity: 0.5 } : undefined}>
+        <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-[#161D2E] border border-[#1E2D45] text-xs text-[#94A3B8] overflow-x-auto whitespace-nowrap">
+          {value}
+        </code>
+        {!locked && (
+          <button
+            onClick={handleCopy}
+            className="px-3 py-2 rounded-md border border-[#1E2D45] text-[#F1F5F9] hover:border-[#253447] transition-colors text-xs shrink-0"
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 async function authHeader(): Promise<Record<string, string>> {
   const supabase = await getSupabaseClient();
@@ -39,28 +78,25 @@ const ICON = 'text-xs leading-none';
 export default function PublisherQuizCard({
   quiz,
   username,
+  tier,
   passRate,
   onDeleted,
   onPublished,
 }: Props) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
 
   const isDraft = quiz.status === 'draft';
+  const isPro = tier === 'pro' || tier === 'team';
 
-  const quizUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/q/${username}/${quiz.slug}`
-      : `/q/${username}/${quiz.slug}`;
-
-  async function handleShare() {
-    await navigator.clipboard.writeText(quizUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const quizUrl = origin ? `${origin}/q/${username}/${quiz.slug}` : `/q/${username}/${quiz.slug}`;
+  const iframeEmbed = `<iframe src="${origin}/embed/${username}/${quiz.slug}" width="100%" height="500" frameborder="0"></iframe>`;
+  const badgeMarkdown = `[![Quiz](${origin}/api/badge/${username}/${quiz.slug})](${quizUrl})`;
 
   async function handlePublish() {
     setPublishing(true);
@@ -150,9 +186,9 @@ export default function PublisherQuizCard({
           Analytics
         </Link>
         {!isDraft && (
-          <button onClick={handleShare} className={BTN}>
+          <button onClick={() => setShowShareModal(true)} className={BTN}>
             <span className={ICON}>🔗</span>
-            {copied ? 'Copied!' : 'Share'}
+            Share
           </button>
         )}
         <button
@@ -191,6 +227,56 @@ export default function PublisherQuizCard({
           </div>
         </div>
       )}
+
+      {showShareModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          onClick={() => setShowShareModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-xl border border-[#1E2D45] bg-[#0F1520] p-6"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="font-heading text-lg font-semibold text-[#F1F5F9]">Share quiz</h3>
+              <button
+                onClick={() => setShowShareModal(false)}
+                aria-label="Close"
+                className="text-[#94A3B8] hover:text-[#F1F5F9] transition-colors text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <ShareRow label="Share link" value={quizUrl} />
+
+            <div className="mb-4">
+              <p className="text-xs font-medium mb-1.5 text-[#94A3B8]">Embed code (Pro)</p>
+              {isPro ? (
+                <ShareRow label="" value={iframeEmbed} />
+              ) : (
+                <>
+                  <div style={{ opacity: 0.5 }} className="mb-2">
+                    <code className="block px-3 py-2 rounded-md bg-[#161D2E] border border-[#1E2D45] text-xs text-[#94A3B8] overflow-x-auto whitespace-nowrap">
+                      {iframeEmbed}
+                    </code>
+                  </div>
+                  <button
+                    onClick={() => setShowWaitlist(true)}
+                    className="text-xs px-3 py-1.5 rounded-md border border-warning/40 text-warning hover:bg-warning/10 transition-colors"
+                  >
+                    Upgrade to Pro →
+                  </button>
+                </>
+              )}
+            </div>
+
+            <ShareRow label="Badge (for READMEs)" value={badgeMarkdown} />
+          </div>
+        </div>
+      )}
+
+      <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </div>
   );
 }

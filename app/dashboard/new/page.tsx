@@ -81,6 +81,7 @@ export default function NewQuizPage() {
     url: string;
     embedHtml: string;
     badgeMarkdown: string;
+    iframeEmbed: string;
   } | null>(null);
 
   useEffect(() => {
@@ -380,6 +381,8 @@ export default function NewQuizPage() {
         url={shareData.url}
         embedHtml={shareData.embedHtml}
         badgeMarkdown={shareData.badgeMarkdown}
+        iframeEmbed={shareData.iframeEmbed}
+        tier={publisher.tier}
         onCreateAnother={resetToSelect}
       />
     );

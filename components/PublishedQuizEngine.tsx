@@ -4,13 +4,19 @@ import { useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { savePublishedAttempt, incrementAttemptCount } from '@/lib/publishedQuiz';
-import { PublishedQuiz } from '@/lib/types';
+import { Publisher, PublishedQuiz } from '@/lib/types';
 
 type Props = {
   quiz: PublishedQuiz;
+  // M3-05 iFrame embed (/embed/[username]/[slug]) — standalone mode: no
+  // "back to article" / "more quizzes" links (nothing outside the iframe
+  // should navigate the embedder's page), a compact title-only header
+  // instead of the normal page chrome, and a tier-gated watermark.
+  embedMode?: boolean;
+  publisherTier?: Publisher['tier'];
 };
 
-export default function PublishedQuizEngine({ quiz }: Props) {
+export default function PublishedQuizEngine({ quiz, embedMode = false, publisherTier }: Props) {
   const questions = quiz.questions;
   const [user, setUser] = useState<User | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -66,6 +72,9 @@ export default function PublishedQuizEngine({ quiz }: Props) {
   const percentage = Math.round((score / questions.length) * 100);
   const passed = percentage >= quiz.pass_mark;
   const wrongAnswers = questions.filter((q) => answers[q.id] !== q.answer);
+  // Free tier (or unknown — fail toward showing it rather than silently
+  // losing attribution) gets the watermark; Pro/Team don't.
+  const showWatermark = embedMode && publisherTier !== 'pro' && publisherTier !== 'team';
 
   useEffect(() => {
     if (!finished || saved) return;
@@ -101,7 +110,15 @@ export default function PublishedQuizEngine({ quiz }: Props) {
 
   if (finished) {
     return (
-      <div className="mt-8">
+      <div className={embedMode ? '' : 'mt-8'}>
+        {embedMode && (
+          <h1
+            className="font-heading text-base font-semibold mb-4 text-center"
+            style={{ color: '#F1F5F9' }}
+          >
+            {quiz.title}
+          </h1>
+        )}
         <div className="flex flex-col items-center text-center mb-8">
           <div
             className={`w-32 h-32 rounded-full flex items-center justify-center border-4 mb-4 ${
@@ -156,24 +173,40 @@ export default function PublishedQuizEngine({ quiz }: Props) {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-3 justify-center mb-10">
-          {quiz.source_url && (
+        {!embedMode && (
+          <div className="flex flex-wrap gap-3 justify-center mb-10">
+            {quiz.source_url && (
+              <a
+                href={quiz.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
+              >
+                Read the original article →
+              </a>
+            )}
             <a
-              href={quiz.source_url}
+              href="/"
+              className="px-5 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
+            >
+              More quizzes on QuizOps
+            </a>
+          </div>
+        )}
+
+        {showWatermark && (
+          <p className="text-center text-xs pb-2" style={{ color: '#475569' }}>
+            Powered by{' '}
+            <a
+              href="https://quiz.autoshiftops.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
+              style={{ color: '#3E7BFA' }}
             >
-              Read the original article →
+              QuizOps
             </a>
-          )}
-          <a
-            href="/"
-            className="px-5 py-2 rounded-md border border-border hover:border-accent transition-colors text-sm"
-          >
-            More quizzes on QuizOps
-          </a>
-        </div>
+          </p>
+        )}
       </div>
     );
   }
@@ -184,7 +217,15 @@ export default function PublishedQuizEngine({ quiz }: Props) {
   const progressPct = (answeredCount / questions.length) * 100;
 
   return (
-    <div className="mt-8">
+    <div className={embedMode ? '' : 'mt-8'}>
+      {embedMode && (
+        <h1
+          className="font-heading text-base font-semibold mb-4 text-center"
+          style={{ color: '#F1F5F9' }}
+        >
+          {quiz.title}
+        </h1>
+      )}
       <div className="flex items-center justify-between mb-2 text-sm text-gray-400">
         <span>
           Question {currentIndex + 1} of {questions.length}
@@ -270,6 +311,20 @@ export default function PublishedQuizEngine({ quiz }: Props) {
           )}
         </div>
       </div>
+
+      {showWatermark && (
+        <p className="text-center text-xs pt-4" style={{ color: '#475569' }}>
+          Powered by{' '}
+          <a
+            href="https://quiz.autoshiftops.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#3E7BFA' }}
+          >
+            QuizOps
+          </a>
+        </p>
+      )}
     </div>
   );
 }

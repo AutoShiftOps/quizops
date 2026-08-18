@@ -261,6 +261,7 @@ export default function DashboardPage() {
             key={quiz.id}
             quiz={quiz}
             username={publisher.username}
+            tier={publisher.tier}
             passRate={passRates[quiz.id] ?? null}
             onDeleted={handleQuizDeleted}
             onPublished={handleQuizPublished}

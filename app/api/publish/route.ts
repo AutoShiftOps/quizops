@@ -130,6 +130,12 @@ export async function POST(req: NextRequest) {
   const url = `${appUrl}/q/${publisher.username}/${slug}`;
   const embedHtml = `<a href="${url}" target="_blank">Test your understanding of this article →</a>`;
   const badgeMarkdown = `[![Quiz](${appUrl}/api/badge/${publisher.username}/${slug})](${url})`;
+  // M3-05 — the actual iFrame embed snippet (distinct from `embedHtml`
+  // above, which is a plain link, not an iframe). Gated to Pro tier in the
+  // UI (SharePanel); the /embed route itself isn't tier-restricted server
+  // side since anyone with the URL could still load it directly — the
+  // restriction is "we don't hand you the snippet," not "the route 403s."
+  const iframeEmbed = `<iframe src="${appUrl}/embed/${publisher.username}/${slug}" width="100%" height="500" frameborder="0"></iframe>`;
 
-  return NextResponse.json({ url, embedHtml, badgeMarkdown });
+  return NextResponse.json({ url, embedHtml, badgeMarkdown, iframeEmbed });
 }
