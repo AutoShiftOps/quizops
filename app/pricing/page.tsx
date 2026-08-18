@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
-import WaitlistModal from '@/components/WaitlistModal';
+import { startProCheckout } from '@/lib/stripeCheckout';
 
 type Billing = 'monthly' | 'annual';
 
 const FAQS = [
   {
     q: 'Can I try before paying?',
-    a: 'Yes — the Free tier is permanent and requires no credit card. Pro waitlist is open for early access.',
+    a: 'Yes — the Free tier is permanent and requires no credit card. Upgrade to Pro anytime, cancel anytime.',
   },
   {
     q: 'What AI model generates the questions?',
@@ -70,8 +70,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function PricingPage() {
   const [billing, setBilling] = useState<Billing>('monthly');
   const isAnnual = billing === 'annual';
-  const [showWaitlist, setShowWaitlist] = useState(false);
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     track('pricing_page_viewed');
@@ -83,6 +84,18 @@ export default function PricingPage() {
       .then((data) => setWaitlistCount(typeof data.count === 'number' ? data.count : null))
       .catch(() => setWaitlistCount(null));
   }, []);
+
+  async function handleUpgrade() {
+    setCheckingOut(true);
+    setCheckoutError(null);
+    const { url, error } = await startProCheckout();
+    if (url) {
+      window.location.href = url;
+      return;
+    }
+    setCheckoutError(error || 'Something went wrong');
+    setCheckingOut(false);
+  }
 
   return (
     <div style={{ background: '#080C14' }}>
@@ -235,15 +248,22 @@ export default function PricingPage() {
             <Feature>All Free features</Feature>
           </ul>
           <button
-            onClick={() => setShowWaitlist(true)}
-            className="btn-glow w-full text-center font-semibold hover:opacity-90 transition-opacity"
+            onClick={handleUpgrade}
+            disabled={checkingOut}
+            className="btn-glow w-full text-center font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
             style={{ borderRadius: 8, padding: 12, background: '#3E7BFA', color: '#fff' }}
           >
-            Join Pro waitlist →
+            {checkingOut ? 'Redirecting…' : 'Upgrade to Pro →'}
           </button>
+          {checkoutError && (
+            <p className="text-center mt-2" style={{ color: '#EF4444', fontSize: 12 }}>
+              {checkoutError}
+            </p>
+          )}
           {waitlistCount !== null && waitlistCount > 0 && (
             <p className="text-center mt-2" style={{ color: '#475569', fontSize: 12 }}>
-              {waitlistCount} {waitlistCount === 1 ? 'publisher' : 'publishers'} on the waitlist
+              {waitlistCount} {waitlistCount === 1 ? 'publisher' : 'publishers'} joined via the
+              waitlist
             </p>
           )}
         </div>
@@ -334,8 +354,6 @@ export default function PricingPage() {
           </a>
         </div>
       </div>
-
-      <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </div>
   );
 }

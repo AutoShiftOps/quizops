@@ -6,12 +6,21 @@ import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/supabase';
 import { getPublisher, checkTierLimit } from '@/lib/publisher';
+import { startProCheckout } from '@/lib/stripeCheckout';
 import { Publisher, PublishedQuiz } from '@/lib/types';
 import { track } from '@/lib/analytics';
 import PublisherOnboarding from '@/components/PublisherOnboarding';
 import TierBadge from '@/components/TierBadge';
 import PublisherQuizCard from '@/components/PublisherQuizCard';
 import WaitlistModal from '@/components/WaitlistModal';
+
+async function authHeader(): Promise<Record<string, string>> {
+  const supabase = await getSupabaseClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return { Authorization: `Bearer ${session?.access_token ?? ''}` };
+}
 
 type Stats = {
   totalAttempts: number;
@@ -32,12 +41,56 @@ export default function DashboardPage() {
   });
   const [passRates, setPassRates] = useState<Record<string, number | null>>({});
   const [origin, setOrigin] = useState('');
-  // Stripe isn't built yet (M2-01) — every "Upgrade" CTA on this page opens
-  // the waitlist modal in the meantime rather than a fake "coming soon"
-  // toast. Replaces the old showUpgradeModal feature-list dialog (whose own
-  // internal "Upgrade to Pro" button had the exact same problem) — one
-  // consistent upgrade path instead of two.
+  // Still used as a fallback in a couple of spots (WaitlistModal itself now
+  // leads with a real "Upgrade to Pro" checkout button — see lib/stripeCheckout.ts).
   const [showWaitlist, setShowWaitlist] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [showUpgradedBanner, setShowUpgradedBanner] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  async function handleUpgrade() {
+    setCheckingOut(true);
+    setCheckoutError(null);
+    const { url, error } = await startProCheckout();
+    if (url) {
+      window.location.href = url;
+      return;
+    }
+    setCheckoutError(error || 'Something went wrong');
+    setCheckingOut(false);
+  }
+
+  async function handleManageSubscription() {
+    setPortalLoading(true);
+    const headers = await authHeader();
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST', headers });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+    } catch (err) {
+      console.error('[dashboard] manage subscription failed:', err);
+    }
+    setPortalLoading(false);
+  }
+
+  // M2-01 Step 8 — ?upgraded=true lands here right after a successful Stripe
+  // Checkout redirect. Shown once, then stripped from the URL so a refresh
+  // (or sharing the link) doesn't replay the banner. Read directly from
+  // window.location rather than useSearchParams() — that hook forces this
+  // page out of static rendering unless wrapped in its own <Suspense>
+  // boundary, and this page is already fully client-driven (see the
+  // window.location.origin read a few lines below) so a plain browser API
+  // read is the lower-risk, more-consistent option here.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('upgraded') === 'true') {
+      setShowUpgradedBanner(true);
+      router.replace('/dashboard');
+    }
+  }, [router]);
 
   // Placed before the loading/onboarding early returns below (hooks can't
   // follow a conditional return), keyed off `publisher` directly rather
@@ -178,14 +231,28 @@ export default function DashboardPage() {
             {publisher.username}
           </Link>
           <TierBadge publisher={publisher} />
+          {(publisher.tier === 'pro' || publisher.tier === 'team') &&
+            publisher.stripe_customer_id && (
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="block text-xs text-[#94A3B8] hover:text-[#F1F5F9] hover:underline transition-colors mt-1 disabled:opacity-50"
+              >
+                {portalLoading ? 'Opening…' : 'Manage subscription →'}
+              </button>
+            )}
         </div>
         {limitReached ? (
-          <button
-            onClick={() => setShowWaitlist(true)}
-            className="px-5 py-2.5 rounded-md bg-warning/10 text-warning border border-warning/40 font-medium hover:bg-warning/20 transition-colors shrink-0"
-          >
-            Upgrade to create more
-          </button>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <button
+              onClick={handleUpgrade}
+              disabled={checkingOut}
+              className="px-5 py-2.5 rounded-md bg-warning/10 text-warning border border-warning/40 font-medium hover:bg-warning/20 transition-colors disabled:opacity-50"
+            >
+              {checkingOut ? 'Redirecting…' : 'Upgrade to create more'}
+            </button>
+            {checkoutError && <p className="text-xs text-danger">{checkoutError}</p>}
+          </div>
         ) : (
           <Link
             href="/dashboard/new"
@@ -195,6 +262,21 @@ export default function DashboardPage() {
           </Link>
         )}
       </div>
+
+      {showUpgradedBanner && (
+        <div className="flex items-center justify-between gap-3 rounded-lg py-3 px-4 mb-6 bg-success/10 border border-success/40">
+          <p className="text-sm text-success">
+            🎉 Welcome to Pro! Your account has been upgraded. Enjoy unlimited quizzes.
+          </p>
+          <button
+            onClick={() => setShowUpgradedBanner(false)}
+            className="text-success hover:opacity-70 transition-opacity shrink-0"
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div

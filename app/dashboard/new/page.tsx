@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import { getPublisher, checkTierLimit } from '@/lib/publisher';
+import { startProCheckout } from '@/lib/stripeCheckout';
 import { Publisher, Question } from '@/lib/types';
 import { track } from '@/lib/analytics';
 import QuestionEditor from '@/components/QuestionEditor';
 import QuizMetadataForm from '@/components/QuizMetadataForm';
 import SharePanel from '@/components/SharePanel';
-import WaitlistModal from '@/components/WaitlistModal';
 
 type Step = 'select' | 'input' | 'generating' | 'review' | 'published';
 type Mode = 'ai' | 'manual';
@@ -71,10 +71,23 @@ export default function NewQuizPage() {
   const [publishError, setPublishError] = useState<string | null>(null);
   // Stripe isn't built yet (M2-01) — every "Upgrade to Pro" CTA opens the
   // waitlist modal in the meantime rather than a fake "coming soon" toast.
-  const [showWaitlist, setShowWaitlist] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [moderationError, setModerationError] = useState<{ message: string; reason?: string } | null>(
     null
   );
+
+  async function handleUpgrade() {
+    setCheckingOut(true);
+    setCheckoutError(null);
+    const { url, error } = await startProCheckout();
+    if (url) {
+      window.location.href = url;
+      return;
+    }
+    setCheckoutError(error || 'Something went wrong');
+    setCheckingOut(false);
+  }
 
   // Published step
   const [shareData, setShareData] = useState<{
@@ -407,16 +420,17 @@ export default function NewQuizPage() {
             You&apos;ve published 3 of 3 free quizzes. Upgrade to Pro for unlimited
             quizzes, advanced analytics, and more.
           </p>
-          <div className="flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
             <button
-              onClick={() => setShowWaitlist(true)}
-              className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm"
+              onClick={handleUpgrade}
+              disabled={checkingOut}
+              className="px-5 py-2.5 rounded-md bg-accent text-white font-medium hover:opacity-90 transition-opacity text-sm disabled:opacity-50"
             >
-              Upgrade to Pro →
+              {checkingOut ? 'Redirecting…' : 'Upgrade to Pro →'}
             </button>
+            {checkoutError && <p className="text-xs text-danger">{checkoutError}</p>}
           </div>
         </div>
-        <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
       </>
     );
   }

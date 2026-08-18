@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { startProCheckout } from '@/lib/stripeCheckout';
 
 type Props = {
   isOpen: boolean;
@@ -49,6 +50,27 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
 
   const [count, setCount] = useState<number | null>(null);
   const [countLoading, setCountLoading] = useState(true);
+
+  // M2-01 — real billing now exists, so every "Upgrade to Pro" trigger
+  // site-wide that still opens this modal (dashboard upsells, share/embed
+  // locks, analytics free-tier notice) gets a real checkout path here
+  // rather than needing to be individually rewired to /api/stripe/checkout.
+  // The waitlist form below stays as a fallback for visitors who aren't
+  // ready to pay yet.
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  async function handleUpgrade() {
+    setCheckingOut(true);
+    setCheckoutError(null);
+    const { url, error } = await startProCheckout();
+    if (url) {
+      window.location.href = url;
+      return;
+    }
+    setCheckoutError(error || 'Something went wrong');
+    setCheckingOut(false);
+  }
 
   useEffect(() => {
     if (!isOpen) return;
@@ -186,10 +208,40 @@ export default function WaitlistModal({ isOpen, onClose }: Props) {
               className="font-heading font-bold mt-2 mb-2"
               style={{ fontSize: 22, fontWeight: 700, color: '#F1F5F9' }}
             >
-              Join the Pro waitlist
+              Upgrade to Pro
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: 14 }} className="mb-4">
+              $9/month. Unlimited quizzes, full analytics history, iFrame embed, no QuizOps
+              branding.
+            </p>
+            <button
+              onClick={handleUpgrade}
+              disabled={checkingOut}
+              className="btn-glow w-full bg-brand-blue text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+              style={{ padding: 12, borderRadius: 8, fontSize: 15, fontWeight: 600, marginBottom: 8 }}
+            >
+              {checkingOut ? 'Redirecting to checkout…' : 'Upgrade to Pro →'}
+            </button>
+            {checkoutError && (
+              <p style={{ color: '#EF4444', fontSize: 13 }} className="mb-2 text-center">
+                {checkoutError}
+              </p>
+            )}
+
+            <div className="flex items-center gap-3 my-5">
+              <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #1E2D45' }} />
+              <span style={{ color: '#475569', fontSize: 12 }}>or</span>
+              <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #1E2D45' }} />
+            </div>
+
+            <h2
+              className="font-heading font-bold mb-2"
+              style={{ fontSize: 18, fontWeight: 700, color: '#F1F5F9' }}
+            >
+              Not ready yet? Join the waitlist
             </h2>
             <p style={{ color: '#94A3B8', fontSize: 14 }} className="mb-3">
-              Be first to know when Pro launches. Early access pricing for waitlist members.
+              Get notified about new features and early access pricing.
             </p>
 
             {!countLoading && count !== null && count > 0 && (

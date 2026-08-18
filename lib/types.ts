@@ -58,6 +58,8 @@ export type Publisher = {
   tier: 'free' | 'pro' | 'team';
   quiz_count: number;
   created_at: string;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
 };
 
 export type PublishedQuiz = {
