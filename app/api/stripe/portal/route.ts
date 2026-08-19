@@ -12,34 +12,12 @@ export async function POST(req: NextRequest) {
 
   const publisher = await getPublisher(authed.supabase, authed.user.id);
   if (!publisher?.stripe_customer_id) {
-    console.error(
-      '[stripe/portal] no_stripe_customer — auth.uid():',
-      authed.user.id,
-      'publisher found:',
-      Boolean(publisher),
-      'publisher.id:',
-      publisher?.id,
-      'tier:',
-      publisher?.tier
-    );
-    // Temporary diagnostic fields (auth.uid()/publisher lookup result, not
-    // secrets — safe to return to the authenticated user themselves) while
-    // tracking down why this fires for an account confirmed to have
-    // stripe_customer_id set in the DB. Remove once root cause is found.
-    return NextResponse.json(
-      {
-        error: 'no_stripe_customer',
-        debug: {
-          auth_uid: authed.user.id,
-          publisher_found: Boolean(publisher),
-          publisher_id: publisher?.id ?? null,
-          tier: publisher?.tier ?? null,
-        },
-      },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'no_stripe_customer' }, { status: 400 });
   }
 
+  // Explicit return_url — deliberately not relying solely on the Stripe
+  // Dashboard's portal-level default redirect, since that can be changed
+  // independently of this code and isn't visible in version control.
   const appUrl = process.env.APP_URL || 'http://localhost:3000';
 
   try {
