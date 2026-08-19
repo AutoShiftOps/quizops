@@ -61,7 +61,15 @@ export default function PublisherOnboarding({ userId }: { userId: string }) {
     try {
       const supabase = await getSupabaseClient();
       await createPublisher(supabase, userId, username, displayName.trim(), bio.trim());
-      window.location.reload();
+      // This is the one reliable "brand-new account" signal — the very
+      // first publishers row for this auth_uid (PublisherOnboarding only
+      // ever renders when dashboard/page.tsx found none). Send them
+      // straight into quiz creation instead of reloading into an empty
+      // dashboard shell — regardless of which button (Sign in / Start for
+      // free) got them here. Returning users never hit this component at
+      // all (they already have a publishers row), so /dashboard stays
+      // their normal, un-redirected landing spot.
+      window.location.href = '/dashboard/new';
     } catch {
       setError('Could not create your profile. Please try again.');
       setSubmitting(false);
