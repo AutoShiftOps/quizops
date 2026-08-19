@@ -2,10 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getSupabaseClient } from '@/lib/supabase';
+import { getPublisher } from '@/lib/publisher';
+import { Publisher } from '@/lib/types';
 import { track } from '@/lib/analytics';
 import { startProCheckout } from '@/lib/stripeCheckout';
 
 type Billing = 'monthly' | 'annual';
+
+async function authHeader(): Promise<Record<string, string>> {
+  const supabase = await getSupabaseClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return { Authorization: `Bearer ${session?.access_token ?? ''}` };
+}
 
 const FAQS = [
   {
@@ -73,6 +84,13 @@ export default function PricingPage() {
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  // Bug fix — null while unknown/signed-out, so the default "Upgrade to
+  // Pro" CTA renders until we know otherwise; a signed-in Pro/Team
+  // publisher gets "Manage subscription" instead, so clicking "Upgrade"
+  // while already Pro (which produced the raw "already_pro" string) is no
+  // longer reachable in the first place.
+  const [publisherTier, setPublisherTier] = useState<Publisher['tier'] | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     track('pricing_page_viewed');
@@ -85,6 +103,20 @@ export default function PricingPage() {
       .catch(() => setWaitlistCount(null));
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const supabase = await getSupabaseClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const publisher = await getPublisher(supabase, session.user.id);
+      setPublisherTier(publisher?.tier ?? null);
+    })().catch(() => {});
+  }, []);
+
+  const isPro = publisherTier === 'pro' || publisherTier === 'team';
+
   async function handleUpgrade() {
     setCheckingOut(true);
     setCheckoutError(null);
@@ -95,6 +127,22 @@ export default function PricingPage() {
     }
     setCheckoutError(error || 'Something went wrong');
     setCheckingOut(false);
+  }
+
+  async function handleManageSubscription() {
+    setPortalLoading(true);
+    const headers = await authHeader();
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST', headers });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+    } catch (err) {
+      console.error('[pricing] manage subscription failed:', err);
+    }
+    setPortalLoading(false);
   }
 
   return (
@@ -247,18 +295,45 @@ export default function PricingPage() {
             <Feature>Community quiz banks</Feature>
             <Feature>All Free features</Feature>
           </ul>
-          <button
-            onClick={handleUpgrade}
-            disabled={checkingOut}
-            className="btn-glow w-full text-center font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
-            style={{ borderRadius: 8, padding: 12, background: '#3E7BFA', color: '#fff' }}
-          >
-            {checkingOut ? 'Redirecting…' : 'Upgrade to Pro →'}
-          </button>
-          {checkoutError && (
-            <p className="text-center mt-2" style={{ color: '#EF4444', fontSize: 12 }}>
-              {checkoutError}
-            </p>
+          {isPro ? (
+            <>
+              <div
+                className="w-full text-center font-semibold"
+                style={{
+                  borderRadius: 8,
+                  padding: 12,
+                  background: 'rgba(34,197,94,0.1)',
+                  border: '1px solid rgba(34,197,94,0.3)',
+                  color: '#22C55E',
+                }}
+              >
+                You&apos;re on Pro ✓
+              </div>
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="text-center mt-2 hover:underline transition-colors disabled:opacity-60"
+                style={{ color: '#94A3B8', fontSize: 13, width: '100%' }}
+              >
+                {portalLoading ? 'Opening…' : 'Manage subscription →'}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={handleUpgrade}
+                disabled={checkingOut}
+                className="btn-glow w-full text-center font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+                style={{ borderRadius: 8, padding: 12, background: '#3E7BFA', color: '#fff' }}
+              >
+                {checkingOut ? 'Redirecting…' : 'Upgrade to Pro →'}
+              </button>
+              {checkoutError && (
+                <p className="text-center mt-2" style={{ color: '#EF4444', fontSize: 12 }}>
+                  {checkoutError}
+                </p>
+              )}
+            </>
           )}
           {waitlistCount !== null && waitlistCount > 0 && (
             <p className="text-center mt-2" style={{ color: '#475569', fontSize: 12 }}>

@@ -320,13 +320,30 @@ export default function DashboardPage() {
       </div>
 
       {!hasAnyAttempts && (
-        <div className="bg-accent/5 border border-accent/20 rounded-xl p-5 mb-8">
-          <p className="text-sm text-[#F1F5F9]">
-            💡 <span className="font-semibold text-accent">Get your first reader:</span>{' '}
-            Copy your quiz link and add &quot;Test your understanding →&quot; at the end
-            of your article. That one CTA typically drives 8–12% click-through from
-            engaged readers.
-          </p>
+        <div
+          className="flex items-start gap-3 rounded-xl p-4 mb-8"
+          style={{
+            background: 'rgba(30,41,59,0.5)',
+            borderTop: '1px solid #1E2D45',
+            borderRight: '1px solid #1E2D45',
+            borderBottom: '1px solid #1E2D45',
+            borderLeft: '3px solid #3E7BFA',
+          }}
+        >
+          <span
+            className="shrink-0 flex items-center justify-center rounded-lg"
+            style={{ width: 32, height: 32, background: 'rgba(62,123,250,0.15)', fontSize: 16 }}
+          >
+            💡
+          </span>
+          <div>
+            <p className="text-sm font-semibold mb-1 text-[#F1F5F9]">Get your first reader</p>
+            <p className="text-sm text-[#94A3B8]">
+              Copy your quiz link and add &quot;Test your understanding →&quot; at the end of
+              your article. That one CTA typically drives 8–12% click-through from engaged
+              readers.
+            </p>
+          </div>
         </div>
       )}
 

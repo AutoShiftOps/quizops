@@ -17,7 +17,13 @@ export async function POST(req: NextRequest) {
   }
 
   if (publisher.tier !== 'free') {
-    return NextResponse.json({ error: 'already_pro' }, { status: 400 });
+    // `message` (not just `error`) so callers that surface this directly to
+    // the user (see lib/stripeCheckout.ts) don't print the raw error code —
+    // that was bug 1: pricing page showed the literal string "already_pro".
+    return NextResponse.json(
+      { error: 'already_pro', message: "You're already on Pro." },
+      { status: 400 }
+    );
   }
 
   // Create or retrieve the Stripe customer. supabaseAdmin (not the
