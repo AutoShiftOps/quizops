@@ -65,6 +65,10 @@ export default function NavBar() {
       provider: 'google',
       options: {
         redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+        // Without this, Google silently reuses the last session with no
+        // chooser — a user with multiple Google accounts has no way to
+        // switch short of Incognito.
+        queryParams: { prompt: 'select_account' },
       },
     });
   }

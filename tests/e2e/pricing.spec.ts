@@ -34,15 +34,16 @@ test.describe('Pricing page', () => {
     ).toBeVisible();
   });
 
-  test('waitlist modal opens on Pro CTA',
+  test('signed-out Pro CTA reads "Upgrade to Pro" (waitlist replaced by real Stripe checkout, M2-01)',
   async ({ page }) => {
     await page.goto('/pricing');
-    await page.getByRole('button', {
-      name: /join pro waitlist/i
-    }).click();
     await expect(
-      page.getByText('Join the Pro waitlist')
+      page.getByRole('button', { name: /upgrade to pro/i })
     ).toBeVisible();
+    // The old "Join Pro waitlist" CTA/modal-open flow this test used to
+    // cover no longer exists on this page — see tests/e2e/stripe.spec.ts
+    // for the tier-aware CTA and checkout-redirect coverage that replaced
+    // it (LT-35 in LIVE_TEST_PLAN.md is stale for the same reason).
   });
 
   test('enterprise CTA has mailto link',

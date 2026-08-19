@@ -438,12 +438,23 @@ Expected: Profile page loads (NOT 404),
 published quizzes listed with cards,
 Take quiz links work.
 
-### LT-35 — Waitlist modal
+### LT-35 — Waitlist modal ← STALE (M2-01)
 Open /pricing → click "Join Pro waitlist"
 Expected: Modal opens, form submits,
 Supabase waitlist table has row,
 admin email received at admin@autoshiftops.com,
 auto-reply received at submitted email.
+
+As of M2-01 (Stripe integration), /pricing's Pro CTA is real Stripe
+Checkout, not a waitlist button — "Join Pro waitlist" no longer exists
+on that page. Verified 2026-08-19: the underlying /api/waitlist
+mechanism this test protected still works (POST returns 200, row
+inserted, count increments) — it's now reached only via the secondary
+"Not ready yet? Join the waitlist" section inside WaitlistModal, itself
+only reachable from a few remaining dashboard-side upgrade CTAs (locked
+embed-code sections, tier-limit-reached card). This test needs a
+rewrite against one of those entry points, or retirement if the
+waitlist path is going away entirely.
 
 ### LT-36 — Content moderation
 In dashboard/new, enter an adult content URL
@@ -520,11 +531,11 @@ to external publishers.**
 | LT-09 | — | |
 | LT-10 | — | |
 | LT-11 | — | |
-| LT-12 | — | |
+| LT-12 | PASS (2026-08-19) | Blocked-domain URL → "Could not fetch article", paste fallback appeared, no crash |
 | LT-13 | — | |
 | LT-14 | — | |
 | LT-15 | — | |
-| LT-16 | — | |
+| LT-16 | PASS (2026-08-19) | Regenerate: confirm dialog fired, cleared + regenerated cleanly, question count intact, no state corruption |
 | LT-17 | — | |
 | LT-17b | — | |
 | LT-17c | — | |
@@ -545,8 +556,8 @@ to external publishers.**
 | LT-32 | — | |
 | LT-33 | — | |
 | LT-34 | — | |
-| LT-35 | — | |
-| LT-36 | — | |
+| LT-35 | STALE — needs rewrite | "Join Pro waitlist" CTA removed from /pricing in M2-01 (real Stripe checkout now); underlying /api/waitlist mechanism verified still working 2026-08-19 |
+| LT-36 | PASS (2026-08-19) | Domain-name-based adult-content URL → 422 "Content not allowed" with reason shown, no generation proceeded |
 | LT-37 | — | |
 | LT-38 | — | |
 | LT-39 | — | |
