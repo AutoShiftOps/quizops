@@ -438,23 +438,13 @@ Expected: Profile page loads (NOT 404),
 published quizzes listed with cards,
 Take quiz links work.
 
-### LT-35 — Waitlist modal ← STALE (M2-01)
-Open /pricing → click "Join Pro waitlist"
-Expected: Modal opens, form submits,
-Supabase waitlist table has row,
-admin email received at admin@autoshiftops.com,
-auto-reply received at submitted email.
-
-As of M2-01 (Stripe integration), /pricing's Pro CTA is real Stripe
-Checkout, not a waitlist button — "Join Pro waitlist" no longer exists
-on that page. Verified 2026-08-19: the underlying /api/waitlist
-mechanism this test protected still works (POST returns 200, row
-inserted, count increments) — it's now reached only via the secondary
-"Not ready yet? Join the waitlist" section inside WaitlistModal, itself
-only reachable from a few remaining dashboard-side upgrade CTAs (locked
-embed-code sections, tier-limit-reached card). This test needs a
-rewrite against one of those entry points, or retirement if the
-waitlist path is going away entirely.
+### LT-35 — RETIRED (2026-08-19)
+Was: open /pricing → click "Join Pro waitlist" → modal opens, form
+submits, waitlist row + emails. That CTA no longer exists — M2-01
+replaced it with real Stripe checkout, now covered by
+tests/e2e/stripe.spec.ts. The underlying /api/waitlist mechanism itself
+is untouched and still functional (verified directly), it just isn't
+reachable from /pricing anymore. No replacement test needed.
 
 ### LT-36 — Content moderation
 In dashboard/new, enter an adult content URL
@@ -556,7 +546,7 @@ to external publishers.**
 | LT-32 | — | |
 | LT-33 | — | |
 | LT-34 | — | |
-| LT-35 | STALE — needs rewrite | "Join Pro waitlist" CTA removed from /pricing in M2-01 (real Stripe checkout now); underlying /api/waitlist mechanism verified still working 2026-08-19 |
+| LT-35 | RETIRED | Superseded by Stripe checkout (M2-01), covered by tests/e2e/stripe.spec.ts; /api/waitlist mechanism itself still functional and untouched |
 | LT-36 | PASS (2026-08-19) | Domain-name-based adult-content URL → 422 "Content not allowed" with reason shown, no generation proceeded |
 | LT-37 | — | |
 | LT-38 | — | |
