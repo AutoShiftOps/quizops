@@ -376,6 +376,10 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
               // Plain <Link>s to ?page=N rather than client state — each
               // page is its own URL, so it's bookmarkable/shareable and the
               // server only ever sends that page's banks (see app/page.tsx).
+              // scroll={false} on both: Next.js's default scroll-to-top on
+              // navigation was yanking users back up past the hero/bento
+              // sections every time they paged through the quiz grid —
+              // this keeps the viewport anchored where they already were.
               <div className="flex items-center justify-center gap-4 mt-8">
                 {currentPage === 1 ? (
                   <span
@@ -387,6 +391,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
                 ) : (
                   <Link
                     href={currentPage - 1 === 1 ? '/' : `/?page=${currentPage - 1}`}
+                    scroll={false}
                     className="text-sm px-3 py-1.5 rounded-md border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
                   >
                     ← Previous
@@ -405,6 +410,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
                 ) : (
                   <Link
                     href={`/?page=${currentPage + 1}`}
+                    scroll={false}
                     className="text-sm px-3 py-1.5 rounded-md border border-dark-border text-content-secondary hover:border-dark-border2 hover:text-content-primary transition-colors"
                   >
                     Next →
