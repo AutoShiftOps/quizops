@@ -79,9 +79,9 @@ export default function Hero({ isSignedIn = false }: { isSignedIn?: boolean }) {
         className="relative z-10 font-heading font-extrabold mx-auto text-[40px] md:text-[64px]"
         style={{ letterSpacing: '-2.5px', lineHeight: 1.05, color: '#F1F5F9', maxWidth: 700 }}
       >
-        Turn articles into{' '}
+        Find out if readers{' '}
         <br className="hidden sm:block" />
-        <span className="gradient-text">knowledge tests.</span>
+        <span className="gradient-text">actually understood</span> what you wrote.
       </h1>
 
       <p
@@ -94,8 +94,9 @@ export default function Hero({ isSignedIn = false }: { isSignedIn?: boolean }) {
           margin: '16px auto 32px',
         }}
       >
-        Paste your article URL. AI builds a quiz in 60 seconds. Share it with your readers. Get
-        back question-level data showing exactly what they understood — and what they missed.
+        Not just clicks and read-time — real comprehension data. Paste your article, get a
+        10-question quiz in 60 seconds, see exactly which sections people got and which ones
+        they missed.
       </p>
 
       {/* Flow line — one line on desktop (nowrap), wraps freely on mobile

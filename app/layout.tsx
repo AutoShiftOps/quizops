@@ -29,17 +29,17 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'QuizOps — Test your technical knowledge',
+  title: 'QuizOps — Know if readers actually understood you',
   description:
-    'Open-source, content-agnostic quiz engine for technical certifications and content-linked knowledge checks.',
+    'Find out if your readers actually understood your article — not just whether they clicked. AI-generated comprehension quizzes for technical writers.',
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
   },
   openGraph: {
-    title: 'QuizOps — Test your technical knowledge',
+    title: 'QuizOps — Know if readers actually understood you',
     description:
-      'Open-source quiz engine for DevOps, Cloud, and engineering certifications.',
+      'Find out if your readers actually understood your article — not just whether they clicked. AI-generated comprehension quizzes for technical writers.',
     url: 'https://quiz.autoshiftops.com',
     siteName: 'QuizOps',
     images: [
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'QuizOps — Test your technical knowledge',
+        alt: 'QuizOps — Know if readers actually understood you',
       },
     ],
   },
