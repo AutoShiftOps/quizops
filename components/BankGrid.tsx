@@ -14,26 +14,20 @@ import PublisherCTA from './PublisherCTA';
 type Score = { percentage: number; passed: boolean };
 type ScoreMap = Record<string, { practice?: Score; exam?: Score }>;
 
-function getFirstName(user: User): string {
-  // Diagnostic — confirms in the browser console which fields Google's
-  // OAuth response actually populated, since full_name showing up empty
-  // (falling all the way through to the email-prefix fallback, e.g.
-  // "Sudhakarrao" from "sudhakarrao@...") was the reported bug.
-  console.log('user metadata:', user?.user_metadata);
-
-  const meta = user.user_metadata ?? {};
-  const fullName = typeof meta.full_name === 'string' ? meta.full_name.trim() : '';
-  // Some OAuth providers populate `name` instead of `full_name`.
-  const name = typeof meta.name === 'string' ? meta.name.trim() : '';
-  const preferredUsername =
-    typeof meta.preferred_username === 'string' ? meta.preferred_username.trim() : '';
-  // Email prefix is a last resort only — it's what produced the original
-  // bug ("Sudhakarrao" from "sudhakarrao@...") whenever the fields above
-  // were empty.
-  const source = fullName || name || preferredUsername || user.email?.split('@')[0] || 'there';
-
-  const firstName = source.split(' ')[0];
-  return firstName.charAt(0).toUpperCase() + firstName.slice(1);
+// Welcome-bar greeting name — reads publishers.display_name (real,
+// user-set at onboarding via PublisherOnboarding's "Display name" field),
+// not raw Google OAuth metadata. The earlier version read
+// user.user_metadata.full_name/name, which is the account's full legal
+// name as Google reports it (e.g. "Sudhakarrao Sajja") — correct data, but
+// the wrong field for a short greeting, and not something the user can
+// ever change from within this app. display_name is that settable field;
+// this just takes its first token for a shorter "Welcome back, X" instead
+// of showing it in full. Falls back to the email prefix only in the brief
+// window before the publisher row has loaded (or doesn't exist yet, e.g.
+// mid-onboarding) — never back to OAuth metadata.
+function greetingName(displayName: string | null, email: string | undefined): string {
+  const source = displayName?.trim() || email?.split('@')[0] || 'there';
+  return source.split(' ')[0];
 }
 
 type TopQuiz = { title: string; slug: string; readers: number; passRate: number };
@@ -54,6 +48,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
   const [user, setUser] = useState<User | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [hasPublisherProfile, setHasPublisherProfile] = useState(false);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [publishedCount, setPublishedCount] = useState(0);
   const [scoreMap, setScoreMap] = useState<ScoreMap>({});
@@ -118,6 +113,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
 
       const publisher = publisherResult.data;
       setHasPublisherProfile(publisher !== null);
+      setDisplayName(publisher?.display_name ?? null);
       setUsername(publisher?.username ?? null);
       setPublishedCount(publisher?.quiz_count ?? 0);
 
@@ -153,6 +149,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
       setScoreMap({});
       setTotalReaders(0);
       setHasPublisherProfile(false);
+      setDisplayName(null);
       setUsername(null);
       setPublishedCount(0);
       setTopQuizThisWeek(null);
@@ -215,7 +212,7 @@ export default function BankGrid({ banks, totalBankCount, currentPage, totalPage
             style={{ maxWidth: 1080 }}
           >
             <span>
-              👋 Welcome back, {getFirstName(user)}
+              👋 Welcome back, {greetingName(displayName, user.email)}
               {/* Publisher-first stats — a signed-in publisher cares about
                   their readers, not their own reader-side quiz scores.
                   Reader stats (quizzes taken, best score) belong on a "My
