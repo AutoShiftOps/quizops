@@ -64,7 +64,12 @@ export default function NavBar() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+        // /auth/callback (not a bare page) is what reliably consumes the
+        // #access_token=... hash Supabase's implicit flow returns and
+        // cleans it out of the URL before landing on /dashboard — see that
+        // route for why a bare landing page wasn't reliable here.
+        redirectTo:
+          typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
         // Without this, Google silently reuses the last session with no
         // chooser — a user with multiple Google accounts has no way to
         // switch short of Incognito.

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import { getPublisher } from '@/lib/publisher';
 import { Publisher } from '@/lib/types';
@@ -79,6 +80,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function PricingPage() {
+  const router = useRouter();
   const [billing, setBilling] = useState<Billing>('monthly');
   const isAnnual = billing === 'annual';
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
@@ -111,7 +113,17 @@ export default function PricingPage() {
       } = await supabase.auth.getSession();
       if (!session?.user) return;
       const publisher = await getPublisher(supabase, session.user.id);
-      setPublisherTier(publisher?.tier ?? null);
+      if (!publisher) {
+        // Signed in but no publishers row yet — mid-onboarding, or landed
+        // here before ever completing it. /dashboard is the onboarding
+        // gate (PublisherOnboarding renders there when this lookup comes
+        // back empty) — send them there instead of letting this page go on
+        // to show a "Could not find your publisher profile" error the
+        // moment they'd click Upgrade.
+        router.replace('/dashboard');
+        return;
+      }
+      setPublisherTier(publisher.tier);
     })().catch(() => {});
   }, []);
 

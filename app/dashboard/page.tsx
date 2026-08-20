@@ -122,8 +122,14 @@ export default function DashboardPage() {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
+            // /auth/callback (not a bare page) reliably consumes the
+            // #access_token=... hash and cleans it out of the URL before
+            // landing on /dashboard — see that route for why landing here
+            // directly wasn't reliable.
             redirectTo:
-              typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined,
+              typeof window !== 'undefined'
+                ? `${window.location.origin}/auth/callback`
+                : undefined,
             // Without this, Google silently reuses the last session with no
             // chooser — a user with multiple Google accounts has no way to
             // switch short of Incognito.
