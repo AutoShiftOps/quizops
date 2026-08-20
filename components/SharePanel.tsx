@@ -110,7 +110,7 @@ export default function SharePanel({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 justify-center mt-4">
+      <div className="flex flex-wrap gap-3 justify-center mt-4 mb-12">
         <a
           href={url}
           target="_blank"
