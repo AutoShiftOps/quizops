@@ -50,6 +50,11 @@ export async function POST(request: Request) {
             tier: 'pro',
             stripe_customer_id: session.customer as string,
             stripe_subscription_id: session.subscription as string,
+            // Reset in case this publisher previously canceled and is now
+            // re-subscribing — a stale cancel_at_period_end: true from a
+            // past subscription shouldn't carry over to the new one.
+            cancel_at_period_end: false,
+            period_end_date: null,
           })
           .eq('id', publisherId);
 
@@ -126,6 +131,33 @@ export async function POST(request: Request) {
       break;
     }
 
+    case 'customer.subscription.updated': {
+      // Fires when a cancellation is scheduled via the billing portal
+      // (cancel_at_period_end flips true, status stays 'active' until the
+      // period actually ends) and again if the user resumes before then
+      // (flips back false) — this is the only event that carries that
+      // transition; checkout.session.completed and .deleted don't cover it.
+      const subscription = event.data.object as Stripe.Subscription;
+      const publisherId = subscription.metadata?.publisher_id;
+
+      if (publisherId) {
+        // current_period_end lives on the subscription's line item, not
+        // the subscription object itself, in this API version (Stripe
+        // moved it there to support multi-item subscriptions). QuizOps
+        // subscriptions are always single-item (one Pro price), so the
+        // first item is the one that matters.
+        const periodEndUnix = subscription.items.data[0]?.current_period_end;
+        await supabaseAdmin
+          .from('publishers')
+          .update({
+            cancel_at_period_end: subscription.cancel_at_period_end,
+            period_end_date: periodEndUnix ? new Date(periodEndUnix * 1000).toISOString() : null,
+          })
+          .eq('id', publisherId);
+      }
+      break;
+    }
+
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
       const publisherId = subscription.metadata?.publisher_id;
@@ -136,6 +168,8 @@ export async function POST(request: Request) {
           .update({
             tier: 'free',
             stripe_subscription_id: null,
+            cancel_at_period_end: false,
+            period_end_date: null,
           })
           .eq('id', publisherId);
       }

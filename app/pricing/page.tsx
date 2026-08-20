@@ -92,6 +92,8 @@ export default function PricingPage() {
   // while already Pro (which produced the raw "already_pro" string) is no
   // longer reachable in the first place.
   const [publisherTier, setPublisherTier] = useState<Publisher['tier'] | null>(null);
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
+  const [periodEndDate, setPeriodEndDate] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
@@ -124,6 +126,8 @@ export default function PricingPage() {
         return;
       }
       setPublisherTier(publisher.tier);
+      setCancelAtPeriodEnd(Boolean(publisher.cancel_at_period_end));
+      setPeriodEndDate(publisher.period_end_date ?? null);
     })().catch(() => {});
   }, []);
 
@@ -202,6 +206,31 @@ export default function PricingPage() {
           </button>
         </div>
       </div>
+
+      {cancelAtPeriodEnd && periodEndDate && (
+        <div
+          className="flex flex-wrap items-center justify-center gap-3 rounded-lg py-3 px-4 mx-auto max-w-2xl"
+          style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.4)' }}
+        >
+          <p className="text-sm text-center" style={{ color: '#F59E0B' }}>
+            Your Pro subscription ends on{' '}
+            {new Date(periodEndDate).toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+            . Renew to keep unlimited quizzes and full analytics.
+          </p>
+          <button
+            onClick={handleManageSubscription}
+            disabled={portalLoading}
+            className="text-xs px-3 py-1.5 rounded-md border shrink-0 transition-colors disabled:opacity-50"
+            style={{ borderColor: 'rgba(245,158,11,0.4)', color: '#F59E0B' }}
+          >
+            {portalLoading ? 'Opening…' : 'Renew →'}
+          </button>
+        </div>
+      )}
 
       {/* Tier cards */}
       <div

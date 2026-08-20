@@ -288,6 +288,27 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {publisher.cancel_at_period_end && publisher.period_end_date && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg py-3 px-4 mb-6 bg-warning/10 border border-warning/40">
+          <p className="text-sm text-warning">
+            Your Pro subscription ends on{' '}
+            {new Date(publisher.period_end_date).toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+            . Renew to keep unlimited quizzes and full analytics.
+          </p>
+          <button
+            onClick={handleManageSubscription}
+            disabled={portalLoading}
+            className="text-xs px-3 py-1.5 rounded-md border border-warning/40 text-warning hover:bg-warning/20 transition-colors shrink-0 disabled:opacity-50"
+          >
+            {portalLoading ? 'Opening…' : 'Renew →'}
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div
           className="bg-[#0F1520] border border-[#1E2D45] rounded-xl p-5"
